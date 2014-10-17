@@ -235,7 +235,7 @@ jQuery(document).ready(function ($) {
 		n_k_,
 		teamsJson,
 		selectedTeamsJson;
-		
+		//localStorage.removeItem('selectedTeams');
 		if(localStorage['teams']){
 			teamsJson =  JSON.parse(localStorage.getItem('teams'));
 			fillTeamList(teamsJson);
@@ -329,14 +329,15 @@ jQuery(document).ready(function ($) {
 				$('<div class="alert alert-info fade in">').appendTo($('#res-col-1'));
 				tCont = "Билет №" + parseInt(i+1) + "</br>";
 				for(var j = 0; j < arr[i].length; j++){
-					if(!selectedTeamsJson.name[j])
-						selectedTeamsJson.name[j] = j+1;
-					tCont += (arr[i][j] == 1) ? (selectedTeamsJson.name[j] + "	+" + "</br>") : (selectedTeamsJson.name[j] + "	-" + "</br>");
+					//if(!selectedTeamsJson.name[j])
+					var prName = selectedTeamsJson.name[j] ? selectedTeamsJson.name[j] :  j+1;
+					//	selectedTeamsJson.name[j] = j+1;
+					tCont += (arr[i][j] == 1) ? (prName + "	+" + "</br>") : (prName + "	-" + "</br>");
 				}
 				newDiv.html(tCont);
 			}
 		}
-		
+		//RUN
 		$(document).on('click', "#run", function(){
 			if(sumOfMas(filter[0]) > k_)
 				filter[0] = filter[0].slice(0,-1);
