@@ -234,7 +234,9 @@ jQuery(document).ready(function ($) {
 		k_,
 		n_k_,
 		teamsJson,
-		selectedTeamsJson;
+		selectedTeamsJson,
+		csId,
+		ticketsJson = {"ticket":[]};
 		//localStorage.removeItem('selectedTeams');
 		if(localStorage['teams']){
 			teamsJson =  JSON.parse(localStorage.getItem('teams'));
@@ -250,6 +252,15 @@ jQuery(document).ready(function ($) {
 				$('#n').val(n_);
 		}else
 			selectedTeamsJson = {"name": []};
+			
+		chrome.runtime.onMessage.addListener(
+		 function(request, sender, sendResponse) {		
+			if (request.askFor == "tickets"){
+				csId = sender.tab.id;
+				//sendResponse(JSON.stringify({mtId: mtTabId}));
+				sendResponse({tickets: localStorage.getItem('tickets')});
+			}
+		});
 	$(".n-k-params").on('input', function(){ 		
 		$('.dynamic').remove();
 		$(this).each(function(){
@@ -328,14 +339,23 @@ jQuery(document).ready(function ($) {
 				$('<div class="alert alert-error fade in">').appendTo($('#res-col-1')) :
 				$('<div class="alert alert-info fade in">').appendTo($('#res-col-1'));
 				tCont = "Билет №" + parseInt(i+1) + "</br>";
+				ticketsJson.ticket[i] = [];
 				for(var j = 0; j < arr[i].length; j++){
 					//if(!selectedTeamsJson.name[j])
 					var prName = selectedTeamsJson.name[j] ? selectedTeamsJson.name[j] :  j+1;
 					//	selectedTeamsJson.name[j] = j+1;
 					tCont += (arr[i][j] == 1) ? (prName + "	+" + "</br>") : (prName + "	-" + "</br>");
+					var ob = {};
+					ob[prName] =  ["date"];					
+					ticketsJson.ticket[i][j] = ob;
+					ticketsJson.ticket[i][j][prName].push(arr[i][j]);
 				}
 				newDiv.html(tCont);
 			}
+			localStorage.removeItem('tickets');
+			localStorage.setItem('tickets', JSON.stringify(ticketsJson));
+			
+		//	console.log(localStorage.tickets.ticket.);
 		}
 		//RUN
 		$(document).on('click', "#run", function(){
