@@ -215,30 +215,50 @@ jQuery(document).ready(function ($) {
 	
 	function fillTeamList(teamsJson){
 		$('#team-list > div').remove();
-		teamsJson.name.forEach(function(item, i){
+		teamsJson.team.forEach(function(item, i){
 			var newDiv =
 				$('<div class="alert alert-standard fade in">').appendTo($('#team-list'))
-					.html(item);
+					.html(item.name + " " + item.date)
+					.attr("data-name", item.name)
+					.attr("data-date", item.date);
 			$('<a class="close" data-dismiss="alert" href="#">&times;</a>').appendTo(newDiv);
 		});
 	}
 	function markSelectedTeams(selectedTeamsJson){
 		$('#team-list .alert').each(function(el){
-			if (selectedTeamsJson.name.indexOf($(this).text().slice(0,-1)) != -1)
-				$(this)
+			var obj = {};
+			obj["name"] = $(this).attr("data-name");
+			obj["date"] = $(this).attr("data-date");
+			$.each(selectedTeamsJson.team, function(data, idx) { 
+			   if ($.isEqual(data, obj)) {
+				  $(this)
 					.removeClass('alert-standard')
 					.addClass('alert-error');
+				  return;
+			   }
+			});			
 		});
 	}
 	var n_,
 		k_,
 		n_k_,
-		teamsJson,
-		selectedTeamsJson,
+		teamsJson = {"team":[]},
+		selectedTeamsJson = {"team":[]},
 		csId,
 		ticketsJson = {"ticket":[]};
 		//localStorage.removeItem('selectedTeams');
-		if(localStorage['teams']){
+		chrome.runtime.onMessage.addListener(
+			 function(request, sender, sendResponse) {		
+				if (request.askFor == "teamsFromMB"){
+					csId = parseInt(sender.tab.id);
+					teamsJson = JSON.parse(request.teams);
+					fillTeamList(teamsJson);
+					markSelectedTeams(selectedTeamsJson);
+					//sendResponse(JSON.stringify({mtId: mtTabId}));
+					//sendResponse({mtId: mtTabId});
+				}
+		});
+		/* if(localStorage['teams']){
 			teamsJson =  JSON.parse(localStorage.getItem('teams'));
 			fillTeamList(teamsJson);
 		}else
@@ -251,16 +271,16 @@ jQuery(document).ready(function ($) {
 			if(n_!=0)
 				$('#n').val(n_);
 		}else
-			selectedTeamsJson = {"name": []};
+			selectedTeamsJson = {"name": []}; */
 			
-		chrome.runtime.onMessage.addListener(
+		/* chrome.runtime.onMessage.addListener(
 		 function(request, sender, sendResponse) {		
 			if (request.askFor == "tickets"){
 				csId = sender.tab.id;
 				//sendResponse(JSON.stringify({mtId: mtTabId}));
 				sendResponse({tickets: localStorage.getItem('tickets')});
 			}
-		});
+		}); */
 	$(".n-k-params").on('input', function(){ 		
 		$('.dynamic').remove();
 		$(this).each(function(){
@@ -341,21 +361,19 @@ jQuery(document).ready(function ($) {
 				tCont = "Билет №" + parseInt(i+1) + "</br>";
 				ticketsJson.ticket[i] = [];
 				for(var j = 0; j < arr[i].length; j++){
-					//if(!selectedTeamsJson.name[j])
-					var prName = selectedTeamsJson.name[j] ? selectedTeamsJson.name[j] :  j+1;
-					//	selectedTeamsJson.name[j] = j+1;
+					var prName = selectedTeamsJson.team[j].name + " " + selectedTeamsJson.team[j].date;
 					tCont += (arr[i][j] == 1) ? (prName + "	+" + "</br>") : (prName + "	-" + "</br>");
-					var ob = {};
-					ob[prName] =  ["date"];					
-					ticketsJson.ticket[i][j] = ob;
-					ticketsJson.ticket[i][j][prName].push(arr[i][j]);
-				}
-				newDiv.html(tCont);
+					var obj = {};
+					obj['name'] =  selectedTeamsJson.team[j].name;	
+					obj['date'] =  selectedTeamsJson.team[j].date;		
+					obj['bet'] =  arr[i][j];	
+					ticketsJson.ticket[i][j] = obj;
+				}				
+				newDiv.html(tCont);				
 			}
-			localStorage.removeItem('tickets');
+			chrome.tabs.sendMessage(csId, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson)});
+			//localStorage.removeItem('tickets');
 			localStorage.setItem('tickets', JSON.stringify(ticketsJson));
-			
-		//	console.log(localStorage.tickets.ticket.);
 		}
 		//RUN
 		$(document).on('click', "#run", function(){
@@ -382,7 +400,7 @@ jQuery(document).ready(function ($) {
 	});
 	
 	//ADD team
-	$(document).on('click', "#add-team", function(){
+	/* $(document).on('click', "#add-team", function(){
 		if($('#team-name').val()){
 			teamsJson.name.push($('#team-name').val());
 			$('#team-name').val('');
@@ -396,9 +414,9 @@ jQuery(document).ready(function ($) {
 			event.preventDefault();
 			$("#add-team").click();
 		}
-	});
+	}); */
 	//remove team from team-list
-	$('#team-list').on('click', '.close', function(){
+	/* $('#team-list').on('click', '.close', function(){
 		var v = $(this).parent('div.alert').text().slice(0,-1);
 		teamsJson.name.splice(teamsJson.name.indexOf(v),1);
 		localStorage.setItem('teams', JSON.stringify(teamsJson));	
@@ -408,24 +426,27 @@ jQuery(document).ready(function ($) {
 			n_ = selectedTeamsJson.name.length;			
 			$('#n').val(n_>0?n_:"");
 		}
-	});
+	}); */
 	//use team from team list
 	$('#team-list').on('click', 'div.alert', function(e){
 		if(e.target == this){
 			if($(this).hasClass('alert-standard')){
-				selectedTeamsJson.name.push($(this).text().slice(0, -1));
+				var obj = {};
+				obj['name'] = $(this).attr("data-name");
+				obj['date'] = $(this).attr("data-date");
+				selectedTeamsJson.team.push(obj);
 				localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
 				$(this)
 					.removeClass('alert-standard')
 					.addClass('alert-error');
 			}else{
-				selectedTeamsJson.name.splice(selectedTeamsJson.name.indexOf($(this).text().slice(0,-1)),1);
+				selectedTeamsJson.team.splice(selectedTeamsJson.team.indexOf(obj,1));
 				localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
 				$(this)
 					.removeClass('alert-error')
 					.addClass('alert-standard');
 			}
-			n_ = selectedTeamsJson.name.length;			
+			n_ = selectedTeamsJson.team.length;			
 			$('#n').val(n_>0?n_:"");
 		}
 	});
