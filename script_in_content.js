@@ -28,7 +28,7 @@
 		var gameDate = $(this).find('td.date').html();
 		var teamsNames = $(this).attr('data-event-name');	
 		if(gameDate && teamsNames){		
-			gameDate = gameDate.replace(/[\s{2,}]+/g, '');
+			gameDate = gameDate.trim();//.replace(/(\n(\r)?)/g, '');
 			var obj = {};
 			obj['name'] = teamsNames;
 			obj['date'] =  gameDate;
@@ -54,12 +54,17 @@
 										if(ticketsJson.ticket[0][0].bet == 1){
 											//setTimeout(function(){
 											forClick.push(item.find('tr:first-child').find('td').eq(-1));
+											//item.find('tr:first-child').find('td').eq(-1).trigger('click');
+											//console.log(item.find('tr:first-child').find('td').eq(-1).html());
 											//},1000);
 											break;
 										}
 										if(ticketsJson.ticket[0][j].bet == 0){
 											//setTimeout(function(){
 											forClick.push(item.find('tr:first-child').find('td').eq(-2));
+											//item.find('tr:first-child').find('td').eq(-2).trigger('click');
+											//console.log(item.find('tr:first-child').find('td').eq(-2));
+											//item.find('tr:first-child').find('td').eq(-2).trigger('click');
 											//},1000);
 											break;
 										}
@@ -67,11 +72,13 @@
 							}
 						}
 					});
-					forClick.forEach(function(item){
+					$(forClick).each(function(i){	
+						var self = this;
 						setTimeout(function(){
-							item.click();
-						},2000);
-					});
+							$(self).click();
+						},1000*(i+1));
+					}); 
+					//forClick.trigger('click');
 				}
 		});
 	}

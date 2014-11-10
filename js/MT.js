@@ -146,7 +146,7 @@ jQuery(document).ready(function ($) {
 	var filter = new Array;
 	filter[0] = new Array; //k block
 	filter[1] = new Array; //n-k block
-	
+	 
 	function inputsForBlocks(n,k){
 		$('.dynamic').detach();	
 		if(k > 1){
