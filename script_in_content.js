@@ -7,28 +7,14 @@
 		teamsJson = {"team":[]},
 		forClick = [];
 		
+										
+		
 	var tbb = $('tbody[data-event-name]');
-	
-	
-	//chrome.runtime.sendMessage({askFor: 'mtId'}, function (response){
-	//	mtId = response.mtId;
-	//});
-	
-	/* tbb.each(function(){
-		tbodyTeams.push($(this));
-		if($(this).attr('data-event-name').indexOf("Валенсия") != -1){
-			var tdDate = $(this).find('td.date').html();
-			if(tdDate)
-				if(tdDate.indexOf("21:00") != -1){
-					divsRel.push($(this));
-				}
-		}
-	});	 */
 	tbb.each(function(i){
 		var gameDate = $(this).find('td.date').html();
 		var teamsNames = $(this).attr('data-event-name');	
 		if(gameDate && teamsNames){		
-			gameDate = gameDate.trim();//.replace(/(\n(\r)?)/g, '');
+			gameDate = gameDate.trim();
 			var obj = {};
 			obj['name'] = teamsNames;
 			obj['date'] =  gameDate;
@@ -51,34 +37,77 @@
 								var tdDate = item.find('td.date').html();
 								if(tdDate)
 									if(tdDate.indexOf(ticketsJson.ticket[0][j].date) != -1){
-										if(ticketsJson.ticket[0][0].bet == 1){
-											//setTimeout(function(){
+										if(ticketsJson.ticket[0][j].bet == 1){
 											forClick.push(item.find('tr:first-child').find('td').eq(-1));
-											//item.find('tr:first-child').find('td').eq(-1).trigger('click');
-											//console.log(item.find('tr:first-child').find('td').eq(-1).html());
-											//},1000);
 											break;
 										}
 										if(ticketsJson.ticket[0][j].bet == 0){
-											//setTimeout(function(){
 											forClick.push(item.find('tr:first-child').find('td').eq(-2));
-											//item.find('tr:first-child').find('td').eq(-2).trigger('click');
-											//console.log(item.find('tr:first-child').find('td').eq(-2));
-											//item.find('tr:first-child').find('td').eq(-2).trigger('click');
-											//},1000);
 											break;
 										}
 									}
 							}
 						}
 					});
+					var marksReady = false;
 					$(forClick).each(function(i){	
 						var self = this;
-						setTimeout(function(){
+						return setTimeout(function(){
 							$(self).click();
+							var tmp = i; 
+							if(tmp == forClick.length-1)
+								return setCoast(123);
 						},1000*(i+1));
-					}); 
-					//forClick.trigger('click');
+					});
+					$(document).on('keyup','.stake.stake-input.js-focusable[name = stake]', function(e){
+						//e.stopPropagation();
+					//	$(this).keyup();
+						console.log(e);
+					});
+					$(document).on('click', '.but-place-bet', function(e){
+						//e.stopPropagation();
+					//	$(this).click();
+						console.log(e);
+					});						
+					function setCoast(coast){					
+									$('#button_accumulator').click();
+									var timer1 = setTimeout(function(){
+										$('.stake.stake-input.js-focusable[name = stake]').val(123);
+									var eve = document.createEvent('KeyboardEvent');
+									eve.initKeyboardEvent('keyup', true, true, window, false, false, false, false, 65, 65);
+									eve.keyCode = 65;
+									eve.which = 65;
+									eve.charCode = 65; 
+									//var canceled = !body.dispatchEvent(evt);
+										$('.stake.stake-input.js-focusable[name = stake]')[0].dispatchEvent(eve);
+									}, 1000);
+									var timer2 = setTimeout(function(){
+										$('.but-place-bet')[0].click();
+									}, 2000);
+					}
+					/* var checkExist = setInterval(function(){
+					   if(marksReady){
+							setTimeout(function(){
+								$('#button_accumulator').click();
+								$('[name = stake]').val(123);
+								clearInterval(checkExist);
+								},1000);
+					   }
+					}, 1000); */
+					/* $('#betslip-content').load($(this).find('#button_accumulator'), function(){
+						$(this).find('#button_accumulator').click();
+						console.log($(this).find('#button_accumulator'));
+					}); */
+					/* $(document).on('load', "#button_accumulator" , function() {
+						$(this).click();
+						}); */
+					/* $.when.apply($, ready).then(function(){
+						$('#button_accumulator').click();
+						console.log($('#button_accumulator'));
+						}); */
+					/* setTimeout(function(){
+							$("a:contains('Экспрессы')").click();
+						},(forClick.length + 1)*1000); */
 				}
 		});
 	}
