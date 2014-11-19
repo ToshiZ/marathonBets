@@ -371,9 +371,12 @@ jQuery(document).ready(function ($) {
 				}				
 				newDiv.html(tCont);				
 			}
-			chrome.tabs.sendMessage(csId, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson)});
+			chrome.tabs.sendMessage(csId, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000)});
 			//localStorage.removeItem('tickets');
 			localStorage.setItem('tickets', JSON.stringify(ticketsJson));
+			var sendRefreshTimer = setInterval(function(){
+				chrome.tabs.sendMessage(csId, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
+			},parseInt($('#refreshTime').val()*1000));
 		}
 		//RUN
 		$(document).on('click', "#run", function(){
@@ -395,7 +398,7 @@ jQuery(document).ready(function ($) {
 					popBloks(res, 0);
 				}
 			}
-			print2DemArr(res);
+			print2DemArr(res);			
 		});
 	});
 	
