@@ -15,38 +15,18 @@ jQuery(document).ready(function ($) {
 				return false;
 		return true;
 	}	
-	
-	function make(arr, el) {
-	  var i, i_m, item;
-	  var len = arr.length;
-	  var res = [];
-	  for(i = len; i >= 0; i--) {
-		res.push(
-		  ([]).concat(
-			arr.slice(0, i),
-			[el],
-			arr.slice(i, i_m)
-		  )
-		);
-	  }
-	  return res;
-	}
 
 	function combinations(arr) {
-	  var prev, curr, el, i;
-	  var len = arr.length;
-	  curr = [[arr[0]]];
-	  for(i = 1; i < len; i++) {
-		el = arr[i];
-		prev = curr;
-		curr = [];
-		prev.forEach(function(item) {
-		  curr = curr.concat(
-			make(item, el)
-		  );
-		});
-	  }
-	  return curr;
+		if(arr.length >1){
+			var beg = arr[0],
+				arr1 = combinations(arr.slice(1)),
+				arr2 = [],
+				l = arr1[0].length;
+				for(var i=0; i < arr1.length; i++)
+					for(var j=0; j <= l; j++)
+						arr2.push(arr1[i].slice(0,j).concat(beg, arr1[i].slice(j)));
+				return arr2;
+		}else return [arr];
 	}
 	
 	function c_n_k (n,k){
@@ -209,8 +189,8 @@ jQuery(document).ready(function ($) {
 				$('.n-k-blocks').filter(function(){return !this.value;}).remove();
 			}
 		});
-		$('<a id="run" class="button button-large dynamic">RUN</a>')
-			.appendTo('#n-k-params-div');
+		$('<a id="run" class="button button-large dynamic">Предпросмотр</a>')
+			.appendTo('#buttons');
 	}	
 	
 	function fillTeamList(teamsJson){
@@ -245,8 +225,11 @@ jQuery(document).ready(function ($) {
 		teamsJson = {"team":[]},
 		selectedTeamsJson = {"team":[]},
 		csId,
-		ticketsJson = {"ticket":[]};
-		//localStorage.removeItem('selectedTeams');
+		ticketsJson = {"ticket":[]},
+		errorInfoJson = localStorage.getItem('errorInfo')? JSON.parse(localStorage.getItem('errorInfo')): {"error":[]},
+		errorTicketsJson = localStorage.getItem('errorTickets')? JSON.parse(localStorage.getItem('errorTickets')): {"ticket":[]},
+		pauseFl = true,
+		sendRefreshTimer;
 		chrome.runtime.onMessage.addListener(
 			 function(request, sender, sendResponse) {		
 				if (request.askFor == "teamsFromMB"){
@@ -254,33 +237,43 @@ jQuery(document).ready(function ($) {
 					teamsJson = JSON.parse(request.teams);
 					fillTeamList(teamsJson);
 					markSelectedTeams(selectedTeamsJson);
-					//sendResponse(JSON.stringify({mtId: mtTabId}));
-					//sendResponse({mtId: mtTabId});
 				}
 		});
-		/* if(localStorage['teams']){
-			teamsJson =  JSON.parse(localStorage.getItem('teams'));
-			fillTeamList(teamsJson);
-		}else
-			teamsJson = {"name": []};
-		
-		if(localStorage['selectedTeams']){
-			selectedTeamsJson =  JSON.parse(localStorage.getItem('selectedTeams'));
-			markSelectedTeams(selectedTeamsJson);
-			n_ = selectedTeamsJson.name.length;
-			if(n_!=0)
-				$('#n').val(n_);
-		}else
-			selectedTeamsJson = {"name": []}; */
-			
-		/* chrome.runtime.onMessage.addListener(
-		 function(request, sender, sendResponse) {		
-			if (request.askFor == "tickets"){
-				csId = sender.tab.id;
-				//sendResponse(JSON.stringify({mtId: mtTabId}));
-				sendResponse({tickets: localStorage.getItem('tickets')});
+		chrome.runtime.onMessage.addListener(
+			 function(request, sender, sendResponse) {		
+				if (request.askFor == "ticketDone"){
+					csId = parseInt(sender.tab.id);
+					var tNum = parseInt(request.ticketNum);
+					markDoneTicket(tNum, false, '');
+				}
+		});
+		chrome.runtime.onMessage.addListener(
+			 function(request, sender, sendResponse) {		
+				if (request.askFor == "ticketError"){
+					csId = parseInt(sender.tab.id);
+					errorInfoJson.error.push(JSON.parse(request.errorInfo));
+					localStorage.setItem('errorInfo', JSON.stringify(errorInfoJson));
+					var tNum = parseInt(errorInfoJson.error[errorInfoJson.error.length-1].ticketNum);
+					var inf = errorInfoJson.error[errorInfoJson.error.length-1].info;
+					errorTicketsJson.ticket.push(ticketsJson.ticket[tNum]);
+					localStorage.setItem('errorTickets', JSON.stringify(errorTicketsJson));
+					markDoneTicket(tNum, true, inf);
+				}
+		});
+		function markDoneTicket(num, err, inf){
+			var ticketDiv = $('#steps-area').find('.row[data-ticket-num = ' + num +']');
+			if(err){
+				ticketDiv.appendTo('#error-area .accordion-inner').find('.alert').html("Билет №" + parseInt(num+1) + ":</br>" + inf);
+				ticketDiv.find('.alert').attr('class', 'alert fade in');
+				$('#error-area').prev().find('a.accordion-toggle').html('Ошибки (' + $('#error-area .accordion-inner > div.row').length + ')');
+				$('#rebet-but').html('Повторить непоставленные (' +  $('#error-area .accordion-inner > div.row').length + ')');
+			}else{
+				ticketDiv.appendTo('#done-area .accordion-inner');
+				$('#done-area').prev().find('a.accordion-toggle').html('Готово (' + $('#done-area .accordion-inner > div.row').length + ')');
 			}
-		}); */
+			$('#steps-area').find('.row[data-ticket-num = ' + num +']').remove();
+			$('#steps-area').prev().find('a.accordion-toggle').html('Билеты (' + $('#steps-area .accordion-inner > div.row').length + ')');
+		}
 	$(".n-k-params").on('input', function(){ 		
 		$('.dynamic').remove();
 		$(this).each(function(){
@@ -350,14 +343,55 @@ jQuery(document).ready(function ($) {
 				}
 		}
 		function print2DemArr(arr){
-			$('#res-col-1 .alert').remove();
+			$('#res-col-1 .alert stp').remove();
+			var newEl = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
+			newEl = $('<div class="accordion-group stp"></div>').appendTo(newEl);
+			var innner = $('<div class="accordion-body collapse stp"></div>').appendTo(newEl)
+				.attr('id', 'steps-area');
+			innner = $('<div class="accordion-inner stp"></div>').appendTo(innner)
+			newEl = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl);
+			newEl = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
+				.appendTo(newEl)
+				.text('Билеты (' + arr.length + ')')
+				.attr('href', '#steps-area' );
+			
+			var newEl2 = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
+			newEl2 = $('<div class="accordion-group stp"></div>').appendTo(newEl2);
+			var innner2 = $('<div class="accordion-body collapse stp"></div>').appendTo(newEl2)
+				.attr('id', 'done-area');
+			innner2 = $('<div class="accordion-inner stp"></div>').appendTo(innner2)
+			newEl2 = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl2);
+			newEl2 = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
+				.appendTo(newEl2)
+				.text('Готово (0)')
+				.attr('href', '#done-area' );
+			
+			var newEl2 = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
+			newEl2 = $('<div class="accordion-group stp"></div>').appendTo(newEl2);
+			var innner2 = $('<div class="accordion-body collapse stp"></div>').appendTo(newEl2)
+				.attr('id', 'error-area');
+			innner2 = $('<div class="accordion-inner stp"></div>').appendTo(innner2)
+			newEl2 = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl2);
+			newEl2 = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
+				.appendTo(newEl2)
+				.text('Ошибки (0)')
+				.attr('href', '#error-area' );
+			
+			$('<a id="start-but" class="button button-large dynamic stp">Старт</a>')
+				.appendTo('#buttons');
+			$('<a id="pause-but" class="button button-large dynamic stp">Пауза</a>')
+				.appendTo('#buttons');
+			$('<a id="stop-but" class="button button-large dynamic stp">Стоп</a>')
+				.appendTo('#buttons');
+			$('<a id="rebet-but" class="button button-large dynamic stp">Повторить непоставленные (0)</a>')
+				.appendTo('#buttons');
 			var tCont = "";
-			$('<div class="alert alert-info fade in">').appendTo($('#res-col-1'))
-				.text("ВСЕГО: " + arr.length);
-			for(var i = 0; i < arr.length; i++){				
+			for(var i = 0; i < arr.length; i++){	
+				var newEl = $('<div class="row cont stp">').appendTo('#steps-area .accordion-inner')
+					.attr('data-ticket-num', i);
 				var newDiv = (i%2 == 0) ?
-				$('<div class="alert alert-error fade in">').appendTo($('#res-col-1')) :
-				$('<div class="alert alert-info fade in">').appendTo($('#res-col-1'));
+				$('<div class="alert alert-error fade in span24 stp">').appendTo(newEl) :
+				$('<div class="alert alert-info fade in span24 stp">').appendTo(newEl);
 				tCont = "Билет №" + parseInt(i+1) + "</br>";
 				ticketsJson.ticket[i] = [];
 				for(var j = 0; j < arr[i].length; j++){
@@ -371,13 +405,55 @@ jQuery(document).ready(function ($) {
 				}				
 				newDiv.html(tCont);				
 			}
+		}
+		//START
+		$(document).on('click', "#start-but", function(){
 			chrome.tabs.sendMessage(csId, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000)});
-			//localStorage.removeItem('tickets');
 			localStorage.setItem('tickets', JSON.stringify(ticketsJson));
-			var sendRefreshTimer = setInterval(function(){
+			sendRefreshTimer = setInterval(function(){
 				chrome.tabs.sendMessage(csId, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
 			},parseInt($('#refreshTime').val()*1000));
-		}
+			pauseFl = false
+			localStorage.removeItem('errorInfo');
+			errorInfoJson = {"error":[]};
+			localStorage.removeItem('errorTickets');
+			errorInfoJson = {"ticket":[]};
+		});
+		//PAUSE
+		$(document).on('click', "#pause-but", function(){
+			if(!pauseFl){
+				chrome.tabs.sendMessage(csId, {'askFor': 'pause'});
+				clearInterval(sendRefreshTimer);
+				pauseFl = true;
+				$(this).html('ПРОДОЛЖИТЬ');
+			}
+			else{
+				chrome.tabs.sendMessage(csId, {'askFor': 'resume'});
+				sendRefreshTimer = setInterval(function(){
+					chrome.tabs.sendMessage(csId, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
+				},parseInt($('#refreshTime').val()*1000));
+				pauseFl = false;
+				$(this).html('ПАУЗА');
+			}
+		});
+		//STOP
+		$(document).on('click', "#stop-but", function(){
+				chrome.tabs.sendMessage(csId, {'askFor': 'stop'});
+				clearInterval(sendRefreshTimer);
+				pauseFl = true;
+		});
+		//REBET
+		$(document).on('click', "#rebet-but", function(){
+			chrome.tabs.sendMessage(csId, {'askFor': 'tickets', 'tickets': JSON.stringify(errorTicketsJson), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000)});
+			sendRefreshTimer = setInterval(function(){
+				chrome.tabs.sendMessage(csId, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
+			},parseInt($('#refreshTime').val()*1000));
+			pauseFl = false
+			localStorage.removeItem('errorInfo');
+			errorInfoJson = {"error":[]};
+			localStorage.removeItem('errorTickets');
+			errorInfoJson = {"ticket":[]};
+		});
 		//RUN
 		$(document).on('click', "#run", function(){
 			if(sumOfMas(filter[0]) > k_)
@@ -401,35 +477,6 @@ jQuery(document).ready(function ($) {
 			print2DemArr(res);			
 		});
 	});
-	
-	//ADD team
-	/* $(document).on('click', "#add-team", function(){
-		if($('#team-name').val()){
-			teamsJson.name.push($('#team-name').val());
-			$('#team-name').val('');
-			localStorage.setItem('teams', JSON.stringify(teamsJson));
-		}
-		fillTeamList(teamsJson);
-		markSelectedTeams(selectedTeamsJson);
-	});	
-	$(document).keyup(function(event){
-		if(event.keyCode == 13){				
-			event.preventDefault();
-			$("#add-team").click();
-		}
-	}); */
-	//remove team from team-list
-	/* $('#team-list').on('click', '.close', function(){
-		var v = $(this).parent('div.alert').text().slice(0,-1);
-		teamsJson.name.splice(teamsJson.name.indexOf(v),1);
-		localStorage.setItem('teams', JSON.stringify(teamsJson));	
-		if($(this).parent('div.alert').hasClass("alert-error")){
-			selectedTeamsJson.name.splice(selectedTeamsJson.name.indexOf(v),1);
-			localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));	
-			n_ = selectedTeamsJson.name.length;			
-			$('#n').val(n_>0?n_:"");
-		}
-	}); */
 	//use team from team list
 	$('#team-list').on('click', 'div.alert', function(e){
 		if(e.target == this){
