@@ -263,15 +263,18 @@ jQuery(document).ready(function ($) {
 		function markDoneTicket(num, err, inf){
 			var ticketDiv = $('#steps-area').find('.row[data-ticket-num = ' + num +']');
 			if(err){
-				ticketDiv.appendTo('#error-area .accordion-inner').find('.alert').html("Билет №" + parseInt(num+1) + ":</br>" + inf);
+				ticketDiv.clone().appendTo('#error-area .accordion-inner').find('.alert').html("Билет №" + parseInt(num+1) + ":</br>" + inf);
 				ticketDiv.find('.alert').attr('class', 'alert fade in');
 				$('#error-area').prev().find('a.accordion-toggle').html('Ошибки (' + $('#error-area .accordion-inner > div.row').length + ')');
 				$('#rebet-but').html('Повторить непоставленные (' +  $('#error-area .accordion-inner > div.row').length + ')');
 			}else{
 				ticketDiv.appendTo('#done-area .accordion-inner');
 				$('#done-area').prev().find('a.accordion-toggle').html('Готово (' + $('#done-area .accordion-inner > div.row').length + ')');
+				$('#steps-area').find('.row[data-ticket-num = ' + num +']').remove();
+				$('#error-area').find('.row[data-ticket-num = ' + num +']').remove();
+				$('#error-area').prev().find('a.accordion-toggle').html('Ошибки (' + $('#error-area .accordion-inner > div.row').length + ')');
+				$('#rebet-but').html('Повторить непоставленные (' +  $('#error-area .accordion-inner > div.row').length + ')');
 			}
-			$('#steps-area').find('.row[data-ticket-num = ' + num +']').remove();
 			$('#steps-area').prev().find('a.accordion-toggle').html('Билеты (' + $('#steps-area .accordion-inner > div.row').length + ')');
 		}
 	$(".n-k-params").on('input', function(){ 		
@@ -417,7 +420,7 @@ jQuery(document).ready(function ($) {
 			localStorage.removeItem('errorInfo');
 			errorInfoJson = {"error":[]};
 			localStorage.removeItem('errorTickets');
-			errorInfoJson = {"ticket":[]};
+			errorTicketsJson = {"ticket":[]};
 		});
 		//PAUSE
 		$(document).on('click', "#pause-but", function(){
@@ -452,7 +455,7 @@ jQuery(document).ready(function ($) {
 			localStorage.removeItem('errorInfo');
 			errorInfoJson = {"error":[]};
 			localStorage.removeItem('errorTickets');
-			errorInfoJson = {"ticket":[]};
+			errorTicketsJson = {"ticket":[]};
 		});
 		//RUN
 		$(document).on('click', "#run", function(){

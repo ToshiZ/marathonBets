@@ -65,11 +65,11 @@
 							clickEnter();
 						}
 					}else{
-						if($('#enter_stake_dialog').find('p').html().indexOf("Пожалуйста, введите сумму ставки.") != -1 || $('p#detail-result-content').html().indexOf("Извините, Ваша ставка не принята. Повторная ставка. Попробуйте сделать ставку позже.") != -1){
+						 if($('p#detail-result-content').html().indexOf("Извините, Ваша ставка не принята. Повторная ставка. Попробуйте сделать ставку позже.") != -1){
 							i--;
 							clickEnter();
 							betTicket();
-						}else{
+						}else{ 
 							var obj = {};										
 							obj['ticketNum'] = i-1;
 							obj['info'] =  "";
@@ -77,6 +77,8 @@
 								obj['info'] += $('p#detail-result-content').html();
 							if($('p#betresult').html())
 								obj['info'] += "</br>" + $('p#betresult').html();
+							if($('#enter_stake_dialog').find('p').html())
+								obj['info'] += "</br>" + $('#enter_stake_dialog').find('p').html();
 							if(!obj['info'])
 								obj['info'] = "Неизвестная ошибка";
 							errorInfoJson.error.push(obj);
@@ -91,7 +93,7 @@
 								localStorage.setItem('finish', 1);
 								clickEnter();
 							}
-						}
+						//}
 					}						
 				}else
 					setTimeout(function(){
