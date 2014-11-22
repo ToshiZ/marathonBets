@@ -26,7 +26,13 @@
 	
 	if(teamsJson.team[0]){
 		localStorage.setItem('teams', JSON.stringify(teamsJson));
-		chrome.runtime.sendMessage({askFor: 'teamsFromMB', teams: JSON.stringify(teamsJson)});
+		chrome.runtime.sendMessage({askFor: 'contentScriptId'});
+		chrome.runtime.onMessage.addListener(
+			 function(request, sender, sendResponse) {				
+				if (request.askFor == "getTeams"){
+					sendResponse({teams: JSON.stringify(teamsJson)});
+				}
+			});
 		chrome.runtime.onMessage.addListener(
 			 function(request, sender, sendResponse) {				
 				if (request.askFor == "tickets"){
@@ -73,7 +79,7 @@
 							var obj = {};										
 							obj['ticketNum'] = i-1;
 							obj['info'] =  "";
-							if($('p#detail-result-content').html())
+							if($('p#detail-result-content').html().indexOf("$betresult") == -1)
 								obj['info'] += $('p#detail-result-content').html();
 							if($('p#betresult').html())
 								obj['info'] += "</br>" + $('p#betresult').html();
@@ -93,7 +99,7 @@
 								localStorage.setItem('finish', 1);
 								clickEnter();
 							}
-						//}
+						}
 					}						
 				}else
 					setTimeout(function(){
@@ -138,7 +144,7 @@
 									setCoast(coast);
 									clearTimeout(markTeamsTimer);
 								}
-							},1000);
+							},300);
 					}
 					function setCoast(coast){
 						if(!pauseFl){
@@ -173,6 +179,7 @@
 			 function(request, sender, sendResponse) {				
 				if (request.askFor == "pause"){
 					pauseFl = true;
+					localStorage.setItem('currentBet', i);
 					clearTimeout(bigCycle);
 				}
 		});

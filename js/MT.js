@@ -1,6 +1,237 @@
-jQuery.noConflict();                               
-jQuery(document).ready(function ($) {
-
+$(function () {    
+	var n_,
+		k_,
+		n_k_,
+		teamsJson,// =  localStorage.getItem('teams')? JSON.parse(localStorage.getItem('teams')): {"team":[]},
+		selectedTeamsJson,// = localStorage.getItem('selectedTeams')? JSON.parse(localStorage.getItem('selectedTeams')): {"team":[]},
+		csId,
+		ticketsJson = {"ticket":[]},
+		errorInfoJson = localStorage.getItem('errorInfo')? JSON.parse(localStorage.getItem('errorInfo')): {"error":[]},
+		errorTicketsJson = localStorage.getItem('errorTickets')? JSON.parse(localStorage.getItem('errorTickets')): {"ticket":[]},
+		pauseFl = true,
+		sendRefreshTimer,
+		filter = [];
+		filter[0] = []; //k block
+		filter[1] = []; //n-k block;
+		//localStorage.removeItem('selectedTeams');
+	if(localStorage['teams']){
+		teamsJson =  JSON.parse(localStorage.getItem('teams'));
+		fillTeamList(teamsJson);
+	}else
+		teamsJson = {"team": []};
+	if(localStorage['selectedTeams']){
+			selectedTeamsJson =  JSON.parse(localStorage.getItem('selectedTeams'));
+			markSelectedTeams(selectedTeamsJson);
+			n_ = selectedTeamsJson.team.length;
+			if(n_!=0)
+				$('#n').val(n_);
+			else
+				$('#n').val("");
+	}else
+		selectedTeamsJson = {"team": []};
+		
+	chrome.runtime.onMessage.addListener(
+		 function(request, sender, sendResponse) {		
+			if (request.askFor == "contentScriptId"){
+				csId = parseInt(sender.tab.id);
+				//teamsJson = JSON.parse(request.teams);
+				//localStorage.setItem('teams', JSON.stringify(teamsJson));
+				//fillTeamList(teamsJson);
+				//markSelectedTeams(selectedTeamsJson);
+			}
+	});
+	chrome.runtime.onMessage.addListener(
+		 function(request, sender, sendResponse) {		
+			if (request.askFor == "ticketDone"){
+				csId = parseInt(sender.tab.id);
+				var tNum = parseInt(request.ticketNum);
+				markDoneTicket(tNum, false, '');
+			}
+	});
+	chrome.runtime.onMessage.addListener(
+		 function(request, sender, sendResponse) {		
+			if (request.askFor == "ticketError"){
+				csId = parseInt(sender.tab.id);
+				errorInfoJson.error.push(JSON.parse(request.errorInfo));
+				localStorage.setItem('errorInfo', JSON.stringify(errorInfoJson));
+				var tNum = parseInt(errorInfoJson.error[errorInfoJson.error.length-1].ticketNum);
+				var inf = errorInfoJson.error[errorInfoJson.error.length-1].info;
+				errorTicketsJson.ticket.push(ticketsJson.ticket[tNum]);
+				localStorage.setItem('errorTickets', JSON.stringify(errorTicketsJson));
+				markDoneTicket(tNum, true, inf);
+			}
+	});
+	$('#get-teams').on('click', function(){
+		chrome.tabs.sendMessage(csId, {'askFor': 'getTeams'}, function(response){
+			teamsJson = JSON.parse(response.teams);
+			localStorage.setItem('teams', JSON.stringify(teamsJson));
+			fillTeamList(teamsJson);
+			selectedTeamsJson = {"team":[]};
+			ticketsJson = {"ticket":[]};
+			errorInfoJson = {"error":[]};
+			errorTicketsJson = {"ticket":[]};
+			localStorage.setItem('tickets', JSON.stringify(ticketsJson));
+			localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
+			n_ = selectedTeamsJson.team.length;
+			if(n_!=0)
+				$('#n').val(n_);
+			else
+				$('#n').val("");
+		});
+	});
+	$(document).on('input', ".k-blocks", function(){ 
+		$('.k-blocks').each(function() {
+				filter[0].push(parseInt($(this).val()));				 
+			});
+		if($(".k-blocks").last().val() < 2){
+			$(".k-blocks").last().val('');
+			return false;
+		}
+		if($(".k-blocks").last().val() && sumOfMas(filter[0]) < k){		
+			$('<input type="text"></input>').appendTo('#k-blocks-div')
+				.attr('id', "k-block"+$(".k-blocks").length)
+				.css({width:"50px",
+					background: "#3C3F45",
+					color: "white"})
+				.attr('placeholder',"Блок "+$(".k-blocks").length)
+				.addClass("k-blocks dynamic");
+		}else{
+			$('.k-blocks').filter(function(){return !this.value;}).remove();
+		}
+	});		
+	$(document).on('input', ".n-k-blocks", function(){			
+		$('.n-k-blocks').each(function() {
+			filter[1].push(parseInt($(this).val()));				 
+		});
+		if($(".n-k-blocks").last().val() < 2){
+			$(".n-k-blocks").last().val('');
+			return false;
+		}
+		if($(".n-k-blocks").last().val() && sumOfMas(filter[1]) < n-k){	
+			$('<input type="text"></input>').appendTo('#n-k-blocks-div')
+				.attr('id', "n-k-block"+$(".n-k-blocks").length)
+				.css({width:"50px",
+					background: "#3C3F45",
+					color: "white",
+					'margin-top': "19px"})
+				.attr('placeholder',"Блок "+$(".n-k-blocks").length)
+				.addClass("n-k-blocks dynamic");
+		}else{
+			$('.n-k-blocks').filter(function(){return !this.value;}).remove();
+		}
+	});
+	$(".n-k-params").on('input', function(){ 		
+		$('.dynamic').remove();
+		$(this).each(function(){
+			if($(this).val().length){
+				if($('#n').val() && $('#k').val())
+					$('#n-k').val(parseInt($('#n').val()) - parseInt($('#k').val()));
+				if($('#n-k').val() && $('#k').val())
+					$('#n').val(parseInt($('#n-k').val()) + parseInt($('#k').val()));
+				if($('#n').val() && $('#n-k').val())
+					$('#k').val(parseInt($('#n').val()) - parseInt($('#n-k').val()));
+				n_ = parseInt($('#n').val());
+				k_ = parseInt($('#k').val());
+				n_k_ = parseInt($('#n-k').val());
+				if(!isNaN(n_) && !isNaN(k_) && n>=k)
+					inputsForBlocks(n_,k_);
+			}
+		});
+	});
+		//START
+	$(document).on('click', "#start-but", function(){
+		chrome.tabs.sendMessage(csId, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000)});
+		localStorage.setItem('tickets', JSON.stringify(ticketsJson));
+		sendRefreshTimer = setInterval(function(){
+			chrome.tabs.sendMessage(csId, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
+		},parseInt($('#refreshTime').val()*1000));
+		pauseFl = false
+		localStorage.removeItem('errorInfo');
+		errorInfoJson = {"error":[]};
+		localStorage.removeItem('errorTickets');
+		errorTicketsJson = {"ticket":[]};
+	});
+	//PAUSE
+	$(document).on('click', "#pause-but", function(){
+		if(!pauseFl){
+			chrome.tabs.sendMessage(csId, {'askFor': 'pause'});
+			clearInterval(sendRefreshTimer);
+			pauseFl = true;
+			$(this).html('ПРОДОЛЖИТЬ');
+		}
+		else{
+			chrome.tabs.sendMessage(csId, {'askFor': 'resume'});
+			sendRefreshTimer = setInterval(function(){
+				chrome.tabs.sendMessage(csId, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
+			},parseInt($('#refreshTime').val()*1000));
+			pauseFl = false;
+			$(this).html('ПАУЗА');
+		}
+	});
+	//STOP
+	$(document).on('click', "#stop-but", function(){
+			chrome.tabs.sendMessage(csId, {'askFor': 'stop'});
+			clearInterval(sendRefreshTimer);
+			pauseFl = true;
+	});
+	//REBET
+	$(document).on('click', "#rebet-but", function(){
+		chrome.tabs.sendMessage(csId, {'askFor': 'tickets', 'tickets': JSON.stringify(errorTicketsJson), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000)});
+		sendRefreshTimer = setInterval(function(){
+			chrome.tabs.sendMessage(csId, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
+		},parseInt($('#refreshTime').val()*1000));
+		pauseFl = false
+		localStorage.removeItem('errorInfo');
+		errorInfoJson = {"error":[]};
+		localStorage.removeItem('errorTickets');
+		errorTicketsJson = {"ticket":[]};
+	});
+	//RUN
+	$(document).on('click', "#run", function(){
+		if(sumOfMas(filter[0]) > k_)
+			filter[0] = filter[0].slice(0,-1);
+		if(sumOfMas(filter[1]) > n_-k_)
+			filter[1] = filter[1].slice(0,-1);
+		var res = cBlocksBin(n_, k_, filter[0], filter[1]);
+		if($('#k-check').prop("checked") && $('#n-k-check').prop("checked")){
+			var res = cBlocksBin(n_, k_, [], []);
+			popBloks(res, 10);
+		}else{
+			if($('#k-check').prop("checked")){
+				var res = cBlocksBin(n_, k_, [], filter[1]);
+				popBloks(res, 1);
+			}
+			if($('#n-k-check').prop("checked")){
+				var res = cBlocksBin(n_, k_, filter[0], []);
+				popBloks(res, 0);
+			}
+		}
+		print2DemArr(res);			
+	});
+	//});
+	//use team from team list
+	$('#team-list').on('click', 'div.alert', function(e){
+		if(e.target == this){
+			if($(this).hasClass('alert-standard')){
+				var obj = {};
+				obj['name'] = $(this).attr("data-name");
+				obj['date'] = $(this).attr("data-date");
+				selectedTeamsJson.team.push(obj);
+				localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
+				$(this)
+					.removeClass('alert-standard')
+					.addClass('alert-error');
+			}else{
+				selectedTeamsJson.team.splice(selectedTeamsJson.team.indexOf(obj,1));
+				localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
+				$(this)
+					.removeClass('alert-error')
+					.addClass('alert-standard');
+			}
+			n_ = selectedTeamsJson.team.length;			
+			$('#n').val(n_>0?n_:"");
+		}
+	});
 	function sumOfMas(m){
 		var total = 0;
 		$.each(m,function(){
@@ -8,14 +239,12 @@ jQuery(document).ready(function ($) {
 		});
 		return total;
 	}
-	
 	function allTrue(m){
 		for(var i = 0; i < m.length; i++)
 			if(m[i] == false)
 				return false;
 		return true;
 	}	
-
 	function combinations(arr) {
 		if(arr.length >1){
 			var beg = arr[0],
@@ -28,7 +257,6 @@ jQuery(document).ready(function ($) {
 				return arr2;
 		}else return [arr];
 	}
-	
 	function c_n_k (n,k){
 		var total = 0,
 			output = new Array;
@@ -54,7 +282,6 @@ jQuery(document).ready(function ($) {
 		}
 		return output;
 	}
-	
 	function invert(input){
 		var k = input[0].length,
 			n = input[input.length-1][k-1]+1,
@@ -70,7 +297,6 @@ jQuery(document).ready(function ($) {
 		}
 		return output;
 	}
-	
 	function block(input,filter,n){
 		if(!filter.length)
 			return input;
@@ -122,11 +348,6 @@ jQuery(document).ready(function ($) {
 		}			
 		return output;
 	}
-	
-	var filter = new Array;
-	filter[0] = new Array; //k block
-	filter[1] = new Array; //n-k block
-	 
 	function inputsForBlocks(n,k){
 		$('.dynamic').detach();	
 		if(k > 1){
@@ -148,51 +369,9 @@ jQuery(document).ready(function ($) {
 				.attr('placeholder',"Блок "+$(".n-k-blocks").length)
 				.addClass("n-k-blocks dynamic");	
 		}
-		$(document).on('input', ".k-blocks", function(){ 
-			filter[0] = $('.k-blocks').map(function(idx, elem) {
-					return parseFloat($(elem).val());				 
-				});
-			if($(".k-blocks").last().val() < 2){
-				$(".k-blocks").last().val('');
-				return false;
-			}
-			if($(".k-blocks").last().val() && sumOfMas(filter[0]) < k){		
-				$('<input type="text"></input>').appendTo('#k-blocks-div')
-					.attr('id', "k-block"+$(".k-blocks").length)
-					.css({width:"50px",
-						background: "#3C3F45",
-						color: "white"})
-					.attr('placeholder',"Блок "+$(".k-blocks").length)
-					.addClass("k-blocks dynamic");
-			}else{
-				$('.k-blocks').filter(function(){return !this.value;}).remove();
-			}
-		});		
-		$(document).on('input', ".n-k-blocks", function(){			
-			filter[1] = $('.n-k-blocks').map(function(idx, elem) {
-					return parseFloat($(elem).val());				 
-				});
-			if($(".n-k-blocks").last().val() < 2){
-				$(".n-k-blocks").last().val('');
-				return false;
-			}
-			if($(".n-k-blocks").last().val() && sumOfMas(filter[1]) < n-k){	
-				$('<input type="text"></input>').appendTo('#n-k-blocks-div')
-					.attr('id', "n-k-block"+$(".n-k-blocks").length)
-					.css({width:"50px",
-						background: "#3C3F45",
-						color: "white",
-						'margin-top': "19px"})
-					.attr('placeholder',"Блок "+$(".n-k-blocks").length)
-					.addClass("n-k-blocks dynamic");
-			}else{
-				$('.n-k-blocks').filter(function(){return !this.value;}).remove();
-			}
-		});
 		$('<a id="run" class="button button-large dynamic">Предпросмотр</a>')
 			.appendTo('#buttons');
 	}	
-	
 	function fillTeamList(teamsJson){
 		$('#team-list > div').remove();
 		teamsJson.team.forEach(function(item, i){
@@ -209,9 +388,10 @@ jQuery(document).ready(function ($) {
 			var obj = {};
 			obj["name"] = $(this).attr("data-name");
 			obj["date"] = $(this).attr("data-date");
-			$.each(selectedTeamsJson.team, function(data, idx) { 
-			   if ($.isEqual(data, obj)) {
-				  $(this)
+			var self = this;
+			$.each(selectedTeamsJson.team, function(idx, data) { 
+			   if (JSON.stringify(data) ==  JSON.stringify(obj)) {
+				  $(self)
 					.removeClass('alert-standard')
 					.addClass('alert-error');
 				  return;
@@ -219,288 +399,137 @@ jQuery(document).ready(function ($) {
 			});			
 		});
 	}
-	var n_,
-		k_,
-		n_k_,
-		teamsJson = {"team":[]},
-		selectedTeamsJson = {"team":[]},
-		csId,
-		ticketsJson = {"ticket":[]},
-		errorInfoJson = localStorage.getItem('errorInfo')? JSON.parse(localStorage.getItem('errorInfo')): {"error":[]},
-		errorTicketsJson = localStorage.getItem('errorTickets')? JSON.parse(localStorage.getItem('errorTickets')): {"ticket":[]},
-		pauseFl = true,
-		sendRefreshTimer;
-		chrome.runtime.onMessage.addListener(
-			 function(request, sender, sendResponse) {		
-				if (request.askFor == "teamsFromMB"){
-					csId = parseInt(sender.tab.id);
-					teamsJson = JSON.parse(request.teams);
-					fillTeamList(teamsJson);
-					markSelectedTeams(selectedTeamsJson);
-				}
-		});
-		chrome.runtime.onMessage.addListener(
-			 function(request, sender, sendResponse) {		
-				if (request.askFor == "ticketDone"){
-					csId = parseInt(sender.tab.id);
-					var tNum = parseInt(request.ticketNum);
-					markDoneTicket(tNum, false, '');
-				}
-		});
-		chrome.runtime.onMessage.addListener(
-			 function(request, sender, sendResponse) {		
-				if (request.askFor == "ticketError"){
-					csId = parseInt(sender.tab.id);
-					errorInfoJson.error.push(JSON.parse(request.errorInfo));
-					localStorage.setItem('errorInfo', JSON.stringify(errorInfoJson));
-					var tNum = parseInt(errorInfoJson.error[errorInfoJson.error.length-1].ticketNum);
-					var inf = errorInfoJson.error[errorInfoJson.error.length-1].info;
-					errorTicketsJson.ticket.push(ticketsJson.ticket[tNum]);
-					localStorage.setItem('errorTickets', JSON.stringify(errorTicketsJson));
-					markDoneTicket(tNum, true, inf);
-				}
-		});
-		function markDoneTicket(num, err, inf){
-			var ticketDiv = $('#steps-area').find('.row[data-ticket-num = ' + num +']');
-			if(err){
-				ticketDiv.clone().appendTo('#error-area .accordion-inner').find('.alert').html("Билет №" + parseInt(num+1) + ":</br>" + inf);
-				ticketDiv.find('.alert').attr('class', 'alert fade in');
-				$('#error-area').prev().find('a.accordion-toggle').html('Ошибки (' + $('#error-area .accordion-inner > div.row').length + ')');
-				$('#rebet-but').html('Повторить непоставленные (' +  $('#error-area .accordion-inner > div.row').length + ')');
-			}else{
-				ticketDiv.appendTo('#done-area .accordion-inner');
-				$('#done-area').prev().find('a.accordion-toggle').html('Готово (' + $('#done-area .accordion-inner > div.row').length + ')');
-				$('#steps-area').find('.row[data-ticket-num = ' + num +']').remove();
-				$('#error-area').find('.row[data-ticket-num = ' + num +']').remove();
-				$('#error-area').prev().find('a.accordion-toggle').html('Ошибки (' + $('#error-area .accordion-inner > div.row').length + ')');
-				$('#rebet-but').html('Повторить непоставленные (' +  $('#error-area .accordion-inner > div.row').length + ')');
-			}
-			$('#steps-area').prev().find('a.accordion-toggle').html('Билеты (' + $('#steps-area .accordion-inner > div.row').length + ')');
+	function markDoneTicket(num, err, inf){
+		var ticketDiv = $('#steps-area').find('.row[data-ticket-num = ' + num +']');
+		if(err){
+			ticketDiv.clone().appendTo('#error-area .accordion-inner').find('.alert').html("Билет №" + parseInt(num+1) + ":</br>" + inf);
+			ticketDiv.find('.alert').attr('class', 'alert fade in');
+			$('#error-area').prev().find('a.accordion-toggle').html('Ошибки (' + $('#error-area .accordion-inner > div.row').length + ')');
+			$('#rebet-but').html('Повторить непоставленные (' +  $('#error-area .accordion-inner > div.row').length + ')');
+		}else{
+			ticketDiv.appendTo('#done-area .accordion-inner');
+			$('#done-area').prev().find('a.accordion-toggle').html('Готово (' + $('#done-area .accordion-inner > div.row').length + ')');
+			$('#steps-area').find('.row[data-ticket-num = ' + num +']').remove();
+			$('#error-area').find('.row[data-ticket-num = ' + num +']').remove();
+			$('#error-area').prev().find('a.accordion-toggle').html('Ошибки (' + $('#error-area .accordion-inner > div.row').length + ')');
+			$('#rebet-but').html('Повторить непоставленные (' +  $('#error-area .accordion-inner > div.row').length + ')');
 		}
-	$(".n-k-params").on('input', function(){ 		
-		$('.dynamic').remove();
-		$(this).each(function(){
-			if($(this).val().length){
-				if($('#n').val() && $('#k').val())
-					$('#n-k').val(parseInt($('#n').val()) - parseInt($('#k').val()));
-				if($('#n-k').val() && $('#k').val())
-					$('#n').val(parseInt($('#n-k').val()) + parseInt($('#k').val()));
-				if($('#n').val() && $('#n-k').val())
-					$('#k').val(parseInt($('#n').val()) - parseInt($('#n-k').val()));
-				n_ = parseInt($('#n').val());
-				k_ = parseInt($('#k').val());
-				n_k_ = parseInt($('#n-k').val());
-				if(!isNaN(n_) && !isNaN(k_) && n>=k)
-					inputsForBlocks(n_,k_);
-			}
-		});
-		
-		function cBlocksBin(n, k, filterK, filterN_K){
-			var kSet = block(c_n_k(n, k), filterK, n),
-				n_kSet = block(invert(c_n_k(n, k)), filterN_K, n),
-				resultSet = new Array,
-				itr = 0;	
-			for(var i = 0; i < kSet.length; i++){
-				for(var j = 0; j < n_kSet.length; j++){
-					var stuck = true;
-					for(var k = 0; k < n_-k_; k++)					
-						if(kSet[i].indexOf(n_kSet[j][k]) != -1){
-							stuck = false;
-							break;
-						}
-					if(stuck){
-						resultSet[itr] = new Array;
-						kSet[i].forEach(function(item){
-							resultSet[itr][item] = 1;
-						});
-						n_kSet[j].forEach(function(item){
-							resultSet[itr][item] = 0;
-						});	
-						itr++
+		$('#steps-area').prev().find('a.accordion-toggle').html('Билеты (' + $('#steps-area .accordion-inner > div.row').length + ')');
+	}
+	function cBlocksBin(n, k, filterK, filterN_K){
+		var kSet = block(c_n_k(n, k), filterK, n),
+			n_kSet = block(invert(c_n_k(n, k)), filterN_K, n),
+			resultSet = new Array,
+			itr = 0;	
+		for(var i = 0; i < kSet.length; i++){
+			for(var j = 0; j < n_kSet.length; j++){
+				var stuck = true;
+				for(var k = 0; k < n_-k_; k++)					
+					if(kSet[i].indexOf(n_kSet[j][k]) != -1){
+						stuck = false;
+						break;
 					}
+				if(stuck){
+					resultSet[itr] = new Array;
+					kSet[i].forEach(function(item){
+						resultSet[itr][item] = 1;
+					});
+					n_kSet[j].forEach(function(item){
+						resultSet[itr][item] = 0;
+					});	
+					itr++
 				}
-			}
-			return resultSet;
-		}		
-		function popBloks(arr ,v){
-			for(var i = 0; i < arr.length; i++)
-				for(var j = 0; j < arr[i].length -1; j++){
-					if(v == 1)
-						if(arr[i][j] == 1 && arr[i][j+1] == 1){
-							arr.splice(i,1);
-							i--;
-							break;
-						}
-					if(v == 0)
-						if(arr[i][j] == 0 && arr[i][j+1] == 0){
-							arr.splice(i,1);
-							i--;
-							break;
-						}
-					if(v == 10)
-						if(arr[i][j] == arr[i][j+1]){
-							arr.splice(i,1);	
-							i--;
-							break;
-						}
-				}
-		}
-		function print2DemArr(arr){
-			$('#res-col-1 .alert stp').remove();
-			var newEl = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
-			newEl = $('<div class="accordion-group stp"></div>').appendTo(newEl);
-			var innner = $('<div class="accordion-body collapse stp"></div>').appendTo(newEl)
-				.attr('id', 'steps-area');
-			innner = $('<div class="accordion-inner stp"></div>').appendTo(innner)
-			newEl = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl);
-			newEl = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
-				.appendTo(newEl)
-				.text('Билеты (' + arr.length + ')')
-				.attr('href', '#steps-area' );
-			
-			var newEl2 = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
-			newEl2 = $('<div class="accordion-group stp"></div>').appendTo(newEl2);
-			var innner2 = $('<div class="accordion-body collapse stp"></div>').appendTo(newEl2)
-				.attr('id', 'done-area');
-			innner2 = $('<div class="accordion-inner stp"></div>').appendTo(innner2)
-			newEl2 = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl2);
-			newEl2 = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
-				.appendTo(newEl2)
-				.text('Готово (0)')
-				.attr('href', '#done-area' );
-			
-			var newEl2 = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
-			newEl2 = $('<div class="accordion-group stp"></div>').appendTo(newEl2);
-			var innner2 = $('<div class="accordion-body collapse stp"></div>').appendTo(newEl2)
-				.attr('id', 'error-area');
-			innner2 = $('<div class="accordion-inner stp"></div>').appendTo(innner2)
-			newEl2 = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl2);
-			newEl2 = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
-				.appendTo(newEl2)
-				.text('Ошибки (0)')
-				.attr('href', '#error-area' );
-			
-			$('<a id="start-but" class="button button-large dynamic stp">Старт</a>')
-				.appendTo('#buttons');
-			$('<a id="pause-but" class="button button-large dynamic stp">Пауза</a>')
-				.appendTo('#buttons');
-			$('<a id="stop-but" class="button button-large dynamic stp">Стоп</a>')
-				.appendTo('#buttons');
-			$('<a id="rebet-but" class="button button-large dynamic stp">Повторить непоставленные (0)</a>')
-				.appendTo('#buttons');
-			var tCont = "";
-			for(var i = 0; i < arr.length; i++){	
-				var newEl = $('<div class="row cont stp">').appendTo('#steps-area .accordion-inner')
-					.attr('data-ticket-num', i);
-				var newDiv = (i%2 == 0) ?
-				$('<div class="alert alert-error fade in span24 stp">').appendTo(newEl) :
-				$('<div class="alert alert-info fade in span24 stp">').appendTo(newEl);
-				tCont = "Билет №" + parseInt(i+1) + "</br>";
-				ticketsJson.ticket[i] = [];
-				for(var j = 0; j < arr[i].length; j++){
-					var prName = selectedTeamsJson.team[j].name + " " + selectedTeamsJson.team[j].date;
-					tCont += (arr[i][j] == 1) ? (prName + "	+" + "</br>") : (prName + "	-" + "</br>");
-					var obj = {};
-					obj['name'] =  selectedTeamsJson.team[j].name;	
-					obj['date'] =  selectedTeamsJson.team[j].date;		
-					obj['bet'] =  arr[i][j];	
-					ticketsJson.ticket[i][j] = obj;
-				}				
-				newDiv.html(tCont);				
 			}
 		}
-		//START
-		$(document).on('click', "#start-but", function(){
-			chrome.tabs.sendMessage(csId, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000)});
-			localStorage.setItem('tickets', JSON.stringify(ticketsJson));
-			sendRefreshTimer = setInterval(function(){
-				chrome.tabs.sendMessage(csId, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
-			},parseInt($('#refreshTime').val()*1000));
-			pauseFl = false
-			localStorage.removeItem('errorInfo');
-			errorInfoJson = {"error":[]};
-			localStorage.removeItem('errorTickets');
-			errorTicketsJson = {"ticket":[]};
-		});
-		//PAUSE
-		$(document).on('click', "#pause-but", function(){
-			if(!pauseFl){
-				chrome.tabs.sendMessage(csId, {'askFor': 'pause'});
-				clearInterval(sendRefreshTimer);
-				pauseFl = true;
-				$(this).html('ПРОДОЛЖИТЬ');
+		return resultSet;
+	}		
+	function popBloks(arr ,v){
+		for(var i = 0; i < arr.length; i++)
+			for(var j = 0; j < arr[i].length -1; j++){
+				if(v == 1)
+					if(arr[i][j] == 1 && arr[i][j+1] == 1){
+						arr.splice(i,1);
+						i--;
+						break;
+					}
+				if(v == 0)
+					if(arr[i][j] == 0 && arr[i][j+1] == 0){
+						arr.splice(i,1);
+						i--;
+						break;
+					}
+				if(v == 10)
+					if(arr[i][j] == arr[i][j+1]){
+						arr.splice(i,1);	
+						i--;
+						break;
+					}
 			}
-			else{
-				chrome.tabs.sendMessage(csId, {'askFor': 'resume'});
-				sendRefreshTimer = setInterval(function(){
-					chrome.tabs.sendMessage(csId, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
-				},parseInt($('#refreshTime').val()*1000));
-				pauseFl = false;
-				$(this).html('ПАУЗА');
-			}
-		});
-		//STOP
-		$(document).on('click', "#stop-but", function(){
-				chrome.tabs.sendMessage(csId, {'askFor': 'stop'});
-				clearInterval(sendRefreshTimer);
-				pauseFl = true;
-		});
-		//REBET
-		$(document).on('click', "#rebet-but", function(){
-			chrome.tabs.sendMessage(csId, {'askFor': 'tickets', 'tickets': JSON.stringify(errorTicketsJson), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000)});
-			sendRefreshTimer = setInterval(function(){
-				chrome.tabs.sendMessage(csId, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
-			},parseInt($('#refreshTime').val()*1000));
-			pauseFl = false
-			localStorage.removeItem('errorInfo');
-			errorInfoJson = {"error":[]};
-			localStorage.removeItem('errorTickets');
-			errorTicketsJson = {"ticket":[]};
-		});
-		//RUN
-		$(document).on('click', "#run", function(){
-			if(sumOfMas(filter[0]) > k_)
-				filter[0] = filter[0].slice(0,-1);
-			if(sumOfMas(filter[1]) > n_-k_)
-				filter[1] = filter[1].slice(0,-1);
-			var res = cBlocksBin(n_, k_, filter[0], filter[1]);
-			if($('#k-check').prop("checked") && $('#n-k-check').prop("checked")){
-				var res = cBlocksBin(n_, k_, [], []);
-				popBloks(res, 10);
-			}else{
-				if($('#k-check').prop("checked")){
-					var res = cBlocksBin(n_, k_, [], filter[1]);
-					popBloks(res, 1);
-				}
-				if($('#n-k-check').prop("checked")){
-					var res = cBlocksBin(n_, k_, filter[0], []);
-					popBloks(res, 0);
-				}
-			}
-			print2DemArr(res);			
-		});
-	});
-	//use team from team list
-	$('#team-list').on('click', 'div.alert', function(e){
-		if(e.target == this){
-			if($(this).hasClass('alert-standard')){
+	}
+	function print2DemArr(arr){
+		$('.stp').remove();
+		ticketsJson = {"ticket":[]};
+		var newEl = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
+		newEl = $('<div class="accordion-group stp"></div>').appendTo(newEl);
+		var innner = $('<div class="accordion-body collapse stp"></div>').appendTo(newEl)
+			.attr('id', 'steps-area');
+		innner = $('<div class="accordion-inner stp"></div>').appendTo(innner)
+		newEl = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl);
+		newEl = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
+			.appendTo(newEl)
+			.text('Билеты (' + arr.length + ')')
+			.attr('href', '#steps-area' );
+		
+		var newEl2 = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
+		newEl2 = $('<div class="accordion-group stp"></div>').appendTo(newEl2);
+		var innner2 = $('<div class="accordion-body collapse stp"></div>').appendTo(newEl2)
+			.attr('id', 'done-area');
+		innner2 = $('<div class="accordion-inner stp"></div>').appendTo(innner2)
+		newEl2 = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl2);
+		newEl2 = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
+			.appendTo(newEl2)
+			.text('Готово (0)')
+			.attr('href', '#done-area' );
+		
+		var newEl2 = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
+		newEl2 = $('<div class="accordion-group stp"></div>').appendTo(newEl2);
+		var innner2 = $('<div class="accordion-body collapse stp"></div>').appendTo(newEl2)
+			.attr('id', 'error-area');
+		innner2 = $('<div class="accordion-inner stp"></div>').appendTo(innner2)
+		newEl2 = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl2);
+		newEl2 = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
+			.appendTo(newEl2)
+			.text('Ошибки (0)')
+			.attr('href', '#error-area' );
+		
+		$('<a id="start-but" class="button button-large dynamic stp">Старт</a>')
+			.appendTo('#buttons');
+		$('<a id="pause-but" class="button button-large dynamic stp">Пауза</a>')
+			.appendTo('#buttons');
+		$('<a id="stop-but" class="button button-large dynamic stp">Стоп</a>')
+			.appendTo('#buttons');
+		$('<a id="rebet-but" class="button button-large dynamic stp">Повторить непоставленные (0)</a>')
+			.appendTo('#buttons');
+		var tCont = "";
+		for(var i = 0; i < arr.length; i++){	
+			var newEl = $('<div class="row cont stp">').appendTo('#steps-area .accordion-inner')
+				.attr('data-ticket-num', i);
+			var newDiv = (i%2 == 0) ?
+			$('<div class="alert alert-error fade in span24 stp">').appendTo(newEl) :
+			$('<div class="alert alert-info fade in span24 stp">').appendTo(newEl);
+			tCont = "Билет №" + parseInt(i+1) + "</br>";
+			ticketsJson.ticket[i] = [];
+			for(var j = 0; j < arr[i].length; j++){
+				var prName = selectedTeamsJson.team[j].name + " " + selectedTeamsJson.team[j].date;
+				tCont += (arr[i][j] == 1) ? (prName + "	+" + "</br>") : (prName + "	-" + "</br>");
 				var obj = {};
-				obj['name'] = $(this).attr("data-name");
-				obj['date'] = $(this).attr("data-date");
-				selectedTeamsJson.team.push(obj);
-				localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
-				$(this)
-					.removeClass('alert-standard')
-					.addClass('alert-error');
-			}else{
-				selectedTeamsJson.team.splice(selectedTeamsJson.team.indexOf(obj,1));
-				localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
-				$(this)
-					.removeClass('alert-error')
-					.addClass('alert-standard');
-			}
-			n_ = selectedTeamsJson.team.length;			
-			$('#n').val(n_>0?n_:"");
+				obj['name'] =  selectedTeamsJson.team[j].name;	
+				obj['date'] =  selectedTeamsJson.team[j].date;		
+				obj['bet'] =  arr[i][j];	
+				ticketsJson.ticket[i][j] = obj;
+			}				
+			newDiv.html(tCont);				
 		}
-	});
+		localStorage.setItem('tickets', JSON.stringify(ticketsJson));
+	}	
 });
