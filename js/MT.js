@@ -4,7 +4,7 @@ $(function () {
 		n_k_,
 		teamsJson,// =  localStorage.getItem('teams')? JSON.parse(localStorage.getItem('teams')): {"team":[]},
 		selectedTeamsJson,// = localStorage.getItem('selectedTeams')? JSON.parse(localStorage.getItem('selectedTeams')): {"team":[]},
-		csId,
+		csId = localStorage.getItem('contentId')? JSON.parse(localStorage.getItem('contentId')): {},
 		ticketsJson = {"ticket":[]},
 		errorInfoJson = localStorage.getItem('errorInfo')? JSON.parse(localStorage.getItem('errorInfo')): {"error":[]},
 		errorTicketsJson = localStorage.getItem('errorTickets')? JSON.parse(localStorage.getItem('errorTickets')): {"ticket":[]},
@@ -14,6 +14,7 @@ $(function () {
 		filter[0] = []; //k block
 		filter[1] = []; //n-k block;
 		//localStorage.removeItem('selectedTeams');
+		//localStorage.removeItem('teams');
 	if(localStorage['teams']){
 		teamsJson =  JSON.parse(localStorage.getItem('teams'));
 		fillTeamList(teamsJson);
@@ -23,17 +24,15 @@ $(function () {
 			selectedTeamsJson =  JSON.parse(localStorage.getItem('selectedTeams'));
 			markSelectedTeams(selectedTeamsJson);
 			n_ = selectedTeamsJson.team.length;
-			if(n_!=0)
-				$('#n').val(n_);
-			else
-				$('#n').val("");
+				$('#n').val(n_ > 0? n_: "");
 	}else
 		selectedTeamsJson = {"team": []};
 		
 	chrome.runtime.onMessage.addListener(
 		 function(request, sender, sendResponse) {		
 			if (request.askFor == "contentScriptId"){
-				csId = parseInt(sender.tab.id);
+				csId.id = parseInt(sender.tab.id);
+				localStorage.setItem('contentId', JSON.stringify(csId));
 				//teamsJson = JSON.parse(request.teams);
 				//localStorage.setItem('teams', JSON.stringify(teamsJson));
 				//fillTeamList(teamsJson);
@@ -43,7 +42,8 @@ $(function () {
 	chrome.runtime.onMessage.addListener(
 		 function(request, sender, sendResponse) {		
 			if (request.askFor == "ticketDone"){
-				csId = parseInt(sender.tab.id);
+				csId.id = parseInt(sender.tab.id);
+                localStorage.setItem('contentId', JSON.stringify(csId));
 				var tNum = parseInt(request.ticketNum);
 				markDoneTicket(tNum, false, '');
 			}
@@ -51,7 +51,8 @@ $(function () {
 	chrome.runtime.onMessage.addListener(
 		 function(request, sender, sendResponse) {		
 			if (request.askFor == "ticketError"){
-				csId = parseInt(sender.tab.id);
+				csId.id = parseInt(sender.tab.id);
+                localStorage.setItem('contentId', JSON.stringify(csId));
 				errorInfoJson.error.push(JSON.parse(request.errorInfo));
 				localStorage.setItem('errorInfo', JSON.stringify(errorInfoJson));
 				var tNum = parseInt(errorInfoJson.error[errorInfoJson.error.length-1].ticketNum);
@@ -62,7 +63,7 @@ $(function () {
 			}
 	});
 	$('#get-teams').on('click', function(){
-		chrome.tabs.sendMessage(csId, {'askFor': 'getTeams'}, function(response){
+		chrome.tabs.sendMessage(csId.id, {'askFor': 'getTeams'}, function(response){
 			teamsJson = JSON.parse(response.teams);
 			localStorage.setItem('teams', JSON.stringify(teamsJson));
 			fillTeamList(teamsJson);
@@ -73,21 +74,36 @@ $(function () {
 			localStorage.setItem('tickets', JSON.stringify(ticketsJson));
 			localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
 			n_ = selectedTeamsJson.team.length;
-			if(n_!=0)
-				$('#n').val(n_);
-			else
-				$('#n').val("");
+			$('#n').val(n_ > 0? n_: "");
 		});
 	});
+	$('#clear').on('click', function(){		
+		$('#team-list > div').remove();
+		$('input').val("");
+		teamsJson = {"team":[]};			
+		selectedTeamsJson = {"team":[]};
+		ticketsJson = {"ticket":[]};
+		errorInfoJson = {"error":[]};
+		errorTicketsJson = {"ticket":[]};
+		localStorage.setItem('teams', JSON.stringify(teamsJson));
+		localStorage.setItem('tickets', JSON.stringify(ticketsJson));
+		localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
+		n_ = 0;			
+		clearInterval(sendRefreshTimer);
+		pauseFl = true;
+		chrome.tabs.sendMessage(csId.id, {'askFor': 'stop'});
+});
 	$(document).on('input', ".k-blocks", function(){ 
+		filter[0] = [];
 		$('.k-blocks').each(function() {
-				filter[0].push(parseInt($(this).val()));				 
+				if($(this).val().length)
+					filter[0].push(parseInt($(this).val()));				 
 			});
 		if($(".k-blocks").last().val() < 2){
 			$(".k-blocks").last().val('');
 			return false;
 		}
-		if($(".k-blocks").last().val() && sumOfMas(filter[0]) < k){		
+		if($(".k-blocks").last().val() && sumOfMas(filter[0]) < k_){		
 			$('<input type="text"></input>').appendTo('#k-blocks-div')
 				.attr('id', "k-block"+$(".k-blocks").length)
 				.css({width:"50px",
@@ -99,15 +115,17 @@ $(function () {
 			$('.k-blocks').filter(function(){return !this.value;}).remove();
 		}
 	});		
-	$(document).on('input', ".n-k-blocks", function(){			
+	$(document).on('input', ".n-k-blocks", function(){
+		filter[1] = [];
 		$('.n-k-blocks').each(function() {
-			filter[1].push(parseInt($(this).val()));				 
+			if($(this).val().length)
+				filter[1].push(parseInt($(this).val()));				 
 		});
 		if($(".n-k-blocks").last().val() < 2){
 			$(".n-k-blocks").last().val('');
 			return false;
 		}
-		if($(".n-k-blocks").last().val() && sumOfMas(filter[1]) < n-k){	
+		if($(".n-k-blocks").last().val() && sumOfMas(filter[1]) < n_k_){	
 			$('<input type="text"></input>').appendTo('#n-k-blocks-div')
 				.attr('id', "n-k-block"+$(".n-k-blocks").length)
 				.css({width:"50px",
@@ -124,15 +142,25 @@ $(function () {
 		$('.dynamic').remove();
 		$(this).each(function(){
 			if($(this).val().length){
-				if($('#n').val() && $('#k').val())
+				/* if($('#n').val() && $('#k').val())
 					$('#n-k').val(parseInt($('#n').val()) - parseInt($('#k').val()));
 				if($('#n-k').val() && $('#k').val())
 					$('#n').val(parseInt($('#n-k').val()) + parseInt($('#k').val()));
 				if($('#n').val() && $('#n-k').val())
-					$('#k').val(parseInt($('#n').val()) - parseInt($('#n-k').val()));
-				n_ = parseInt($('#n').val());
+					$('#k').val(parseInt($('#n').val()) - parseInt($('#n-k').val())); */
+				if($(this).attr('id') == 'k'){
+					k_ = parseInt($(this).val());
+					n_k_ = n_ - k_;
+					$('#n-k').val(n_k_);
+				}
+				if($(this).attr('id') == 'n-k'){
+					n_k_ = parseInt($(this).val());
+					k_ = n_ - n_k_;
+					$('#k').val(k_);
+				}
+				/* n_ = parseInt($('#n').val());
 				k_ = parseInt($('#k').val());
-				n_k_ = parseInt($('#n-k').val());
+				n_k_ = parseInt($('#n-k').val()); */
 				if(!isNaN(n_) && !isNaN(k_) && n>=k)
 					inputsForBlocks(n_,k_);
 			}
@@ -140,10 +168,10 @@ $(function () {
 	});
 		//START
 	$(document).on('click', "#start-but", function(){
-		chrome.tabs.sendMessage(csId, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000)});
+		chrome.tabs.sendMessage(csId.id, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000)});
 		localStorage.setItem('tickets', JSON.stringify(ticketsJson));
 		sendRefreshTimer = setInterval(function(){
-			chrome.tabs.sendMessage(csId, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
+			chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
 		},parseInt($('#refreshTime').val()*1000));
 		pauseFl = false
 		localStorage.removeItem('errorInfo');
@@ -154,15 +182,15 @@ $(function () {
 	//PAUSE
 	$(document).on('click', "#pause-but", function(){
 		if(!pauseFl){
-			chrome.tabs.sendMessage(csId, {'askFor': 'pause'});
+			chrome.tabs.sendMessage(csId.id, {'askFor': 'pause'});
 			clearInterval(sendRefreshTimer);
 			pauseFl = true;
 			$(this).html('ПРОДОЛЖИТЬ');
 		}
 		else{
-			chrome.tabs.sendMessage(csId, {'askFor': 'resume'});
+			chrome.tabs.sendMessage(csId.id, {'askFor': 'resume'});
 			sendRefreshTimer = setInterval(function(){
-				chrome.tabs.sendMessage(csId, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
+				chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
 			},parseInt($('#refreshTime').val()*1000));
 			pauseFl = false;
 			$(this).html('ПАУЗА');
@@ -170,15 +198,15 @@ $(function () {
 	});
 	//STOP
 	$(document).on('click', "#stop-but", function(){
-			chrome.tabs.sendMessage(csId, {'askFor': 'stop'});
+			chrome.tabs.sendMessage(csId.id, {'askFor': 'stop'});
 			clearInterval(sendRefreshTimer);
 			pauseFl = true;
 	});
 	//REBET
 	$(document).on('click', "#rebet-but", function(){
-		chrome.tabs.sendMessage(csId, {'askFor': 'tickets', 'tickets': JSON.stringify(errorTicketsJson), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000)});
+		chrome.tabs.sendMessage(csId.id, {'askFor': 'tickets', 'tickets': JSON.stringify(errorTicketsJson), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000)});
 		sendRefreshTimer = setInterval(function(){
-			chrome.tabs.sendMessage(csId, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
+			chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000)});
 		},parseInt($('#refreshTime').val()*1000));
 		pauseFl = false
 		localStorage.removeItem('errorInfo');
@@ -375,12 +403,16 @@ $(function () {
 	function fillTeamList(teamsJson){
 		$('#team-list > div').remove();
 		teamsJson.team.forEach(function(item, i){
-			var newDiv =
-				$('<div class="alert alert-standard fade in">').appendTo($('#team-list'))
-					.html(item.name + " " + item.date)
-					.attr("data-name", item.name)
-					.attr("data-date", item.date);
-			$('<a class="close" data-dismiss="alert" href="#">&times;</a>').appendTo(newDiv);
+            if(item == null){
+               teamsJson.team = teamsJson.team.splice(i, 1);
+            }else{
+                var newDiv =
+                    $('<div class="alert alert-standard fade in">').appendTo($('#team-list'))
+                        .html(item.name + " " + item.date)
+                        .attr("data-name", item.name)
+                        .attr("data-date", item.date);
+                $('<a class="close" data-dismiss="alert" href="#">&times;</a>').appendTo(newDiv);
+            }
 		});
 	}
 	function markSelectedTeams(selectedTeamsJson){

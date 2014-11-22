@@ -1,4 +1,4 @@
-﻿$(function () {    
+$(function () {    
 	var mtId,
 		pauseFl = false,
 		bigCycle,
@@ -14,7 +14,7 @@
 	tbb.each(function(i){
 		var gameDate = $(this).find('td.date').html();
 		var teamsNames = $(this).attr('data-event-name');	
-		if(gameDate && teamsNames){		
+		if(gameDate && teamsNames && $(this).find('td.price').length > 0){		
 			gameDate = gameDate.trim();
 			var obj = {};
 			obj['name'] = teamsNames;
@@ -68,6 +68,7 @@
 								}, 500);
 						}else{
 							localStorage.setItem('finish', 1);
+							chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
 							clickEnter();
 						}
 					}else{
@@ -141,14 +142,16 @@
 									markTeams();
 								}
 								else{
-									setCoast(coast);
-									clearTimeout(markTeamsTimer);
+									$('#button_accumulator')[0].click();
+									setTimeout(function(){
+										setCoast(coast);},500);
+									//clearTimeout(markTeamsTimer);
 								}
 							},300);
 					}
 					function setCoast(coast){
 						if(!pauseFl){
-							$('#button_accumulator')[0].click();
+							//$('#button_accumulator')[0].click();
 							var timer1 = setTimeout(function(){										
 									var evt = document.createEvent('KeyboardEvent');
 									evt.initKeyboardEvent('keyup', true, true, window, false, false, false, false, 13, 13);
@@ -157,7 +160,7 @@
 									evt.charCode = 13; 
 									$('.stake.stake-input.js-focusable[name = stake]').val(coast);
 									$('.stake.stake-input.js-focusable[name = stake]')[0].dispatchEvent(evt);
-								}, 1500);
+								}, 1000);
 							var timer2 = setTimeout(function(){
 										$('.but-place-bet')[0].click();
 										i++;
