@@ -1,4 +1,4 @@
-п»ї<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
  <meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
@@ -17,30 +17,33 @@
 	 <link rel="shortcut icon" href="#">
 	 <!-- Font Icons -->
 	<link href="css/fonts.css" rel="stylesheet">
-	<!-- Responsive -->
-	<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
-	<link href="css/responsive.css" rel="stylesheet">
+		<!-- Responsive -->
+		<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link href="css/responsive.css" rel="stylesheet">
 </head>
 <body>
 <div id="top-div" class="span24">
 <div class="span24">
 	<div id="n-k-params-div" class="span2">		
 				<input id="n" type="text" name="n" class="n-k-params" 
-					placeholder = "Р’СЃРµРіРѕ" style="width:80px; background: #3C3F45; color: white"></input></br>	
+					placeholder = "Всего" style="width:80px; background: #3C3F45; color: white"></input></br>	
 				<input id="k" type="text" name="k" class="n-k-params" 
-					placeholder = "РџР»СЋСЃРѕРІ" style="width:80px; background: #3C3F45; color: white"></input>
-				<label> <input type="checkBox"  name="check" id="k-check"/> Р±РµР· Р±Р»РѕРєРѕРІ </label>		
+					placeholder = "Плюсов" style="width:80px; background: #3C3F45; color: white"></input>
+				<label> <input type="checkBox"  name="check" id="k-check"/> без блоков </label>		
 				<input id="n-k" type="text" name="n-k" class="n-k-params" 
-					placeholder = "РњРёРЅСѓСЃРѕРІ" style="width:80px; background: #3C3F45; color: white"></input>		
-				<label> <input type="checkBox"  name="check" id="n-k-check"/> Р±РµР· Р±Р»РѕРєРѕРІ </label>
+					placeholder = "Минусов" style="width:80px; background: #3C3F45; color: white"></input>		
+				<label> <input type="checkBox"  name="check" id="n-k-check"/> без блоков </label>
 				<input id="coast" type="text" name="coast" class="coast" 
-					placeholder = "РЎСѓРјРјР°" style="width:80px; background: #3C3F45; color: white"></input>
-				<label>Р—Р°РґРµСЂР¶РєР° РїРѕСЃР»Рµ СЃС‚Р°РІРєРё, СЃРµРє</label>
+					placeholder = "Сумма" style="width:80px; background: #3C3F45; color: white"></input>
+				<label>Выделение команд, мс</label>
+				<input id="markTime" type="text" name="refreshTime" class="coast" 
+					placeholder = "минимум 300" style="width:100px; background: #3C3F45; color: white"></input>
+				<label>Задержка после ставки, сек</label>
 				<input id="betTime" type="text" name="betTime" class="coast" 
-					placeholder = "РјРёРЅРёРјСѓРј 5" style="width:80px; background: #3C3F45; color: white"></input>
-				<label>РћР±РЅРѕРІР»СЏС‚СЊ С‡РµСЂРµР·, СЃРµРє</label>
+					placeholder = "минимум 5" style="width:100px; background: #3C3F45; color: white"></input>
+				<label>Обновлять через, сек</label>
 				<input id="refreshTime" type="text" name="refreshTime" class="coast" 
-					placeholder = "РјРёРЅРёРјСѓРј 60" style="width:80px; background: #3C3F45; color: white"></input>
+					placeholder = "минимум 60" style="width:100px; background: #3C3F45; color: white"></input>
 			</li>
 		</ul>
 	</div>
@@ -54,12 +57,12 @@
 			<div class="accordion-group">
 				<div class="accordion-heading accordionize">
 					<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionArea" href="#oneArea">
-						РљРѕРјР°РЅРґС‹
+						Команды
 						<span class="font-icon-arrow-simple-down"></span>
 					</a>
 				</div>
-				<a id="get-teams" class="button button-large">РћР±РЅРѕРІРёС‚СЊ РєРѕРјР°РЅРґС‹</a>
-				<a id="clear" class="button button-large">РћС‡РёСЃС‚РёС‚СЊ</a>
+				<a id="get-teams" class="button button-large">Обновить команды</a>
+				<a id="clear" class="button button-large">Очистить</a>
 				<div id="oneArea" class="accordion-body collapse">
 					<div id="team-list" class="accordion-inner">	
 					</div>

