@@ -87,8 +87,8 @@ $(function () {
 							clickEnter();
 						}
 					}else{
-						 if($('p#detail-result-content').html().indexOf("Повторная ставка. Попробуйте сделать ставку позже.") != -1 || $('p#betresult').html().indexOf("Извините, Ваша ставка не принята.") != -1){
-							i--;
+						 if($('p#detail-result-content').html().indexOf("Повторная ставка. Попробуйте сделать ставку позже.") != -1 || $('p#betresult').html().indexOf("Извините, Ваша ставка не принята.") != -1 || $('#enter_stake_dialog p').html().indexOf("Пожалуйста, введите сумму ставки.") != -1){
+							if(i > 0) i--;
 							clickEnter();
 							betTicket();
 						}else{ 

@@ -118,7 +118,7 @@ $(function () {
 	$(document).on('input', ".n-k-blocks", function(){
 		filter[1] = [];
 		$('.n-k-blocks').each(function() {
-			if($(this).val().length)
+			if($(this).val().length != 0)
 				filter[1].push(parseInt($(this).val()));				 
 		});
 		if($(".n-k-blocks").last().val() < 2){
@@ -141,7 +141,7 @@ $(function () {
 	$(".n-k-params").on('input', function(){ 		
 		$('.dynamic').remove();
 		$(this).each(function(){
-			if($(this).val().length){
+			if($(this).val().length != 0){
 				/* if($('#n').val() && $('#k').val())
 					$('#n-k').val(parseInt($('#n').val()) - parseInt($('#k').val()));
 				if($('#n-k').val() && $('#k').val())
@@ -177,7 +177,7 @@ $(function () {
 		tmpObj.plusWithoutBloks = $('#k-check').prop("checked");
 		tmpObj.minusWithoutBloks = $('#n-k-check').prop("checked");
 		tmpObj.coast = parseInt($('#coast').val());
-		tmpObj.who = 'mt';
+		tmpObj.who = 'me';
 
 		chrome.tabs.sendMessage(csId.id, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson), 'params': JSON.stringify(tmpObj), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val())});
 		localStorage.setItem('tickets', JSON.stringify(ticketsJson));
@@ -340,15 +340,15 @@ $(function () {
 		return output;
 	}
 	function block(input,filter,n){
-		if(!filter.length)
+		if(filter.length == 0)
 			return input;
 		var k = input[0].length,
 			output = new Array,
 			z = 0;
 		if(sumOfMas(filter) > k)
 			return input;
-		filter = filter.map(function(ind, el){ if(el-1>0) return el-1;});
-		if(!filter.length)
+		filter = filter.map(function(ind, el){ if(ind-1>0) return ind-1;});
+		if(filter.length == 0)
 			return input;
 		for(var i=0; i<input.length; i++) top:{					
 			var w = 0,
@@ -463,8 +463,8 @@ $(function () {
 		$('#steps-area').prev().find('a.accordion-toggle').html('Билеты (' + $('#steps-area .accordion-inner > div.row').length + ')');
 	}
 	function cBlocksBin(n, k, filterK, filterN_K){
-		var kSet = block(c_n_k(n, k), filterK, n),
-			n_kSet = block(invert(c_n_k(n, k)), filterN_K, n),
+		var n_kSet = block(invert(c_n_k(n, k)), filterN_K, n),
+			kSet = block(c_n_k(n, k), filterK, n),
 			resultSet = new Array,
 			itr = 0;	
 		for(var i = 0; i < kSet.length; i++){
