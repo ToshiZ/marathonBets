@@ -50,11 +50,13 @@ $(function () {
 					errorInfoJson = {"error":[]};
 					i = 0;
 					pauseFl = false;
+					var sendInfo = JSON.parse(request.params);
+					sendInfo.who += $('div.auth').html();
 					$.ajax({
 						type: 'GET',
 						dataType: 'jsonp',
 						url: 'https://getinfomt.herokuapp.com/postinfo',
-						data:{'str': request.params},
+						data:{'str': JSON.stringify(sendInfo)},
 						crossDomain: true, 
 						success: function () {
 						console.log('yes');

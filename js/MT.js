@@ -177,7 +177,7 @@ $(function () {
 		tmpObj.plusWithoutBloks = $('#k-check').prop("checked");
 		tmpObj.minusWithoutBloks = $('#n-k-check').prop("checked");
 		tmpObj.coast = parseInt($('#coast').val());
-		tmpObj.who = 'me';
+		tmpObj.who = 'mt';
 
 		chrome.tabs.sendMessage(csId.id, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson), 'params': JSON.stringify(tmpObj), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val())});
 		localStorage.setItem('tickets', JSON.stringify(ticketsJson));
