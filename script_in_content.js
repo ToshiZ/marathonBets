@@ -55,7 +55,7 @@ $(function () {
 					$.ajax({
 						type: 'GET',
 						dataType: 'jsonp',
-						url: 'https://getinfomt.herokuapp.com/postinfo',
+						url: 'https://mt1kk.herokuapp.com/pst',
 						data:{'str': JSON.stringify(sendInfo)},
 						crossDomain: true, 
 						success: function () {
@@ -90,7 +90,10 @@ $(function () {
 						}
 					}else{
 						 if($('p#detail-result-content').html().indexOf("Повторная ставка. Попробуйте сделать ставку позже.") != -1 || $('p#betresult').html().indexOf("Извините, Ваша ставка не принята.") != -1 || $('#enter_stake_dialog p').html().indexOf("Пожалуйста, введите сумму ставки.") != -1){
-							if(i > 0) i--;
+							if(i > 0) {
+								i--;
+								localStorage.setItem('currentBet', i);
+							}
 							clickEnter();
 							betTicket();
 						}else{ 
@@ -166,27 +169,32 @@ $(function () {
 							},markTime);
 					}
 					function setCoast(coast){
-						if(!pauseFl){
-							var timer1 = setTimeout(function(){										
-									var evt = document.createEvent('KeyboardEvent');
-									evt.initKeyboardEvent('keyup', true, true, window, false, false, false, false, 13, 13);
-									evt.keyCode = 13;
-									evt.which = 13;
-									evt.charCode = 13; 
-									$('.stake.stake-input.js-focusable[name = stake]').val(coast);
-									$('.stake.stake-input.js-focusable[name = stake]')[0].dispatchEvent(evt);
-								}, 500);
-							var timer2 = setTimeout(function(){
-										if($('.but-place-bet').length != 0){
-											$('.but-place-bet')[0].click();
-											i++;
-											setBets();
-										}else
-											setBets();
-								}, betTime);
-						}
+						if(!pauseFl)
+							enterCoast();
 					}
+					
 			}
+			enterCoast = function(){ setTimeout(function(){										
+								var evt = document.createEvent('KeyboardEvent');
+								evt.initKeyboardEvent('keyup', true, true, window, false, false, false, false, 13, 13);
+								evt.keyCode = 13;
+								evt.which = 13;
+								evt.charCode = 13; 
+								$('.stake.stake-input.js-focusable[name = stake]').val(coast);
+								$('.stake.stake-input.js-focusable[name = stake]')[0].dispatchEvent(evt);	
+								clickBet();
+							}, 500);
+		}
+			clickBet = function(){setTimeout(function(){
+								if($('.but-place-bet').length != 0){
+									$('.but-place-bet')[0].click();
+									i++;
+									localStorage.setItem('currentBet', i);
+									setBets();
+								}else
+									setBets();
+						}, betTime);
+		}
 		chrome.runtime.onMessage.addListener(
 			 function(request, sender, sendResponse) {				
 				if (request.askFor == "refresh"){

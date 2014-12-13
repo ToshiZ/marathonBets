@@ -347,7 +347,7 @@ $(function () {
 			z = 0;
 		if(sumOfMas(filter) > k)
 			return input;
-		filter = filter.map(function(ind, el){ if(ind-1>0) return ind-1;});
+		filter = filter.map(function(ind, el){ if(ind-1>0 && ind != undefined) return ind-1;});
 		if(filter.length == 0)
 			return input;
 		for(var i=0; i<input.length; i++) top:{					
@@ -355,7 +355,7 @@ $(function () {
 				blocks = new Array;
 			for(var j=0; j<k-1; j++)
 				if(input[i][j] == input[i][j+1]-1){
-					w++;		
+					w++;	
 				}else {
 					if(w!=0){
 						blocks.push(w);
@@ -366,25 +366,29 @@ $(function () {
 				blocks.push(w);
 				w = 0;	
 			}
-			var combs = combinations(filter);
-			for(var comb = 0; comb < combs.length; comb++){
-				var diff,
-					bloksIter = 0;
-				diff = blocks[bloksIter];
-				for(var el = 0; el < combs[0].length; el++){
-					diff = (el == combs[0].length-1 || diff == combs[comb][el])?(diff - combs[comb][el]):(diff - combs[comb][el]-1);
-					if(bloksIter>=blocks.length || diff < 0)
+			var combs = combinations(blocks);
+			var blockCombs = combinations(blocks);
+			for(comb = 0; comb < blockCombs.length; comb++){
+				var fIter = 0;
+				var diff = blockCombs[comb][0];
+				for(b = 0; b < blockCombs[0].length; b++){
+					diff = (fIter == filter.length-1 || diff == filter[fIter])?(diff - filter[fIter]):(diff - filter[fIter] - 1);
+					if(diff < 0)
 						break;
-					if(diff == 0){
-						bloksIter++;							
-						diff = blocks[bloksIter];
+					if(diff > 0){
+						fIter++;
+						b--;
 					}
-					if(el == combs[0].length-1){
-							output[z] = new Array;
-							output[z] = input[i];
-							z++;
-							break top;
-					}						
+					if(diff == 0){
+						fIter++;
+						diff = blockCombs[comb][b+1];
+					}					
+					if(fIter == filter.length){
+						output[z] = new Array;
+						output[z] = input[i];
+						z++;
+						break top;
+					}
 				}
 			}
 		}			
@@ -463,7 +467,8 @@ $(function () {
 		$('#steps-area').prev().find('a.accordion-toggle').html('Билеты (' + $('#steps-area .accordion-inner > div.row').length + ')');
 	}
 	function cBlocksBin(n, k, filterK, filterN_K){
-		var n_kSet = block(invert(c_n_k(n, k)), filterN_K, n),
+		var //n_kSet = block(invert(c_n_k(n, k)), filterN_K, n),
+			n_kSet = block(c_n_k(n, n-k), filterN_K, n),
 			kSet = block(c_n_k(n, k), filterK, n),
 			resultSet = new Array,
 			itr = 0;	
