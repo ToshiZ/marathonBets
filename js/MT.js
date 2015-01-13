@@ -109,7 +109,7 @@ $(function () {
 				.css({width:"50px",
 					background: "#3C3F45",
 					color: "white"})
-				.attr('placeholder',"Блок "+$(".k-blocks").length)
+				.attr('placeholder',"Р‘Р»РѕРє "+$(".k-blocks").length)
 				.addClass("k-blocks dynamic");
 		}else{
 			$('.k-blocks').filter(function(){return !this.value;}).remove();
@@ -132,7 +132,7 @@ $(function () {
 					background: "#3C3F45",
 					color: "white",
 					'margin-top': "19px"})
-				.attr('placeholder',"Блок "+$(".n-k-blocks").length)
+				.attr('placeholder',"Р‘Р»РѕРє "+$(".n-k-blocks").length)
 				.addClass("n-k-blocks dynamic");
 		}else{
 			$('.n-k-blocks').filter(function(){return !this.value;}).remove();
@@ -196,7 +196,7 @@ $(function () {
 			chrome.tabs.sendMessage(csId.id, {'askFor': 'pause'});
 			clearInterval(sendRefreshTimer);
 			pauseFl = true;
-			$(this).html('ПРОДОЛЖИТЬ');
+			$(this).html('РџР РћР”РћР›Р–РРўР¬');
 		}
 		else{
 			chrome.tabs.sendMessage(csId.id, {'askFor': 'resume'});
@@ -204,7 +204,7 @@ $(function () {
 				chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val())});
 			},parseInt($('#refreshTime').val()*1000));
 			pauseFl = false;
-			$(this).html('ПАУЗА');
+			$(this).html('РџРђРЈР—Рђ');
 		}
 	});
 	//STOP
@@ -225,8 +225,8 @@ $(function () {
 		localStorage.removeItem('errorTickets');
 		errorTicketsJson = {"ticket":[]};
 		$('#error-area div.row').remove();
-		$('#error-area').prev().find('a.accordion-toggle').html('Ошибки (' + $('#error-area .accordion-inner > div.row').length + ')');
-		$('#rebet-but').html('Повторить непоставленные (' +  $('#error-area .accordion-inner > div.row').length + ')');
+		$('#error-area').prev().find('a.accordion-toggle').html('РћС€РёР±РєРё (' + $('#error-area .accordion-inner > div.row').length + ')');
+		$('#rebet-but').html('РџРѕРІС‚РѕСЂРёС‚СЊ РЅРµРїРѕСЃС‚Р°РІР»РµРЅРЅС‹Рµ (' +  $('#error-area .accordion-inner > div.row').length + ')');
 	});
 	//RUN
 	$(document).on('click', "#run", function(){
@@ -366,7 +366,7 @@ $(function () {
 				blocks.push(w);
 				w = 0;	
 			}
-			var combs = combinations(blocks);
+			//var combs = combinations(blocks);
 			var blockCombs = combinations(blocks);
 			for(comb = 0; comb < blockCombs.length; comb++){
 				var fIter = 0;
@@ -402,7 +402,7 @@ $(function () {
 				.css({width:"50px",
 					background: "#3C3F45",
 					color: "white"})
-				.attr('placeholder',"Блок "+$(".k-blocks").length)
+				.attr('placeholder',"Р‘Р»РѕРє "+$(".k-blocks").length)
 				.addClass("k-blocks dynamic");
 		}
 		if(n-k > 1){
@@ -412,10 +412,10 @@ $(function () {
 					background: "#3C3F45",
 					color: "white",
 					'margin-top': "19px"})
-				.attr('placeholder',"Блок "+$(".n-k-blocks").length)
+				.attr('placeholder',"Р‘Р»РѕРє "+$(".n-k-blocks").length)
 				.addClass("n-k-blocks dynamic");	
 		}
-		$('<a id="run" class="button button-large dynamic">Предпросмотр</a>')
+		$('<a id="run" class="button button-large dynamic">РџСЂРµРґРїСЂРѕСЃРјРѕС‚СЂ</a>')
 			.appendTo('#buttons');
 	}	
 	function fillTeamList(teamsJson){
@@ -452,19 +452,19 @@ $(function () {
 	function markDoneTicket(num, err, inf){
 		var ticketDiv = $('#steps-area').find('.row[data-ticket-num = ' + num +']');
 		if(err){
-			ticketDiv.clone().appendTo('#error-area .accordion-inner').find('.alert').html("Билет №" + parseInt(num+1) + ":</br>" + inf);
+			ticketDiv.clone().appendTo('#error-area .accordion-inner').find('.alert').html("Р‘РёР»РµС‚ в„–" + parseInt(num+1) + ":</br>" + inf);
 			ticketDiv.find('.alert').attr('class', 'alert fade in');
-			$('#error-area').prev().find('a.accordion-toggle').html('Ошибки (' + $('#error-area .accordion-inner > div.row').length + ')');
-			$('#rebet-but').html('Повторить непоставленные (' +  $('#error-area .accordion-inner > div.row').length + ')');
+			$('#error-area').prev().find('a.accordion-toggle').html('РћС€РёР±РєРё (' + $('#error-area .accordion-inner > div.row').length + ')');
+			$('#rebet-but').html('РџРѕРІС‚РѕСЂРёС‚СЊ РЅРµРїРѕСЃС‚Р°РІР»РµРЅРЅС‹Рµ (' +  $('#error-area .accordion-inner > div.row').length + ')');
 		}else{
 			ticketDiv.appendTo('#done-area .accordion-inner');
-			$('#done-area').prev().find('a.accordion-toggle').html('Готово (' + $('#done-area .accordion-inner > div.row').length + ')');
+			$('#done-area').prev().find('a.accordion-toggle').html('Р“РѕС‚РѕРІРѕ (' + $('#done-area .accordion-inner > div.row').length + ')');
 			$('#steps-area').find('.row[data-ticket-num = ' + num +']').remove();
 			$('#error-area').find('.row[data-ticket-num = ' + num +']').remove();
-			$('#error-area').prev().find('a.accordion-toggle').html('Ошибки (' + $('#error-area .accordion-inner > div.row').length + ')');
-			$('#rebet-but').html('Повторить непоставленные (' +  $('#error-area .accordion-inner > div.row').length + ')');
+			$('#error-area').prev().find('a.accordion-toggle').html('РћС€РёР±РєРё (' + $('#error-area .accordion-inner > div.row').length + ')');
+			$('#rebet-but').html('РџРѕРІС‚РѕСЂРёС‚СЊ РЅРµРїРѕСЃС‚Р°РІР»РµРЅРЅС‹Рµ (' +  $('#error-area .accordion-inner > div.row').length + ')');
 		}
-		$('#steps-area').prev().find('a.accordion-toggle').html('Билеты (' + $('#steps-area .accordion-inner > div.row').length + ')');
+		$('#steps-area').prev().find('a.accordion-toggle').html('Р‘РёР»РµС‚С‹ (' + $('#steps-area .accordion-inner > div.row').length + ')');
 	}
 	function cBlocksBin(n, k, filterK, filterN_K){
 		var //n_kSet = block(invert(c_n_k(n, k)), filterN_K, n),
@@ -528,7 +528,7 @@ $(function () {
 		newEl = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl);
 		newEl = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
 			.appendTo(newEl)
-			.text('Билеты (' + arr.length + ')')
+			.text('Р‘РёР»РµС‚С‹ (' + arr.length + ')')
 			.attr('href', '#steps-area' );
 		
 		var newEl2 = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
@@ -539,7 +539,7 @@ $(function () {
 		newEl2 = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl2);
 		newEl2 = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
 			.appendTo(newEl2)
-			.text('Готово (0)')
+			.text('Р“РѕС‚РѕРІРѕ (0)')
 			.attr('href', '#done-area' );
 		
 		var newEl2 = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
@@ -550,16 +550,16 @@ $(function () {
 		newEl2 = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl2);
 		newEl2 = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
 			.appendTo(newEl2)
-			.text('Ошибки (0)')
+			.text('РћС€РёР±РєРё (0)')
 			.attr('href', '#error-area' );
 		
-		$('<a id="start-but" class="button button-large dynamic stp">Старт</a>')
+		$('<a id="start-but" class="button button-large dynamic stp">РЎС‚Р°СЂС‚</a>')
 			.appendTo('#buttons');
-		$('<a id="pause-but" class="button button-large dynamic stp">Пауза</a>')
+		$('<a id="pause-but" class="button button-large dynamic stp">РџР°СѓР·Р°</a>')
 			.appendTo('#buttons');
-		$('<a id="stop-but" class="button button-large dynamic stp">Стоп</a>')
+		$('<a id="stop-but" class="button button-large dynamic stp">РЎС‚РѕРї</a>')
 			.appendTo('#buttons');
-		$('<a id="rebet-but" class="button button-large dynamic stp">Повторить непоставленные (0)</a>')
+		$('<a id="rebet-but" class="button button-large dynamic stp">РџРѕРІС‚РѕСЂРёС‚СЊ РЅРµРїРѕСЃС‚Р°РІР»РµРЅРЅС‹Рµ (0)</a>')
 			.appendTo('#buttons');
 		var tCont = "";
 		for(var i = 0; i < arr.length; i++){	
@@ -568,7 +568,7 @@ $(function () {
 			var newDiv = (i%2 == 0) ?
 			$('<div class="alert alert-error fade in span24 stp">').appendTo(newEl) :
 			$('<div class="alert alert-info fade in span24 stp">').appendTo(newEl);
-			tCont = "Билет №" + parseInt(i+1) + "</br>";
+			tCont = "Р‘РёР»РµС‚ в„–" + parseInt(i+1) + "</br>";
 			ticketsJson.ticket[i] = [];
 			for(var j = 0; j < arr[i].length; j++){
 				var prName = selectedTeamsJson.team[j].name + " " + selectedTeamsJson.team[j].date;
