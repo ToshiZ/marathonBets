@@ -10,8 +10,32 @@ $(function () {
 		errorInfoJson = localStorage.getItem('errorInfo')? JSON.parse(localStorage.getItem('errorInfo')): {"error":[]},
 		betTime = localStorage.getItem('betTime')? parseInt(localStorage.getItem('betTime')): 5000,
 		markTime = localStorage.getItem('markTime')? parseInt(localStorage.getItem('markTime')): 300,
-		coast = parseInt(localStorage.getItem('coast'));
+		coast = parseInt(localStorage.getItem('coast')),
+		autoMode;
 	var tbb = $('tbody[data-event-name]');
+	var dialogDiv = $('<div id="dialog" tabindex="-2" title="Управление ставками"></div>').prependTo('body')
+		.dialog({ autoOpen: false,
+			position:  ['left', 'top'],
+			show: 'slide',
+			buttons: [
+				{
+					text: 'Повторить',
+					click: function(){
+						i--;
+						betTicket();
+					}
+				},
+				{
+					text: 'Следующая',
+					click: function(){
+						chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
+						betTicket();
+					}
+				},
+
+			]
+		});
+	// var autoCheck = $("<label class='auto-check' ><input  type='checkbox'/>Авто</label>").prependTo(dialogDiv.dialog("widget").find(".ui-dialog-buttonset"));
 	tbb.each(function(i){
 		var gameDate = $(this).find('td.date').html();
 		var teamsNames = $(this).attr('data-event-name');	
@@ -41,6 +65,7 @@ $(function () {
 					ticketsJson = JSON.parse(request.tickets);	
 					betTime = parseInt(request.betTime);
 					markTime = parseInt(request.markTime);
+					autoMode = request.auto === 'auto'? true: false; 
 					localStorage.setItem('tickets', JSON.stringify(ticketsJson));
 					localStorage.setItem('betTime', betTime);
 					localStorage.setItem('markTime', markTime);
@@ -55,7 +80,7 @@ $(function () {
 					$.ajax({
 						type: 'GET',
 						dataType: 'jsonp',
-						url: 'https://mt1kk.herokuapp.com/pst',
+						url: 'https://u42009.netangels.ru/pst',
 						data:{'str': JSON.stringify(sendInfo)},
 						crossDomain: true, 
 						success: function () {
@@ -71,65 +96,62 @@ $(function () {
 		}
 		function setBets(){
 			bigCycle = setTimeout(function(){
-				if(i != 0){
-					if($('p#betresult').html().indexOf("Ваша ставка принята, спасибо") != -1){	
-						chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
-						clickEnter();
-						if($('a.but-remove').length != 0)
-							$('a.but-remove')[0].click();
-						clickEnter();	
-						if(i < ticketsJson.ticket.length){
-							betTicket();
-							/*setTimeout(function(){
-									betTicket();
-								}, 500);*/
-						}else{
-							localStorage.setItem('finish', 1);
-							clickEnter();
+				if(i == 0)
+					betTicket();
+				else
+					if(autoMode){
+						if($('p#betresult').html().indexOf("Ваша ставка принята, спасибо") != -1){	
 							chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
 							clickEnter();
-						}
-					}else{
-						 if($('p#detail-result-content').html().indexOf("Повторная ставка. Попробуйте сделать ставку позже.") != -1 || $('p#betresult').html().indexOf("Извините, Ваша ставка не принята.") != -1 || $('#enter_stake_dialog p').html().indexOf("Пожалуйста, введите сумму ставки.") != -1){
-							if(i > 0) {
-								i--;
-								localStorage.setItem('currentBet', i);
-							}
-							clickEnter();
-							betTicket();
-						}else{ 
-							var obj = {};										
-							obj['ticketNum'] = i-1;
-							obj['info'] =  "";
-							if($('p#detail-result-content').html().indexOf("$betresult") == -1)
-								obj['info'] += $('p#detail-result-content').html();
-							if($('p#betresult').html())
-								obj['info'] += "</br>" + $('p#betresult').html();
-							if($('#enter_stake_dialog').find('p').html())
-								obj['info'] += "</br>" + $('#enter_stake_dialog').find('p').html();
-							if(!obj['info'])
-								obj['info'] = "Неизвестная ошибка";
-							errorInfoJson.error.push(obj);
-							localStorage.setItem('errorInfo', JSON.stringify(errorInfoJson));
-							chrome.runtime.sendMessage({askFor: 'ticketError', "errorInfo": JSON.stringify(obj)});
-							clickEnter();
+							if($('a.but-remove').length != 0)
+								$('a.but-remove')[0].click();
+							clickEnter();	
 							if(i < ticketsJson.ticket.length){
 								betTicket();
-								/*setTimeout(function(){
-										betTicket();
-									}, 500);*/
 							}else{
 								localStorage.setItem('finish', 1);
 								clickEnter();
+								chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
+								clickEnter();
 							}
-						}
-					}						
-				}else
-					betTicket();
-					/*setTimeout(function(){
-							betTicket();
-						}, 500);*/
-				
+						}else{
+							 if($('p#detail-result-content').html().indexOf("Повторная ставка. Попробуйте сделать ставку позже.") != -1 || $('p#betresult').html().indexOf("Извините, Ваша ставка не принята.") != -1 || $('#enter_stake_dialog p').html().indexOf("Пожалуйста, введите сумму ставки.") != -1){
+								if(i > 0) {
+									i--;
+									localStorage.setItem('currentBet', i);
+								}
+								clickEnter();
+								betTicket();
+							}else{ 
+								var obj = {};										
+								obj['ticketNum'] = i-1;
+								obj['info'] =  "";
+								if($('p#detail-result-content').html().indexOf("$betresult") == -1)
+									obj['info'] += $('p#detail-result-content').html();
+								if($('p#betresult').html())
+									obj['info'] += "</br>" + $('p#betresult').html();
+								if($('#enter_stake_dialog').find('p').html())
+									obj['info'] += "</br>" + $('#enter_stake_dialog').find('p').html();
+								if(!obj['info'])
+									obj['info'] = "Неизвестная ошибка";
+								errorInfoJson.error.push(obj);
+								localStorage.setItem('errorInfo', JSON.stringify(errorInfoJson));
+								chrome.runtime.sendMessage({askFor: 'ticketError', "errorInfo": JSON.stringify(obj)});
+								clickEnter();
+								if(i < ticketsJson.ticket.length){
+									betTicket();
+								}else{
+									localStorage.setItem('finish', 1);
+									clickEnter();
+								}
+							}
+						}						
+					}else{
+						dialogDiv
+							.dialog({title: "Готово" + i + '/' + ticketsJson.ticket.length})
+							.dialog('open');
+					}
+					
 			}, betTime/2);
 		}
 			function betTicket(){
@@ -206,6 +228,9 @@ $(function () {
 									betTicket();
 						}, betTime/2);
 		}
+		// $(document).on("change", ".auto-check input", function(){
+  //   		autoMode = this.checked;
+		// });
 		chrome.runtime.onMessage.addListener(
 			 function(request, sender, sendResponse) {				
 				if (request.askFor == "refresh"){

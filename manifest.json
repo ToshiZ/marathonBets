@@ -23,10 +23,12 @@
              "http://www.marathonbet.com/*",
             "https://www.marathonbet.com/*"
         ],
-        "js": [            
-			"js/jquery-2.1.1.js",
-			"script_in_content.js"
-        ]
+        "js": [  
+            "js/jquery-ui-1.11.2.custom/external/jquery/jquery.js",
+            "js/jquery-ui-1.11.2.custom/jquery-ui.js",   
+            "script_in_content.js"
+        ],
+        "css": ["js/jquery-ui-1.11.2.custom/jquery-ui.css"]
     }],
     "browser_action": {
         "default_title": "marathonExt",

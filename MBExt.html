@@ -43,7 +43,7 @@
 				<input id="betTime" type="text" name="betTime" class="coast" 
 					placeholder = "минимум 5" style="width:100px; background: #3C3F45; color: white"></input>
 				<label>Обновлять через, сек</label>
-				<input id="refreshTime" type="text" name="refreshTime" class="coast" 
+				<input id="refreshTime" type="text" name="refreshTime" readonly class="coast" 
 					placeholder = "минимум 60" style="width:100px; background: #3C3F45; color: white"></input>
 			</li>
 		</ul>
@@ -65,6 +65,7 @@
 				</div>
 				<a id="get-teams" class="button button-large">Обновить команды</a>
 				<a id="clear" class="button button-large">Очистить</a>
+				<a id="auto" class="button button-large" data-state='manual'>Авто</a>
 				<div id="oneArea" class="accordion-body collapse">
 					<div id="team-list" class="accordion-inner">	
 					</div>

@@ -93,6 +93,17 @@ $(function () {
 		pauseFl = true;
 		chrome.tabs.sendMessage(csId.id, {'askFor': 'stop'});
 	});
+	$('#auto').on('click', function(){
+		if($(this).data('state') === 'manual'){
+			$(this).data('state', 'auto');
+			$(this).css({'background-color': '#DE5E60'});
+			$('#refreshTime').readOnly = false;
+		}else if($(this).data('state') === 'auto'){
+			$(this).data('state', 'manual');
+			$(this).css({'background-color': '#3C3F45'});
+			$('#refreshTime').readOnly = true;
+		}
+	});
 	$(document).on('input', ".k-blocks", function(){ 
 		filter[0] = [];
 		$('.k-blocks').each(function() {
@@ -177,13 +188,15 @@ $(function () {
 		tmpObj.plusWithoutBloks = $('#k-check').prop("checked");
 		tmpObj.minusWithoutBloks = $('#n-k-check').prop("checked");
 		tmpObj.coast = parseInt($('#coast').val());
+		tmpObj.auto = $('#auto').data('state');
 		tmpObj.who = 'mt';
 
-		chrome.tabs.sendMessage(csId.id, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson), 'params': JSON.stringify(tmpObj), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val())});
+		chrome.tabs.sendMessage(csId.id, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson), 'params': JSON.stringify(tmpObj), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val()), 'auto': $('#auto').data('state')});
 		localStorage.setItem('tickets', JSON.stringify(ticketsJson));
-		sendRefreshTimer = setInterval(function(){
-			chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val())});
-		},parseInt($('#refreshTime').val()*1000));
+		if($('#auto').data('state') === 'auto')
+			sendRefreshTimer = setInterval(function(){
+				chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val())});
+			},parseInt($('#refreshTime').val()*1000));
 		pauseFl = false
 		localStorage.removeItem('errorInfo');
 		errorInfoJson = {"error":[]};
