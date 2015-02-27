@@ -98,10 +98,21 @@ $(function () {
 			$(this).data('state', 'auto');
 			$(this).css({'background-color': '#DE5E60'});
 			$('#refreshTime').readOnly = false;
+			$('#refreshTime').val(180);
+			if(!pauseFl){
+				chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val()), 'auto': 'auto'});
+				sendRefreshTimer = setInterval(function(){
+						chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val()), 'auto': 'auto'});
+					},parseInt($('#refreshTime').val()*1000));
+			}
 		}else if($(this).data('state') === 'auto'){
 			$(this).data('state', 'manual');
 			$(this).css({'background-color': '#3C3F45'});
 			$('#refreshTime').readOnly = true;
+			if(!pauseFl){
+				clearInterval(sendRefreshTimer);
+				chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val()), 'auto': 'manual'});
+			}
 		}
 	});
 	$(document).on('input', ".k-blocks", function(){ 
