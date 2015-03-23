@@ -97,10 +97,11 @@ $(function () {
 		if($(this).data('state') === 'manual'){
 			$(this).data('state', 'auto');
 			$(this).css({'background-color': '#DE5E60'});
-			$('#refreshTime').readOnly = false;
-			$('#refreshTime').val(180);
+			$('#refreshTime').attr('readonly', false);
+			$('#refreshTime').val(300);
 			if(!pauseFl){
 				chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val()), 'auto': 'auto'});
+				clearInterval(sendRefreshTimer);
 				sendRefreshTimer = setInterval(function(){
 						chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val()), 'auto': 'auto'});
 					},parseInt($('#refreshTime').val()*1000));
@@ -108,7 +109,7 @@ $(function () {
 		}else if($(this).data('state') === 'auto'){
 			$(this).data('state', 'manual');
 			$(this).css({'background-color': '#3C3F45'});
-			$('#refreshTime').readOnly = true;
+			$('#refreshTime').attr('readonly', true);
 			if(!pauseFl){
 				clearInterval(sendRefreshTimer);
 				chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val()), 'auto': 'manual'});
@@ -204,10 +205,13 @@ $(function () {
 
 		chrome.tabs.sendMessage(csId.id, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson), 'params': JSON.stringify(tmpObj), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val()), 'auto': $('#auto').data('state')});
 		localStorage.setItem('tickets', JSON.stringify(ticketsJson));
-		if($('#auto').data('state') === 'auto')
+		clearInterval(sendRefreshTimer);
+		if($('#auto').data('state') === 'auto'){
+			clearInterval(sendRefreshTimer);
 			sendRefreshTimer = setInterval(function(){
-				chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val())});
+						chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val()), 'auto': $('#auto').data('state')});
 			},parseInt($('#refreshTime').val()*1000));
+		}
 		pauseFl = false
 		localStorage.removeItem('errorInfo');
 		errorInfoJson = {"error":[]};
@@ -224,8 +228,9 @@ $(function () {
 		}
 		else{
 			chrome.tabs.sendMessage(csId.id, {'askFor': 'resume'});
+			clearInterval(sendRefreshTimer);
 			sendRefreshTimer = setInterval(function(){
-				chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val())});
+						chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val()), 'auto': $('#auto').data('state')});
 			},parseInt($('#refreshTime').val()*1000));
 			pauseFl = false;
 			$(this).html('ПАУЗА');
@@ -240,8 +245,9 @@ $(function () {
 	//REBET
 	$(document).on('click', "#rebet-but", function(){
 		chrome.tabs.sendMessage(csId.id, {'askFor': 'tickets', 'tickets': JSON.stringify(errorTicketsJson), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val())});
+		clearInterval(sendRefreshTimer);
 		sendRefreshTimer = setInterval(function(){
-			chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val())});
+						chrome.tabs.sendMessage(csId.id, {'askFor': 'refresh', 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val()), 'auto': $('#auto').data('state')});
 		},parseInt($('#refreshTime').val()*1000));
 		pauseFl = false
 		localStorage.removeItem('errorInfo');
@@ -408,10 +414,39 @@ $(function () {
 						diff = blockCombs[comb][b+1];
 					}					
 					if(fIter == filter.length){
-						output[z] = new Array;
-						output[z] = input[i];
-						z++;
-						break top;
+						var tmp = input[i].slice();
+						for(var blockIter in filter){
+							var w = 0;
+							for(var inpIter = 0; inpIter < tmp.length - 1; inpIter++){
+								if(tmp[inpIter] == tmp[inpIter + 1] - 1)
+									w++;
+								else
+									w = 0;
+								if(w == filter[blockIter]){
+									for(var inv = 0; inv <= w; inv++){
+										tmp[inpIter + 1 - inv] = -1;
+									}
+									break;
+								}
+							}
+						}
+						var fl = true;
+						for(var t = 0; t < tmp.length - 1; t++){
+							if(tmp[t] == tmp[t + 1] - 1){
+								fl = false;
+								break;
+							}
+							if(tmp[t] == -1 && tmp[t + 1] != -1 && input[i][t] == input[i][t + 1] - 1){
+								fl = false;
+								break;
+							}
+						}
+						if(fl){
+							output[z] = new Array;
+							output[z] = input[i];
+							z++;
+							break top;
+						}
 					}
 				}
 			}
