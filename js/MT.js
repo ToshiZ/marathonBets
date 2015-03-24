@@ -369,7 +369,7 @@ $(function () {
 		}
 		return output;
 	}
-	function block(input,filter,n){
+	function block(input,filter,n,onlySelectedBlocks){
 		if(filter.length == 0)
 			return input;
 		var k = input[0].length,
@@ -414,38 +414,45 @@ $(function () {
 						diff = blockCombs[comb][b+1];
 					}					
 					if(fIter == filter.length){
-						var tmp = input[i].slice();
-						for(var blockIter in filter){
-							var w = 0;
-							for(var inpIter = 0; inpIter < tmp.length - 1; inpIter++){
-								if(tmp[inpIter] == tmp[inpIter + 1] - 1)
-									w++;
-								else
-									w = 0;
-								if(w == filter[blockIter]){
-									for(var inv = 0; inv <= w; inv++){
-										tmp[inpIter + 1 - inv] = -1;
+						var filterComb = combinations(filter);
+						for(var fComb = 0; fComb < filterComb.length; fComb++){
+							var tmp = input[i].slice();
+							var fl = true;
+							for(var blockIter in filterComb[fComb]){
+								var w = 0;
+								for(var inpIter = 0; inpIter < tmp.length - 1; inpIter++){
+									if(tmp[inpIter] == tmp[inpIter + 1] - 1)
+										w++;
+									else
+										w = 0;
+									if(w == filterComb[fComb][blockIter]){
+										for(var inv = 0; inv <= w; inv++){
+											tmp[inpIter + 1 - inv] = -1;
+										}
+										break;
 									}
+								}
+							}						
+							for(var t = 0; t < tmp.length - 1; t++){
+								if(tmp[t] == tmp[t + 1] - 1){
+									fl = false;
 									break;
 								}
+								if(tmp[t] == -1 && tmp[t + 1] != -1 && input[i][t] == input[i][t + 1] - 1){
+									fl = false;
+									break;
+								}
+								// if(tmp[t] != -1 && tmp[t - 1] == -1 && input[i][t - 1] == input[i][t] - 1){
+								// 	fl = false;
+								// 	break;
+								// }
 							}
-						}
-						var fl = true;
-						for(var t = 0; t < tmp.length - 1; t++){
-							if(tmp[t] == tmp[t + 1] - 1){
-								fl = false;
-								break;
+							if(fl || !onlySelectedBlocks){
+								output[z] = new Array;
+								output[z] = input[i];
+								z++;
+								break top;
 							}
-							if(tmp[t] == -1 && tmp[t + 1] != -1 && input[i][t] == input[i][t + 1] - 1){
-								fl = false;
-								break;
-							}
-						}
-						if(fl){
-							output[z] = new Array;
-							output[z] = input[i];
-							z++;
-							break top;
 						}
 					}
 				}
@@ -527,8 +534,8 @@ $(function () {
 	}
 	function cBlocksBin(n, k, filterK, filterN_K){
 		var //n_kSet = block(invert(c_n_k(n, k)), filterN_K, n),
-			n_kSet = block(c_n_k(n, n-k), filterN_K, n),
-			kSet = block(c_n_k(n, k), filterK, n),
+			n_kSet =  $('#anti-block-minus-check').prop("checked")? block(c_n_k(n, n-k), filterN_K, n, true): block(c_n_k(n, n-k), filterN_K, n, false),
+			kSet =  $('#anti-block-plus-check').prop("checked")? block(c_n_k(n, k), filterK, n, true): block(c_n_k(n, k), filterK, n, false),
 			resultSet = new Array,
 			itr = 0;	
 		for(var i = 0; i < kSet.length; i++){

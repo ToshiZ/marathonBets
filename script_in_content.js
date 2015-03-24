@@ -171,54 +171,51 @@ var setBets = function(){
 	}, betTime/2);
 }
 viewDialog = function(dialogEl){
-							var nn = i > 0? i: parseInt(i+1);
-							//dialogEl.dialog('destroy');
-							dialogEl.dialog({ autoOpen: true,
-									position:  ['left', 'top'],
-									show: 'slide',
-									buttons: [
-										{
-											text: 'Повторить ' + nn + '-й',
-											click: function(){
-												// if(i > 0){
-												// 	i--;
-												// 	localStorage.setItem('currentBet', i);
-												// }
-												if(pauseFl)
-													pauseFl = false;
-												betTicket();
-											}
-										},
-										{
-											text: ticketsJson.ticket.length > i? 'Следующая': 'Готово',
-											click: function(){
-												chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
-												if(pauseFl)
-													pauseFl = false;
-												i++;
-												localStorage.setItem('currentBet', i);
-												betTicket();
-											}
-										},
-										{
-											text: 'Выбранная',
-											click: function(){
-												chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
-												if(pauseFl)
-													pauseFl = false;
-												i = parseInt($('#bet-num').val() - 1);
-												localStorage.setItem('currentBet', i);
-												viewDialog(dialogEl);
-												betTicket();
-											}
-										}
+		var nn = i == 0? i: parseInt(i+1);
+		//$('#dialog').dialog('destroy');
+		dialogEl.dialog({ autoOpen: true,
+				position:  ['left', 'top'],
+				show: 'slide',
+				buttons: [
+					{
+						text: 'Повторить ' + nn + '-й',
+						click: function(){
+							if(pauseFl)
+								pauseFl = false;
+							betTicket();
+						}
+					},
+					{
+						text: ticketsJson.ticket.length > i? 'Следующая': 'Готово',
+						click: function(){
+							chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
+							if(pauseFl)
+								pauseFl = false;
+							i++;
+							localStorage.setItem('currentBet', i);
+							viewDialog($('#dialog')); 
+							betTicket();
+						}
+					},
+					{
+						text: 'Выбранная',
+						click: function(){
+							chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
+							if(pauseFl)
+								pauseFl = false;
+							i = parseInt($('#bet-num').val() - 1);
+							localStorage.setItem('currentBet', i);
+							viewDialog($('#dialog')); 
+							betTicket();
+						}
+					}
 
-									]
-								});
-						dialogEl
-							.dialog({title: "Готово" + i + '/' + ticketsJson.ticket.length})
-							.dialog('open');
-					}			
+				]
+			});
+	dialogEl
+		.dialog({title: "Готово" + i + '/' + ticketsJson.ticket.length})
+		.dialog('open');
+}			
 $(function () {  
 	$('<div id="dialog" tabindex="-2" title="Управление ставками"><input id="bet-num" type="text"></div>').prependTo('body'); 
 	viewDialog($('#dialog')); 
