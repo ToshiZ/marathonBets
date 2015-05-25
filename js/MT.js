@@ -2,8 +2,8 @@ $(function () {
 	var n_,
 		k_,
 		n_k_,
-		teamsJson,// =  localStorage.getItem('teams')? JSON.parse(localStorage.getItem('teams')): {"team":[]},
-		selectedTeamsJson,// = localStorage.getItem('selectedTeams')? JSON.parse(localStorage.getItem('selectedTeams')): {"team":[]},
+		teamsJson,
+		selectedTeamsJson,
 		csId = localStorage.getItem('contentId')? JSON.parse(localStorage.getItem('contentId')): {},
 		ticketsJson = {"ticket":[]},
 		errorInfoJson = localStorage.getItem('errorInfo')? JSON.parse(localStorage.getItem('errorInfo')): {"error":[]},
@@ -13,8 +13,6 @@ $(function () {
 		filter = [];
 		filter[0] = []; //k block
 		filter[1] = []; //n-k block;
-		//localStorage.removeItem('selectedTeams');
-		//localStorage.removeItem('teams');
 	if(localStorage['teams']){
 		teamsJson =  JSON.parse(localStorage.getItem('teams'));
 		fillTeamList(teamsJson);
@@ -33,10 +31,6 @@ $(function () {
 			if (request.askFor == "contentScriptId"){
 				csId.id = parseInt(sender.tab.id);
 				localStorage.setItem('contentId', JSON.stringify(csId));
-				//teamsJson = JSON.parse(request.teams);
-				//localStorage.setItem('teams', JSON.stringify(teamsJson));
-				//fillTeamList(teamsJson);
-				//markSelectedTeams(selectedTeamsJson);
 			}
 	});
 	chrome.runtime.onMessage.addListener(
@@ -116,6 +110,9 @@ $(function () {
 			}
 		}
 	});
+	$('#marathon-vijet').on('click', function(){
+		chrome.tabs.sendMessage(csId.id, {'askFor': 'vijet'});
+	});
 	$(document).on('input', ".k-blocks", function(){ 
 		filter[0] = [];
 		$('.k-blocks').each(function() {
@@ -153,8 +150,8 @@ $(function () {
 				.attr('id', "n-k-block"+$(".n-k-blocks").length)
 				.css({width:"50px",
 					background: "#3C3F45",
-					color: "white",
-					'margin-top': "19px"})
+					color: "white"
+					})
 				.attr('placeholder',"Блок "+$(".n-k-blocks").length)
 				.addClass("n-k-blocks dynamic");
 		}else{
@@ -165,12 +162,6 @@ $(function () {
 		$('.dynamic').remove();
 		$(this).each(function(){
 			if($(this).val().length != 0){
-				/* if($('#n').val() && $('#k').val())
-					$('#n-k').val(parseInt($('#n').val()) - parseInt($('#k').val()));
-				if($('#n-k').val() && $('#k').val())
-					$('#n').val(parseInt($('#n-k').val()) + parseInt($('#k').val()));
-				if($('#n').val() && $('#n-k').val())
-					$('#k').val(parseInt($('#n').val()) - parseInt($('#n-k').val())); */
 				if($(this).attr('id') == 'k'){
 					k_ = parseInt($(this).val());
 					n_k_ = n_ - k_;
@@ -181,9 +172,6 @@ $(function () {
 					k_ = n_ - n_k_;
 					$('#k').val(k_);
 				}
-				/* n_ = parseInt($('#n').val());
-				k_ = parseInt($('#k').val());
-				n_k_ = parseInt($('#n-k').val()); */
 				if(!isNaN(n_) && !isNaN(k_) && n>=k)
 					inputsForBlocks(n_,k_);
 			}
@@ -396,7 +384,6 @@ $(function () {
 				blocks.push(w);
 				w = 0;	
 			}
-			//var combs = combinations(blocks);
 			var blockCombs = combinations(blocks);
 			for(comb = 0; comb < blockCombs.length; comb++){
 				var fIter = 0;
@@ -427,25 +414,17 @@ $(function () {
 										w = 0;
 									if(w == filterComb[fComb][blockIter]){
 										for(var inv = 0; inv <= w; inv++){
-											tmp[inpIter + 1 - inv] = -1;
+											tmp[inpIter + 1 - inv] = parseInt(blockIter)*-1;
 										}
 										break;
 									}
 								}
 							}						
 							for(var t = 0; t < tmp.length - 1; t++){
-								if(tmp[t] == tmp[t + 1] - 1){
+								if(tmp[t] != tmp[t + 1] && input[i][t] == input[i][t + 1] - 1){
 									fl = false;
 									break;
 								}
-								if(tmp[t] == -1 && tmp[t + 1] != -1 && input[i][t] == input[i][t + 1] - 1){
-									fl = false;
-									break;
-								}
-								// if(tmp[t] != -1 && tmp[t - 1] == -1 && input[i][t - 1] == input[i][t] - 1){
-								// 	fl = false;
-								// 	break;
-								// }
 							}
 							if(fl || !onlySelectedBlocks){
 								output[z] = new Array;
@@ -476,8 +455,7 @@ $(function () {
 				.attr('id', "n-k-block"+$(".n-k-blocks").length)
 				.css({width:"50px",
 					background: "#3C3F45",
-					color: "white",
-					'margin-top': "19px"})
+					color: "white"})
 				.attr('placeholder',"Блок "+$(".n-k-blocks").length)
 				.addClass("n-k-blocks dynamic");	
 		}
@@ -638,7 +616,7 @@ $(function () {
 			ticketsJson.ticket[i] = [];
 			for(var j = 0; j < arr[i].length; j++){
 				var prName = selectedTeamsJson.team[j].name + " " + selectedTeamsJson.team[j].date;
-				tCont += (arr[i][j] == 1) ? (prName + "	+" + "</br>") : (prName + "	-" + "</br>");
+				tCont += (arr[i][j] == 1) ? ("<strong>+</strong> " + prName +   "</br>") : ("<strong>-</strong> " + prName + "</br>");
 				var obj = {};
 				obj['name'] =  selectedTeamsJson.team[j].name;	
 				obj['date'] =  selectedTeamsJson.team[j].date;		
