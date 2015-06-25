@@ -1,6 +1,6 @@
 $(function () {    
 	var n_,
-		k_,
+		k_ = $('#k'),
 		n_k_,
 		teamsJson,
 		selectedTeamsJson,
@@ -292,11 +292,130 @@ $(function () {
 			$('#n').val(n_>0?n_:"");
 		}
 	});
+	$('#var-ok').on('click', function(e){
+		$('.stp2').remove();
+		var varAmount = $('#var-amount').val();
+		var n_filter_combs = [[0,0,0]];
+		var k_filter_combs = [[0,0,0]];
+		var fl = true;
+		var i = 0;
+		while(fl){
+			if(sumOfMas(n_filter_combs[i]) <= parseInt(n_ - k_)-1){
+				n_filter_combs[i+1] = n_filter_combs[i].slice();
+				n_filter_combs[i+1][0]++;
+				i++;
+			}else{
+				if(n_filter_combs[i][1] < Math.ceil(n_ - k_/2) && (((n_filter_combs[i][1] + 1)*2 + (n_filter_combs[i][2])) <= n_ - k_)){
+					n_filter_combs[i+1] = n_filter_combs[i].slice();
+					n_filter_combs[i+1][1]++;
+					n_filter_combs[i+1][0] = n_filter_combs[i+1][1];
+				}else{
+					if(n_filter_combs[i][2] < Math.ceil(n_ - k_/2)){
+						if ((n_filter_combs[i][2] + 1) * 3 <= n_ - k_){
+							n_filter_combs[i+1] = n_filter_combs[i].slice();			
+							n_filter_combs[i+1][2]++; 
+							n_filter_combs[i+1][1] = n_filter_combs[i+1][2];
+							n_filter_combs[i+1][0] = n_filter_combs[i+1][1];
+						}else{
+							fl = false;
+						}
+					}
+				}
+				i++;
+			}			
+		}
+		fl = true;
+		i = 0;
+		while(fl){
+			if(sumOfMas(k_filter_combs[i]) <= parseInt(k_)-1){
+				k_filter_combs[i+1] = k_filter_combs[i].slice();
+				k_filter_combs[i+1][0]++;
+				i++;
+			}else{
+				if(k_filter_combs[i][1] < Math.ceil(k_/2) && (((k_filter_combs[i][1] + 1)*2 + (k_filter_combs[i][2])) <= k_)){
+					k_filter_combs[i+1] = k_filter_combs[i].slice();
+					k_filter_combs[i+1][1]++;
+					k_filter_combs[i+1][0] = k_filter_combs[i+1][1];
+				}else{
+					if(k_filter_combs[i][2] < Math.ceil(k_/2)){
+						if ((k_filter_combs[i][2] + 1) * 3 <= k_){
+							k_filter_combs[i+1] = k_filter_combs[i].slice();			
+							k_filter_combs[i+1][2]++; 
+							k_filter_combs[i+1][1] = k_filter_combs[i+1][2];
+							k_filter_combs[i+1][0] = k_filter_combs[i+1][1];
+						}else{
+							fl = false;
+						}
+					}
+				}
+				i++;
+			}
+		}
+		for(var j in n_filter_combs){
+			for (var i = n_filter_combs[j].length - 1; i >= 0; i--) {
+			    if (n_filter_combs[j][i] < 2) {
+			        n_filter_combs[j].splice(i, 1);
+			    }
+			}
+		}
+		for(var j in k_filter_combs){
+			for (var i = k_filter_combs[j].length - 1; i >= 0; i--) {
+			    if (k_filter_combs[j][i] < 2) {
+			        k_filter_combs[j].splice(i, 1);
+			    }
+			}
+		}
+		var tCont = "";
+		var tCont2 = "";
+		var arrConts = [];
+		var varNum = 0;
+		for(var i = 0; i < k_filter_combs.length; i++){
+			for(var j = 0; j < n_filter_combs.length; j++){
+				var fl_k = false;
+				var fl_n = false;
+				if(n_filter_combs[j].length != 0)
+					fl_n = true;
+				if(k_filter_combs[i].length != 0)
+					fl_k = true;
+				if(true){
+					var res = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j]);
+					if(res.length == varAmount ){
+						tCont = "Блоки №" + parseInt(varNum+1) + "</br>";
+						tCont2 = "";
+						if(!fl_k){ 
+							tCont2 += "ТБ: Без блоков." + "</br>";
+						}else{
+							tCont2 += "ТБ: " + k_filter_combs[i] + "</br>";	
+						}	
+						if(!fl_n){ 
+							tCont2 += "ТМ: Без блоков."
+						}else{
+							tCont2 += "ТМ: " + n_filter_combs[j];	
+						}			
+						if(arrConts.indexOf(tCont2) == -1){
+							var newEl = $('<div class="row cont stp2">')
+							.appendTo('#accordionArea2 .accordion-inner')
+							.attr('data-var-num', i);
+							var newDiv = (varNum%2 == 0) ?
+							$('<div class="alert alert-error fade in span24 stp2">').appendTo(newEl) :
+							$('<div class="alert alert-info fade in span24 stp2">').appendTo(newEl);
+							arrConts.push(tCont2);
+							newDiv.html(tCont + tCont2);	
+							varNum++;
+						}
+					}
+				}
+			}
+		}		
+	});
 	function sumOfMas(m){
 		var total = 0;
-		$.each(m,function(){
-			total += this;			
-		});
+		for(var i in m){
+			if(m[i] != undefined)
+				total += m[i];
+			else
+				return undefined;
+		}
 		return total;
 	}
 	function allTrue(m){
@@ -366,7 +485,7 @@ $(function () {
 		if(sumOfMas(filter) > k)
 			return input;
 		filter = filter.map(function(ind, el){ if(ind-1>0 && ind != undefined) return ind-1;});
-		if(filter.length == 0)
+		if(filter.length == 0 || sumOfMas(filter) == undefined)
 			return input;
 		for(var i=0; i<input.length; i++) top:{					
 			var w = 0,
@@ -511,8 +630,7 @@ $(function () {
 		$('#steps-area').prev().find('a.accordion-toggle').html('Билеты (' + $('#steps-area .accordion-inner > div.row').length + ')');
 	}
 	function cBlocksBin(n, k, filterK, filterN_K){
-		var //n_kSet = block(invert(c_n_k(n, k)), filterN_K, n),
-			n_kSet =  $('#anti-block-minus-check').prop("checked")? block(c_n_k(n, n-k), filterN_K, n, true): block(c_n_k(n, n-k), filterN_K, n, false),
+		var n_kSet =  $('#anti-block-minus-check').prop("checked")? block(c_n_k(n, n-k), filterN_K, n, true): block(c_n_k(n, n-k), filterN_K, n, false),
 			kSet =  $('#anti-block-plus-check').prop("checked")? block(c_n_k(n, k), filterK, n, true): block(c_n_k(n, k), filterK, n, false),
 			resultSet = new Array,
 			itr = 0;	
