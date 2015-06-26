@@ -379,6 +379,19 @@ $(function () {
 					fl_k = true;
 				if(true){
 					var res = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j]);
+					if($('#k-check').prop("checked") && $('#n-k-check').prop("checked")){
+						//var res = cBlocksBin(n_, k_, [], []);
+						popBloks(res, 10);
+					}else{
+						if($('#k-check').prop("checked")){
+							//var res = cBlocksBin(n_, k_, [], filter[1]);
+							popBloks(res, 1);
+						}
+						if($('#n-k-check').prop("checked")){
+							//var res = cBlocksBin(n_, k_, filter[0], []);
+							popBloks(res, 0);
+						}
+					}
 					if(res.length == varAmount ){
 						tCont = "Блоки №" + parseInt(varNum+1) + "</br>";
 						tCont2 = "";
