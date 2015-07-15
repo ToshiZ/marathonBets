@@ -11,6 +11,8 @@
     "permissions": [
               "https://getinfomt.herokuapp.com/*",
               "http://www.marathonbet.com/*",
+              "http://www.betmarathon.com/*",
+              "http://www.marathonsportsbook.com/*",
 			  "tabs"
 	],
 	"background" : {
@@ -21,7 +23,11 @@
 		"run_at":"document_end",
         "matches": [
              "http://www.marathonbet.com/*",
-            "https://www.marathonbet.com/*"
+            "https://www.marathonbet.com/*",
+            "http://www.betmarathon.com/*",
+            "http://www.marathonsportsbook.com/*",
+            "https://www.betmarathon.com/*",
+            "https://www.marathonsportsbook.com/*"
         ],
         "js": [  
             "js/jquery-ui-1.11.2.custom/external/jquery/jquery.js",
