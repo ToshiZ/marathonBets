@@ -252,17 +252,17 @@ $(function () {
 			filter[0] = filter[0].slice(0,-1);
 		if(sumOfMas(filter[1]) > n_-k_)
 			filter[1] = filter[1].slice(0,-1);
-		var res = cBlocksBin(n_, k_, filter[0], filter[1]);
+		var res = cBlocksBin(n_, k_, filter[0], filter[1], $('#anti-block-minus-check').prop("checked"), $('#anti-block-plus-check').prop("checked"));
 		if($('#k-check').prop("checked") && $('#n-k-check').prop("checked")){
-			var res = cBlocksBin(n_, k_, [], []);
+			var res = cBlocksBin(n_, k_, [], [], $('#anti-block-minus-check').prop("checked"), $('#anti-block-plus-check').prop("checked"));
 			popBloks(res, 10);
 		}else{
 			if($('#k-check').prop("checked")){
-				var res = cBlocksBin(n_, k_, [], filter[1]);
+				var res = cBlocksBin(n_, k_, [], filter[1], $('#anti-block-minus-check').prop("checked"), $('#anti-block-plus-check').prop("checked"));
 				popBloks(res, 1);
 			}
 			if($('#n-k-check').prop("checked")){
-				var res = cBlocksBin(n_, k_, filter[0], []);
+				var res = cBlocksBin(n_, k_, filter[0], [], $('#anti-block-minus-check').prop("checked"), $('#anti-block-plus-check').prop("checked"));
 				popBloks(res, 0);
 			}
 		}
@@ -377,49 +377,74 @@ $(function () {
 					fl_n = true;
 				if(k_filter_combs[i].length != 0)
 					fl_k = true;
-				if(true){
-					var res = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j]);
-					if($('#k-check').prop("checked") && $('#n-k-check').prop("checked")){
-						//var res = cBlocksBin(n_, k_, [], []);
-						popBloks(res, 10);
-					}else{
-						if($('#k-check').prop("checked")){
-							//var res = cBlocksBin(n_, k_, [], filter[1]);
-							popBloks(res, 1);
-						}
-						if($('#n-k-check').prop("checked")){
-							//var res = cBlocksBin(n_, k_, filter[0], []);
-							popBloks(res, 0);
-						}
+				var res = [];
+				res[0] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], true, true);
+				res[1] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], false, true);
+				res[2] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], true, false);
+				res[3] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], false, false);	
+
+				if($('#k-check').prop("checked") && $('#n-k-check').prop("checked")){
+					for(var ii = 0; ii < 4; ii++)
+						popBloks(res[ii], 10);
+				}else{
+					if($('#k-check').prop("checked")){
+						for(var ii = 0; ii < 4; ii++)
+							popBloks(res[ii], 1);
 					}
-					if(res.length == varAmount ){
-						tCont = "Блоки №" + parseInt(varNum+1) + "</br>";
-						tCont2 = "";
-						if(!fl_k){ 
-							tCont2 += "ТБ: Без блоков." + "</br>";
-						}else{
-							tCont2 += "ТБ: " + k_filter_combs[i] + "</br>";	
-						}	
-						if(!fl_n){ 
-							tCont2 += "ТМ: Без блоков."
-						}else{
-							tCont2 += "ТМ: " + n_filter_combs[j];	
-						}			
-						if(arrConts.indexOf(tCont2) == -1){
-							var newEl = $('<div class="row cont stp2">')
-							.appendTo('#accordionArea2 .accordion-inner')
-							.attr('data-var-num', i);
-							var newDiv = (varNum%2 == 0) ?
-							$('<div class="alert alert-error fade in span24 stp2">').appendTo(newEl) :
-							$('<div class="alert alert-info fade in span24 stp2">').appendTo(newEl);
-							arrConts.push(tCont2);
-							newDiv.html(tCont + tCont2);	
-							varNum++;
-						}
+					if($('#n-k-check').prop("checked")){
+						for(var ii = 0; ii < 4; ii++)
+							popBloks(res[ii], 0);
+					}
+				}
+				var fl_ok = false;
+				if(!$('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")){
+					if(res[0].length == varAmount || res[1].length == varAmount || res[2].length == varAmount || res[3].length == varAmount){
+						fl_ok = true;
+					}
+				}
+				if($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")){
+					if(res[0].length == varAmount){
+						fl_ok = true;
+					}
+				}
+				if(!$('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")){
+					if(res[0].length == varAmount || res[1].length == varAmount){
+						fl_ok = true;
+					}
+				}
+				if($('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")){
+					if(res[0].length == varAmount || res[2].length == varAmount){
+						fl_ok = true;
+					}
+				}
+				if(fl_ok){
+					tCont = "Блоки №" + parseInt(varNum+1) + "</br>";
+					tCont2 = "";
+					if(!fl_k){ 
+						tCont2 += "ТБ: Без блоков." + "</br>";
+					}else{
+						tCont2 += "ТБ: " + k_filter_combs[i] + "</br>";	
+					}	
+					if(!fl_n){ 
+						tCont2 += "ТМ: Без блоков."
+					}else{
+						tCont2 += "ТМ: " + n_filter_combs[j];	
+					}			
+					if(arrConts.indexOf(tCont2) == -1){
+						var newEl = $('<div class="row cont stp2">')
+						.appendTo('#accordionArea2 .accordion-inner')
+						.attr('data-var-num', i);
+						var newDiv = (varNum%2 == 0) ?
+						$('<div class="alert alert-error fade in span24 stp2">').appendTo(newEl) :
+						$('<div class="alert alert-info fade in span24 stp2">').appendTo(newEl);
+						arrConts.push(tCont2);
+						newDiv.html(tCont + tCont2);	
+						varNum++;
 					}
 				}
 			}
-		}		
+		}	
+		$('#var-num').html('Варианты (' + varNum + ')');	
 	});
 	function sumOfMas(m){
 		var total = 0;
@@ -641,10 +666,10 @@ $(function () {
 			$('#rebet-but').html('Повторить непоставленные (' +  $('#error-area .accordion-inner > div.row').length + ')');
 		}
 		$('#steps-area').prev().find('a.accordion-toggle').html('Билеты (' + $('#steps-area .accordion-inner > div.row').length + ')');
-	}
-	function cBlocksBin(n, k, filterK, filterN_K){
-		var n_kSet =  $('#anti-block-minus-check').prop("checked")? block(c_n_k(n, n-k), filterN_K, n, true): block(c_n_k(n, n-k), filterN_K, n, false),
-			kSet =  $('#anti-block-plus-check').prop("checked")? block(c_n_k(n, k), filterK, n, true): block(c_n_k(n, k), filterK, n, false),
+	}	
+	function cBlocksBin(n, k, filterK, filterN_K, anti_block_minus, anti_block_plus){
+		var n_kSet =  anti_block_minus? block(c_n_k(n, n-k), filterN_K, n, true): block(c_n_k(n, n-k), filterN_K, n, false),
+			kSet =  anti_block_plus? block(c_n_k(n, k), filterK, n, true): block(c_n_k(n, k), filterK, n, false),
 			resultSet = new Array,
 			itr = 0;	
 		for(var i = 0; i < kSet.length; i++){
