@@ -306,6 +306,7 @@ $(function () {
 		if(filter[0].length == 0){
 			while(fl){
 				if(sumOfMas(k_filter_combs[i]) <= parseInt(k_)-1){
+
 					k_filter_combs[i+1] = k_filter_combs[i].slice();
 					k_filter_combs[i+1][0]++;
 					i++;
@@ -316,7 +317,7 @@ $(function () {
 						k_filter_combs[i+1][0] = k_filter_combs[i+1][1];
 					}else{
 						if(k_filter_combs[i][2] < Math.ceil(k_/2)){
-							if ((k_filter_combs[i][2] + 1) * 3 <= k_){
+							if((k_filter_combs[i][2] + 1) * 3 <= k_){
 								k_filter_combs[i+1] = k_filter_combs[i].slice();			
 								k_filter_combs[i+1][2]++; 
 								k_filter_combs[i+1][1] = k_filter_combs[i+1][2];
@@ -330,9 +331,10 @@ $(function () {
 				}
 			}
 			for(var j in k_filter_combs){
-				for (var i = k_filter_combs[j].length - 1; i >= 0; i--) {
-				    if (k_filter_combs[j][i] < 2) {
+				for(var i = k_filter_combs[j].length - 1; i >= 0; i--) {
+				    if(k_filter_combs[j][i] < 2) {
 				        k_filter_combs[j].splice(i, 1);
+				        i++;
 				    }
 				}
 			}
@@ -368,27 +370,33 @@ $(function () {
 				}			
 			}
 			for(var j in n_filter_combs){
-				for (var i = n_filter_combs[j].length - 1; i >= 0; i--) {
+				for (var i = n_filter_combs[j].length - 1; i >= 0; i--){
 				    if (n_filter_combs[j][i] < 2) {
 				        n_filter_combs[j].splice(i, 1);
+				        i++;
 				    }
 				}
 			}
 		}else{
 			n_filter_combs[0] = filter[1].slice();			
 		}	
-		
-		var tCont = "";
-		var tCont2 = "";
+		findVars(k_filter_combs, n_filter_combs, varAmount);		
+	});
+
+	function findVars(k_filter_combs, n_filter_combs, varAmount, upperLimit){
 		var arrConts = [];
 		var varNum = 0;
 		for(var i = 0; i < k_filter_combs.length; i++){
 			for(var j = 0; j < n_filter_combs.length; j++){
 				var fl_k = false;
 				var fl_n = false;
-				if(n_filter_combs[j].length != 0)
+				var k_check = false;
+				var n_check = false;
+				var k_anti_check = false;
+				var n_anti_check = false;
+				if(n_filter_combs[j].length == 0 || sumOfMas(n_filter_combs[j]) == 0)
 					fl_n = true;
-				if(k_filter_combs[i].length != 0)
+				if(k_filter_combs[i].length == 0 || sumOfMas(k_filter_combs[i]) == 0)
 					fl_k = true;
 				var res = [];
 				res[0] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], true, true);
@@ -396,54 +404,341 @@ $(function () {
 				res[2] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], true, false);
 				res[3] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], false, false);	
 
+				var fl_ok = false;
+
 				if($('#k-check').prop("checked") && $('#n-k-check').prop("checked")){
-					for(var ii = 0; ii < 4; ii++)
-						popBloks(res[ii], 10);
+					if($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")){
+						if(res[0].length == varAmount ){
+							fl_ok = true;							
+							k_anti_check = true;
+							n_anti_check = true;
+						}
+						if(res[1].length == varAmount){
+							fl_ok = true;
+							k_anti_check = true;
+						}
+						if(res[2].length == varAmount){
+							fl_ok = true;
+							n_anti_check = true;
+						}
+						if(res[3].length == varAmount){
+							fl_ok = true;
+						}
+						if(!fl_ok){
+							var resTmp = [];
+							for(var ii in res){
+								resTmp[ii] = res[ii].slice();
+							}
+							if(fl_n && fl_k){
+								for(var ii = 0; ii < 4; ii++)
+									popBloks(res[ii], 10);
+								if(res[0].length == varAmount || res[1].length == varAmount || res[2].length == varAmount || res[3].length == varAmount){
+									fl_ok = true;
+									k_check = true;
+									n_check = true;
+								}
+							}
+							if(!fl_n && fl_k){
+								for(var ii = 0; ii < 4; ii++)
+									popBloks(res[ii], 1);
+								if(res[0].length == varAmount || res[1].length == varAmount || res[2].length == varAmount || res[3].length == varAmount){
+									fl_ok = true;
+									k_check = true;
+								}
+							}
+							if(!fl_k && fl_n){
+								for(var ii = 0; ii < 4; ii++)
+									popBloks(res[ii], 0);
+								if(res[0].length == varAmount || res[1].length == varAmount || res[2].length == varAmount || res[3].length == varAmount){
+									fl_ok = true;
+									n_check = true;
+								}
+							}
+							for(var ii in resTmp){
+								res[ii] = resTmp[ii].slice();
+							}
+						}
+					}else{
+						for(var ii = 0; ii < 4; ii++)
+							popBloks(res[ii], 10);
+						k_check = true;
+						n_check = true;
+
+						if(res[0].length == varAmount){
+							fl_ok = true;	
+							k_anti_check = true;
+							n_anti_check = true;
+						}
+						if(res[1].length == varAmount){
+							fl_ok = true;
+							k_anti_check = true;
+						}
+						if(res[2].length == varAmount){
+							fl_ok = true;
+							n_anti_check = true;
+						}
+						if(res[3].length == varAmount){
+							fl_ok = true;
+						}
+					}
 				}else{
 					if($('#k-check').prop("checked")){
 						for(var ii = 0; ii < 4; ii++)
 							popBloks(res[ii], 1);
+						k_check = true;
 					}
 					if($('#n-k-check').prop("checked")){
 						for(var ii = 0; ii < 4; ii++)
 							popBloks(res[ii], 0);
+						n_check = true;
+					}
+					if(!$('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")){
+						if(res[3].length == varAmount){
+							fl_ok = true;
+						}
+					}
+					if($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")){
+						if(res[0].length == varAmount){
+							fl_ok = true;
+							k_anti_check = true;
+							n_anti_check = true;
+						}
+					}
+					if(!$('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")){
+						if(res[1].length == varAmount){
+							fl_ok = true;							
+							k_anti_check = true;
+						}
+					}
+					if($('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")){
+						if(res[2].length == varAmount){
+							fl_ok = true;
+							n_anti_check = true;
+						}
 					}
 				}
+
+				if(fl_ok){
+					var tCont = "Блоки №" + parseInt(varNum+1) + "</br>";
+					var tCont2 = "";
+					var tCont3 = "";
+					if(fl_k){ 
+						if(k_check){ 
+							tCont2 += "ТБ: Без блоков." + "</br>";
+						}
+					}else{
+						if(k_anti_check){
+							tCont2 += "ТБ: " + k_filter_combs[i] + "+" + "</br>";	
+						}
+						// }else{
+						// 	tCont2 += "ТБ: " + k_filter_combs[i] + "</br>";	
+						// }
+					}	
+					if(fl_n){ 
+						if(n_check){ 
+							tCont3 += "ТМ: Без блоков."
+						}
+					}else{
+						if(n_anti_check){
+							tCont3 += "ТМ: " + n_filter_combs[j] + "+";	
+						}
+						// else{
+						// 	tCont3 += "ТМ: " + n_filter_combs[j];
+						// }
+					}	
+					if(arrConts.indexOf(tCont2 + tCont3) == -1 && tCont2.length != 0 && tCont3.length != 0){
+						var newEl = $('<div class="row cont stp2">')
+						.appendTo('#accordionArea2 .accordion-inner')
+						.attr('data-var-num', i);
+						var newDiv = (varNum%2 == 0) ?
+						$('<div class="alert alert-error fade in span24 stp2">').appendTo(newEl) :
+						$('<div class="alert alert-info fade in span24 stp2">').appendTo(newEl);
+						arrConts.push(tCont2 + tCont3);
+						newDiv.html(tCont + tCont2 + tCont3);	
+						varNum++;
+					}
+				}
+			}
+		}	
+		$('#var-num').html('Варианты (' + varNum + ')');	
+	}
+
+	function isArraysEqual(a, b){
+		if(a === b) return true;
+		if(a == null || b == null) return false;
+		if(a.length != b.length) return false;
+		a.sort();
+		b.sort();
+		for(var i = 0; i < a.length; ++i){
+			if(a[i] !== b[i]) return false;
+		}
+		return true;
+	}
+	function findVarsLimit(k_filter_combs, n_filter_combs, upperLimit){
+		var tCont = "";
+		var tCont2 = "";
+		var tCont3 = "";
+		var arrConts = [];
+		var varNum = 0;
+		for(var i = 0; i < k_filter_combs.length; i++){
+			for(var j = 0; j < n_filter_combs.length; j++){
+				var fl_k = false;
+				var fl_n = false;
+				var k_check = false;
+				var n_check = false;
+				var k_anti_check = false;
+				var n_anti_check = false;
+				if(n_filter_combs[j].length == 0)
+					fl_n = true;
+				if(k_filter_combs[i].length == 0)
+					fl_k = true;
+				var res = [];
+				res[0] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], true, true);
+				res[1] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], false, true);
+				res[2] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], true, false);
+				res[3] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], false, false);	
+
 				var fl_ok = false;
-				if(!$('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")){
-					if(res[0].length == varAmount || res[1].length == varAmount || res[2].length == varAmount || res[3].length == varAmount){
-						fl_ok = true;
+
+				if($('#k-check').prop("checked") && $('#n-k-check').prop("checked")){
+					if($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")){
+						if(res[0].length == varAmount ){
+							fl_ok = true;							
+							k_anti_check = true;
+							n_anti_check = true;
+						}
+						if(res[1].length == varAmount){
+							fl_ok = true;
+							k_anti_check = true;
+						}
+						if(res[2].length == varAmount){
+							fl_ok = true;
+							n_anti_check = true;
+						}
+						if(res[3].length == varAmount){
+							fl_ok = true;
+						}
+						if(!fl_ok){
+							var resTmp = [];
+							for(var ii in res){
+								resTmp[ii] = res[ii].slice();
+							}
+							if(fl_n && fl_k){
+								for(var ii = 0; ii < 4; ii++)
+									popBloks(res[ii], 10);
+								if(res[0].length == varAmount || res[1].length == varAmount || res[2].length == varAmount || res[3].length == varAmount){
+									fl_ok = true;
+									k_check = true;
+									n_check = true;
+								}
+							}
+							if(!fl_n && fl_k){
+								for(var ii = 0; ii < 4; ii++)
+									popBloks(res[ii], 1);
+								if(res[0].length == varAmount || res[1].length == varAmount || res[2].length == varAmount || res[3].length == varAmount){
+									fl_ok = true;
+									k_check = true;
+								}
+							}
+							if(!fl_k && fl_n){
+								for(var ii = 0; ii < 4; ii++)
+									popBloks(res[ii], 0);
+								if(res[0].length == varAmount || res[1].length == varAmount || res[2].length == varAmount || res[3].length == varAmount){
+									fl_ok = true;
+									n_check = true;
+								}
+							}
+							for(var ii in resTmp){
+								res[ii] = resTmp[ii].slice();
+							}
+						}
+					}else{
+						for(var ii = 0; ii < 4; ii++)
+							popBloks(res[ii], 10);
+						k_check = true;
+						n_check = true;
+
+						if(res[0].length == varAmount){
+							fl_ok = true;	
+							k_anti_check = true;
+							n_anti_check = true;
+						}
+						if(res[1].length == varAmount){
+							fl_ok = true;
+							k_anti_check = true;
+						}
+						if(res[2].length == varAmount){
+							fl_ok = true;
+							n_anti_check = true;
+						}
+						if(res[3].length == varAmount){
+							fl_ok = true;
+						}
+					}
+				}else{
+					if($('#k-check').prop("checked")){
+						for(var ii = 0; ii < 4; ii++)
+							popBloks(res[ii], 1);
+						k_check = true;
+					}
+					if($('#n-k-check').prop("checked")){
+						for(var ii = 0; ii < 4; ii++)
+							popBloks(res[ii], 0);
+						n_check = true;
+					}
+					if(!$('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")){
+						if(res[3].length == varAmount){
+							fl_ok = true;
+						}
+					}
+					if($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")){
+						if(res[0].length == varAmount){
+							fl_ok = true;
+							k_anti_check = true;
+							n_anti_check = true;
+						}
+					}
+					if(!$('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")){
+						if(res[1].length == varAmount){
+							fl_ok = true;							
+							k_anti_check = true;
+						}
+					}
+					if($('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")){
+						if(res[2].length == varAmount){
+							fl_ok = true;
+							n_anti_check = true;
+						}
 					}
 				}
-				if($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")){
-					if(res[0].length == varAmount){
-						fl_ok = true;
-					}
-				}
-				if(!$('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")){
-					if(res[0].length == varAmount || res[1].length == varAmount){
-						fl_ok = true;
-					}
-				}
-				if($('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")){
-					if(res[0].length == varAmount || res[2].length == varAmount){
-						fl_ok = true;
-					}
-				}
+
 				if(fl_ok){
 					tCont = "Блоки №" + parseInt(varNum+1) + "</br>";
 					tCont2 = "";
-					if(!fl_k){ 
-						tCont2 += "ТБ: Без блоков." + "</br>";
+					tCont3 = "";
+					if(fl_k){ 
+						if(k_check){ 
+							tCont2 += "ТБ: Без блоков." + "</br>";
+						}
 					}else{
-						tCont2 += "ТБ: " + k_filter_combs[i] + "</br>";	
+						if(k_anti_check){
+							tCont2 += "ТБ: " + k_filter_combs[i] + "+" + "</br>";	
+						}else{
+							tCont2 += "ТБ: " + k_filter_combs[i] + "</br>";	
+						}
 					}	
-					if(!fl_n){ 
-						tCont2 += "ТМ: Без блоков."
+					if(fl_n){ 
+						if(n_check){ 
+							tCont3 += "ТМ: Без блоков."
+						}
 					}else{
-						tCont2 += "ТМ: " + n_filter_combs[j];	
-					}			
-					if(arrConts.indexOf(tCont2) == -1){
+						if(n_anti_check){
+							tCont3 += "ТМ: " + n_filter_combs[j] + "+";	
+						}else{
+							tCont3 += "ТМ: " + n_filter_combs[j];
+						}
+					}	
+					if(arrConts.indexOf(tCont2) == -1 && tCont2.length != 0 && tCont3.length != 0){
 						var newEl = $('<div class="row cont stp2">')
 						.appendTo('#accordionArea2 .accordion-inner')
 						.attr('data-var-num', i);
@@ -451,14 +746,14 @@ $(function () {
 						$('<div class="alert alert-error fade in span24 stp2">').appendTo(newEl) :
 						$('<div class="alert alert-info fade in span24 stp2">').appendTo(newEl);
 						arrConts.push(tCont2);
-						newDiv.html(tCont + tCont2);	
+						newDiv.html(tCont + tCont2 + tCont3);	
 						varNum++;
 					}
 				}
 			}
 		}	
 		$('#var-num').html('Варианты (' + varNum + ')');	
-	});
+	}
 	function sumOfMas(m){
 		var total = 0;
 		for(var i in m){
