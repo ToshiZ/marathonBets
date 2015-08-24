@@ -441,17 +441,19 @@ $(function () {
 							if(!fl_n && fl_k){
 								for(var ii = 0; ii < 4; ii++)
 									popBloks(res[ii], 1);
-								if(res[0].length == varAmount || res[1].length == varAmount || res[2].length == varAmount || res[3].length == varAmount){
+								if(res[2].length == varAmount){
 									fl_ok = true;
 									k_check = true;
+									n_anti_check = true;
 								}
 							}
 							if(!fl_k && fl_n){
 								for(var ii = 0; ii < 4; ii++)
 									popBloks(res[ii], 0);
-								if(res[0].length == varAmount || res[1].length == varAmount || res[2].length == varAmount || res[3].length == varAmount){
+								if(res[1].length == varAmount){
 									fl_ok = true;
 									n_check = true;
+									k_anti_check = true;
 								}
 							}
 							for(var ii in resTmp){
@@ -522,7 +524,13 @@ $(function () {
 					var tCont = "Блоки №" + parseInt(varNum+1) + "</br>";
 					var tCont2 = "";
 					var tCont3 = "";
-					if(fl_k){ 
+					if(k_ == 1){
+						k_check = true;
+					}
+					if(n_ - k_ == 1){
+						n_check = true;
+					}
+					if(fl_k){
 						if(k_check){ 
 							tCont2 += "ТБ: Без блоков." + "</br>";
 						}
