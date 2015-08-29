@@ -408,23 +408,25 @@ $(function () {
 
 				if($('#k-check').prop("checked") && $('#n-k-check').prop("checked")){
 					if($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")){
-						if(res[0].length == varAmount ){
+						if(res[0].length == varAmount && !fl_k && !fl_n){
 							fl_ok = true;							
 							k_anti_check = true;
 							n_anti_check = true;
 						}
-						if(res[1].length == varAmount){
-							fl_ok = true;
-							k_anti_check = true;
-						}
-						if(res[2].length == varAmount){
-							fl_ok = true;
-							n_anti_check = true;
+						if(res[1].length != varAmount || res[2].length != varAmount){
+							if(res[1].length == varAmount && !fl_k){
+								fl_ok = true;
+								k_anti_check = true;
+							}
+							if(res[2].length == varAmount && !fl_n){
+								fl_ok = true;
+								n_anti_check = true;
+							}
 						}
 						if(res[3].length == varAmount){
 							fl_ok = true;
 						}
-						if(!fl_ok){
+						if(fl_n || fl_k){
 							var resTmp = [];
 							for(var ii in res){
 								resTmp[ii] = res[ii].slice();
@@ -471,13 +473,15 @@ $(function () {
 							k_anti_check = true;
 							n_anti_check = true;
 						}
-						if(res[1].length == varAmount){
-							fl_ok = true;
-							k_anti_check = true;
-						}
-						if(res[2].length == varAmount){
-							fl_ok = true;
-							n_anti_check = true;
+						if(res[1].length != varAmount || res[2].length != varAmount){
+							if(res[1].length == varAmount){
+								fl_ok = true;
+								k_anti_check = true;
+							}
+							if(res[2].length == varAmount){
+								fl_ok = true;
+								n_anti_check = true;
+							}
 						}
 						if(res[3].length == varAmount){
 							fl_ok = true;
