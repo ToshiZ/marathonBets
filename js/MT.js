@@ -129,8 +129,8 @@ $(function () {
 				.css({width:"50px",
 					background: "#3C3F45",
 					color: "white"})
-				.attr('placeholder',"Блок "+$(".k-blocks").length)
-				.addClass("k-blocks dynamic");
+				.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length +1))
+				.addClass("k-blocks dynamic dynamic-k");
 		}else{
 			$('.k-blocks').filter(function(){return !this.value;}).remove();
 		}
@@ -152,8 +152,8 @@ $(function () {
 					background: "#3C3F45",
 					color: "white"
 					})
-				.attr('placeholder',"Блок "+$(".n-k-blocks").length)
-				.addClass("n-k-blocks dynamic");
+				.attr('placeholder',"Блок "+ parseInt($(".n-k-blocks").length + 1))
+				.addClass("n-k-blocks dynamic dynamic-n-k");
 		}else{
 			$('.n-k-blocks').filter(function(){return !this.value;}).remove();
 		}
@@ -292,6 +292,25 @@ $(function () {
 			$('#n').val(n_>0?n_:"");
 		}
 	});
+	$('#k-check').on('dblclick', function(e){
+		if($('#k-check').prop("checked") == false){
+			$('#k-check').prop("checked", true);
+			$('#anti-block-plus-check').prop("checked", true);
+			$('#n-k-check').prop("checked", true);
+			$('#anti-block-minus-check').prop("checked", true);
+		}else{
+			$('#k-check').prop("checked", false);
+			$('#anti-block-plus-check').prop("checked", false);
+			$('#n-k-check').prop("checked", false);
+			$('#anti-block-minus-check').prop("checked", false);
+		}
+
+	});
+	$(document).keypress(function(e) {
+	    if(e.which == 13) {
+	    	$('#var-ok').click();
+	    }
+	});
 	$('#var-ok').on('click', function(e){
 		$('.stp2').remove();
 		var varAmount = $('#var-amount').val();
@@ -382,7 +401,12 @@ $(function () {
 		}	
 		findVars(k_filter_combs, n_filter_combs, varAmount);		
 	});
-
+	$('#clean-k').on('click', function(e){
+		inputsForBlocksK(k_);
+	});
+	$('#clean-n-k').on('click', function(e){
+		inputsForBlocksN(n_ - k_);
+	});
 	function findVars(k_filter_combs, n_filter_combs, varAmount, upperLimit){
 		var arrConts = [];
 		var varNum = 0;
@@ -916,6 +940,33 @@ $(function () {
 		}			
 		return output;
 	}
+	function inputsForBlocksK(k){
+		$('.dynamic-k').detach();
+		filter[0] = [];	
+		if(k > 1){
+			$('<input type="text"></input>').appendTo('#k-blocks-div')
+				.attr('id', "k-block"+$(".k-blocks").length)
+				.css({width:"50px",
+					background: "#3C3F45",
+					color: "white"})
+				.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length + 1))
+				.addClass("k-blocks dynamic dynamic-k");
+		}
+	}
+	function inputsForBlocksN(n_k){
+		$('.dynamic-n-k').detach();	
+		filter[1] = [];
+		if(n_k > 1){
+			$('<input type="text"></input>').appendTo('#n-k-blocks-div')
+				.attr('id', "n-k-block"+$(".n-k-blocks").length)
+				.css({width:"50px",
+					background: "#3C3F45",
+					color: "white"})
+				.attr('placeholder',"Блок " + parseInt($(".n-k-blocks").length + 1))
+				.addClass("n-k-blocks dynamic dynamic-n-k");	
+		}
+	}
+
 	function inputsForBlocks(n,k){
 		$('.dynamic').detach();	
 		if(k > 1){
@@ -924,8 +975,8 @@ $(function () {
 				.css({width:"50px",
 					background: "#3C3F45",
 					color: "white"})
-				.attr('placeholder',"Блок "+$(".k-blocks").length)
-				.addClass("k-blocks dynamic");
+				.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length + 1))
+				.addClass("k-blocks dynamic dynamic-k");
 		}
 		if(n-k > 1){
 			$('<input type="text"></input>').appendTo('#n-k-blocks-div')
@@ -933,8 +984,8 @@ $(function () {
 				.css({width:"50px",
 					background: "#3C3F45",
 					color: "white"})
-				.attr('placeholder',"Блок "+$(".n-k-blocks").length)
-				.addClass("n-k-blocks dynamic");	
+				.attr('placeholder',"Блок " + parseInt($(".n-k-blocks").length + 1))
+				.addClass("n-k-blocks dynamic dynamic-n-k");	
 		}
 		$('<a id="run" class="button button-large dynamic">Предпросмотр</a>')
 			.appendTo('#buttons');
@@ -1092,6 +1143,7 @@ $(function () {
 			ticketsJson.ticket[i] = [];
 			for(var j = 0; j < arr[i].length; j++){
 				var prName = selectedTeamsJson.team[j].name + " " + selectedTeamsJson.team[j].date;
+				tCont+= parseInt(j + 1) + '. ';
 				tCont += (arr[i][j] == 1) ? ("<strong>+</strong> " + prName +   "</br>") : ("<strong>-</strong> " + prName + "</br>");
 				var obj = {};
 				obj['name'] =  selectedTeamsJson.team[j].name;	
