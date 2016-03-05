@@ -22,9 +22,10 @@ var clickEnter = function(){
 	}
 var	clickBet = function(){
 		setTimeout(function(){
-			if($('.but-place-bet').length != 0 && $('#button_accumulator.active').length != 0){
+			if($('.btn-place-bet').length != 0 && $('#button_accumulator.active').length != 0){
+				//$('#betslip_button')[0].click();
 				if(autoMode){
-					$('.but-place-bet')[0].click();
+					$('.btn-place-bet')[0].click();
 				setBets();
 			}
 			}else
@@ -53,8 +54,8 @@ var setCoast = function(coast){
 			}
 var betTicket = function(){
 				var forClick = [];
-				if($('a.but-remove').length != 0)
-					$('a.but-remove')[0].click();	
+				if($('span.btn-remove').length != 0)
+					$('span.btn-remove')[0].click();	
 				tbodyTeams.forEach(function(item, index){
 						for(var j = 0; j < ticketsJson.ticket[i].length; j++){       		
 							if(item.attr('data-event-name').indexOf(ticketsJson.ticket[i][j].name) != -1){
@@ -101,8 +102,8 @@ var setBets = function(){
 				if($('p#betresult').html().indexOf("Ваша ставка принята, спасибо") != -1){	
 					chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i)});
 					clickEnter();
-					if($('a.but-remove').length != 0)
-						$('a.but-remove')[0].click();
+					if($('span.btn-remove').length != 0)
+						$('span.btn-remove')[0].click();
 					clickEnter();	
 					if(i < ticketsJson.ticket.length - 1){
 							i++;
@@ -280,7 +281,7 @@ $(function () {
 					localStorage.setItem('reloaded', 1);
 					autoMode = request.auto === 'auto'? 1: 0;
 					localStorage.setItem('autoMode', autoMode); 
-					$('.but-refresh')[0].click();
+					$('.btn-refresh')[0].click();
 				}
 		});
 		chrome.runtime.onMessage.addListener(

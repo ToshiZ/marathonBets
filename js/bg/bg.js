@@ -5,7 +5,7 @@ jQuery(document).ready(function ($) {
 		ticketsJson;
 	chrome.browserAction.onClicked.addListener(function() {
 		chrome.tabs.create({'url': "MBExt.html", 'active': false}, function(tab){
-		mtTabId = tab.id;
+			mtTabId = tab.id;
 		});
 	});
 	/* chrome.runtime.onMessage.addListener(

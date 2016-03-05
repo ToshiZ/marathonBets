@@ -12,7 +12,7 @@ $(function () {
 		sendRefreshTimer,
 		filter = [];
 		filter[0] = []; //k block
-		filter[1] = []; //n-k block;
+		filter[1] = []; //n-k blocksock;
 	if(localStorage['teams']){
 		teamsJson =  JSON.parse(localStorage.getItem('teams'));
 		fillTeamList(teamsJson);
@@ -114,27 +114,9 @@ $(function () {
 		chrome.tabs.sendMessage(csId.id, {'askFor': 'vijet'});
 	});
 	$(document).on('input', ".k-blocks", function(){ 
-		filter[0] = [];
-		$('.k-blocks').each(function() {
-				if($(this).val().length)
-					filter[0].push(parseInt($(this).val()));				 
-			});
-		if($(".k-blocks").last().val() < 2){
-			$(".k-blocks").last().val('');
-			return false;
-		}
-		if($(".k-blocks").last().val() && sumOfMas(filter[0]) < k_){		
-			$('<input type="text"></input>').appendTo('#k-blocks-div')
-				.attr('id', "k-block"+$(".k-blocks").length)
-				.css({width:"50px",
-					background: "#3C3F45",
-					color: "white"})
-				.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length +1))
-				.addClass("k-blocks dynamic dynamic-k");
-		}else{
-			$('.k-blocks').filter(function(){return !this.value;}).remove();
-		}
-	});		
+		blocksInput(this);
+	});	
+	
 	$(document).on('input', ".n-k-blocks", function(){
 		filter[1] = [];
 		$('.n-k-blocks').each(function() {
@@ -158,6 +140,28 @@ $(function () {
 			$('.n-k-blocks').filter(function(){return !this.value;}).remove();
 		}
 	});
+	function blocksInput(el){
+		filter[0] = [];
+		$('.k-blocks').each(function() {
+				if($(el).val().length)
+					filter[0].push(parseInt($(el).val()));				 
+			});
+		if($(".k-blocks").last().val() < 2){
+			$(".k-blocks").last().val('');
+			return false;
+		}
+		if($(".k-blocks").last().val() && sumOfMas(filter[0]) < k_){		
+			$('<input type="text"></input>').appendTo('#k-blocks-div')
+				.attr('id', "k-block"+$(".k-blocks").length)
+				.css({width:"50px",
+					background: "#3C3F45",
+					color: "white"})
+				.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length +1))
+				.addClass("k-blocks dynamic dynamic-k");
+		}else{
+			$('.k-blocks').filter(function(){return !el.value;}).remove();
+		}
+	}	
 	$(".n-k-params").on('input', function(){ 		
 		$('.dynamic').remove();
 		$(this).each(function(){
@@ -325,7 +329,6 @@ $(function () {
 		if(filter[0].length == 0){
 			while(fl){
 				if(sumOfMas(k_filter_combs[i]) <= parseInt(k_)-1){
-
 					k_filter_combs[i+1] = k_filter_combs[i].slice();
 					k_filter_combs[i+1][0]++;
 					i++;
@@ -406,6 +409,79 @@ $(function () {
 	});
 	$('#clean-n-k').on('click', function(e){
 		inputsForBlocksN(n_ - k_);
+	});
+	$(document).on('click', ".var-div", function(){
+		var tb = this.getAttribute('tb');
+		var tm = this.getAttribute('tm');
+
+		if(tb.indexOf('Без блоков') != -1){
+			filter[0] = [];			
+			$('.k-blocks').detach();
+			$('#k-check')[0].checked = true;
+			$('#anti-block-plus-check')[0].checked = false;
+			$('<input type="text"></input>').appendTo('#k-blocks-div')
+				.attr('id', "k-block"+$(".k-blocks").length)
+				.css({width:"50px",
+					background: "#3C3F45",
+					color: "white"})
+				.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length +1))
+				.addClass("k-blocks dynamic dynamic-k");
+
+		}else{
+			$('.k-blocks').detach();
+			$('#k-check')[0].checked = false;
+			$('#anti-block-plus-check')[0].checked = true;
+			filter[0] = tb.replace('+</br>', '')
+				.split(':')[1].split(',')
+				.map(function(item){
+					return parseInt(item)
+				});
+
+			for(var i = 0; i < filter[0].length; i++){		
+			$('<input type="text"></input>').appendTo('#k-blocks-div')
+				.attr('id', "k-block"+$(".k-blocks").length)
+				.css({width:"50px",
+					background: "#3C3F45",
+					color: "white"})
+				.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length +1))
+				.addClass("k-blocks dynamic dynamic-k")
+				.val(filter[0][i]);
+			}
+		}
+		if(tm.indexOf('Без блоков') != -1){
+		 	filter[1] = [];
+		 	$('.n-k-blocks').detach();
+		 	$('#n-k-check')[0].checked = true;
+			$('#anti-block-minus-check')[0].checked = false;
+		 	$('<input type="text"></input>').appendTo('#n-k-blocks-div')
+				.attr('id', "n-k-blocks"+$(".n-k-blocks").length)
+				.css({width:"50px",
+					background: "#3C3F45",
+					color: "white"})
+				.attr('placeholder',"Блок "+ parseInt($(".n-k-blocks").length +1))
+				.addClass("n-k-blocks dynamic dynamic-n-k");
+		}else{
+			$('.n-k-blocks').detach();
+			$('#n-k-check')[0].checked = false;
+			$('#anti-block-minus-check')[0].checked = true;
+			filter[1] = tm.replace('+', '')
+				.split(':')[1]
+				.split(',')
+				.map(function(item){
+					return parseInt(item)
+				});
+
+			for(var i = 0; i < filter[1].length; i++){		
+			$('<input type="text"></input>').appendTo('#n-k-blocks-div')
+				.attr('id', "n-k-blocks"+$(".n-k-blocks").length)
+				.css({width:"50px",
+					background: "#3C3F45",
+					color: "white"})
+				.attr('placeholder',"Блок "+ parseInt($(".n-k-blocks").length +1))
+				.addClass("n-k-blocks dynamic dynamic-n-k")
+				.val(filter[1][i]);
+			}
+		}		
 	});
 	function findVars(k_filter_combs, n_filter_combs, varAmount, upperLimit){
 		var arrConts = [];
@@ -549,7 +625,7 @@ $(function () {
 				}
 
 				if(fl_ok){
-					var tCont = "Блоки №" + parseInt(varNum+1) + "</br>";
+					var tCont = "Вариант №" + parseInt(varNum+1) + "</br>";
 					var tCont2 = "";
 					var tCont3 = "";
 					if(k_ == 1){
@@ -565,10 +641,7 @@ $(function () {
 					}else{
 						if(k_anti_check){
 							tCont2 += "ТБ: " + k_filter_combs[i] + "+" + "</br>";	
-						}
-						// }else{
-						// 	tCont2 += "ТБ: " + k_filter_combs[i] + "</br>";	
-						// }
+						}						
 					}	
 					if(fl_n){ 
 						if(n_check){ 
@@ -578,17 +651,23 @@ $(function () {
 						if(n_anti_check){
 							tCont3 += "ТМ: " + n_filter_combs[j] + "+";	
 						}
-						// else{
-						// 	tCont3 += "ТМ: " + n_filter_combs[j];
-						// }
 					}	
 					if(arrConts.indexOf(tCont2 + tCont3) == -1 && tCont2.length != 0 && tCont3.length != 0){
 						var newEl = $('<div class="row cont stp2">')
 						.appendTo('#accordionArea2 .accordion-inner')
 						.attr('data-var-num', i);
 						var newDiv = (varNum%2 == 0) ?
-						$('<div class="alert alert-error fade in span24 stp2">').appendTo(newEl) :
-						$('<div class="alert alert-info fade in span24 stp2">').appendTo(newEl);
+						$('<div class="alert alert-error fade in span24 stp2 var-div">').appendTo(newEl) :
+						$('<div class="alert alert-info fade in span24 stp2 var-div">').appendTo(newEl);
+						newDiv.attr('tb', tCont2);
+						newDiv.attr('tm', tCont3);
+						//newDiv[0].onclick =   (function(r){alert(r);})(i);
+							
+							// if (tCont2.indexOf("ТМ: Без блоков."))
+							// {
+							// 	$('#k-block0').val(3);
+							// }
+						
 						arrConts.push(tCont2 + tCont3);
 						newDiv.html(tCont + tCont2 + tCont3);	
 						varNum++;
@@ -1001,7 +1080,7 @@ $(function () {
                         .html(item.name + " " + item.date)
                         .attr("data-name", item.name)
                         .attr("data-date", item.date);
-                $('<a class="close" data-dismiss="alert" href="#">&times;</a>').appendTo(newDiv);
+                $('<a class="close" data-dismiss="alert" href="#">x</a>').appendTo(newDiv);
             }
 		});
 	}
@@ -1132,26 +1211,46 @@ $(function () {
 			.appendTo('#buttons');
 		$('<a id="rebet-but" class="button button-large dynamic stp">Повторить непоставленные (0)</a>')
 			.appendTo('#buttons');
-		var tCont = "";
-		for(var i = 0; i < arr.length; i++){	
+		var tCont = "",
+			tCont2 = "";
+		var totalTickets = arr.length;
+		var plusSymbol = '<span style="color: #333;font-size: 140%"> + </span>';
+		var minusSymbol = '<span style="color:#333;font-size: 145%"> - </span>';
+		for(var i = 0; i < arr.length; i++){							
 			var newEl = $('<div class="row cont stp">').appendTo('#steps-area .accordion-inner')
 				.attr('data-ticket-num', i);
 			var newDiv = (i%2 == 0) ?
 			$('<div class="alert alert-error fade in span24 stp">').appendTo(newEl) :
 			$('<div class="alert alert-info fade in span24 stp">').appendTo(newEl);
+			var newDiv2 = (i%2 == 0) ?
+			$('<div class="alert alert-error fade in span24 stp">').appendTo(newEl) :
+			$('<div class="alert alert-info fade in span24 stp">').appendTo(newEl);
 			tCont = "Билет №" + parseInt(i+1) + "</br>";
+			tCont2 = "Билет №" + parseInt(i+1) + "</br>";
 			ticketsJson.ticket[i] = [];
 			for(var j = 0; j < arr[i].length; j++){
-				var prName = selectedTeamsJson.team[j].name + " " + selectedTeamsJson.team[j].date;
+				var dist = 0;
+				for (var ii = j+1; ii < arr[i].length; ii++) {
+					if(arr[i][j] == arr[i][ii]) break;
+					dist++;
+				}
+				var prName = "&nbsp;" + selectedTeamsJson.team[j].name + " " + selectedTeamsJson.team[j].date;
 				tCont+= parseInt(j + 1) + '. ';
-				tCont += (arr[i][j] == 1) ? ("<strong>+</strong> " + prName +   "</br>") : ("<strong>-</strong> " + prName + "</br>");
+				tCont2 += parseInt(j + 1) + '. ';
+				var plusArrow = k_ <= n_-k_ && dist != 0 ? ('<span style="color:black;font-size: 120%">' + " &darr; " + dist + '</span>') : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+				var minusArrow = k_ > n_-k_ && dist != 0 ? ('<span style="color:black;font-size: 120%">' + " &darr; " + dist + '</span>') : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+
+				tCont += (arr[i][j] == 1) ? (plusSymbol + plusArrow + prName + "</br>") : (minusSymbol + minusArrow + prName + "</br>");
+				tCont2 += (arr[i][j] == 0) ? plusSymbol + (plusArrow + prName + "</br>") : (minusSymbol +  minusArrow + prName + "</br>");
 				var obj = {};
 				obj['name'] =  selectedTeamsJson.team[j].name;	
 				obj['date'] =  selectedTeamsJson.team[j].date;		
 				obj['bet'] =  arr[i][j];	
 				ticketsJson.ticket[i][j] = obj;
 			}				
-			newDiv.html(tCont);				
+			newDiv.html(tCont);		
+			newDiv2.html(tCont2);		
+			document.title = parseInt(i+1) + " из " + totalTickets;
 		}
 		localStorage.setItem('tickets', JSON.stringify(ticketsJson));
 	}	

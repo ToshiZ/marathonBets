@@ -13,6 +13,8 @@
               "http://www.marathonbet.com/*",
               "http://www.betmarathon.com/*",
               "http://www.marathonsportsbook.com/*",
+              "http://www.mbet.com/*",
+              "https://www.mirrormarathonbet.com/*",
 			  "tabs"
 	],
 	"background" : {
@@ -27,7 +29,9 @@
             "http://www.betmarathon.com/*",
             "http://www.marathonsportsbook.com/*",
             "https://www.betmarathon.com/*",
-            "https://www.marathonsportsbook.com/*"
+            "https://www.marathonsportsbook.com/*",
+            "http://www.mbet.com/*",
+            "https://www.mirrormarathonbet.com/*"
         ],
         "js": [  
             "js/jquery-ui-1.11.2.custom/external/jquery/jquery.js",
