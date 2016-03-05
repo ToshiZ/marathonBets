@@ -25,14 +25,14 @@
 <div id="top-div" class="span24">
 <div class="span24">
 	<div id="n-k-params-div" class="span2">		
-				<input id="n" type="text" name="n" class="n-k-params" 
+				<input id="n" readonly type="number"  min="1" name="n" class="n-k-params" 
 					placeholder = "Всего" style="width:80px; background: #3C3F45; color: white"></input></br>	
-				<input id="k" type="text" name="k" class="n-k-params" 
+				<input id="k" type="number"  min="1"  name="k" class="n-k-params" 
 					placeholder = "Плюсов" style="width:80px; background: #3C3F45; color: white"></input>
 				<a id="clean-k">очистить</a>
 				<label> <input type="checkBox"  name="check" id="k-check"/> Плюсы без блоков </label>
 				<label> <input type="checkBox"  name="check" id="anti-block-plus-check"/> Только указанные</label>
-				<input id="n-k" type="text" name="n-k" class="n-k-params" 
+				<input id="n-k" type="number"  min="1" name="n-k" class="n-k-params" 
 					placeholder = "Минусов" style="width:80px; background: #3C3F45; color: white"></input>
 				<a id="clean-n-k">очистить</a>		
 				<label> <input type="checkBox"  name="check" id="n-k-check"/> Минусы без блоков </label>
@@ -79,8 +79,9 @@
 	</div>	
 	<div class="span24 pull-right" style="margin-right:10px">
 	</br></br></br></br></br></br></br>		
-		<input id="var-amount" type="text" class="" 
+		<input id="var-amount" type="number"  min="1" class="" 
 			placeholder = "Количество билетов" style="width:160px; background: #3C3F45; color: white"></input>
+		<a id="clean-vars">очистить</a>
 		</br>	
 		<a id="var-ok" class="button button-large">Ok</a>
 		</br>

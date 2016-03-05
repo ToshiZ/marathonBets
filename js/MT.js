@@ -128,7 +128,7 @@ $(function () {
 			return false;
 		}
 		if($(".n-k-blocks").last().val() && sumOfMas(filter[1]) < n_k_){	
-			$('<input type="text"></input>').appendTo('#n-k-blocks-div')
+			$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
 				.attr('id', "n-k-block"+$(".n-k-blocks").length)
 				.css({width:"50px",
 					background: "#3C3F45",
@@ -151,7 +151,7 @@ $(function () {
 			return false;
 		}
 		if($(".k-blocks").last().val() && sumOfMas(filter[0]) < k_){		
-			$('<input type="text"></input>').appendTo('#k-blocks-div')
+			$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
 				.attr('id', "k-block"+$(".k-blocks").length)
 				.css({width:"50px",
 					background: "#3C3F45",
@@ -315,6 +315,9 @@ $(function () {
 	    	$('#var-ok').click();
 	    }
 	});
+	$('#clean-vars').on('click', function(e){
+		$('#var-amount')[0].value = "";
+	});
 	$('#var-ok').on('click', function(e){
 		$('.stp2').remove();
 		var varAmount = $('#var-amount').val();
@@ -419,7 +422,7 @@ $(function () {
 			$('.k-blocks').detach();
 			$('#k-check')[0].checked = true;
 			$('#anti-block-plus-check')[0].checked = false;
-			$('<input type="text"></input>').appendTo('#k-blocks-div')
+			$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
 				.attr('id', "k-block"+$(".k-blocks").length)
 				.css({width:"50px",
 					background: "#3C3F45",
@@ -438,14 +441,14 @@ $(function () {
 				});
 
 			for(var i = 0; i < filter[0].length; i++){		
-			$('<input type="text"></input>').appendTo('#k-blocks-div')
-				.attr('id', "k-block"+$(".k-blocks").length)
-				.css({width:"50px",
-					background: "#3C3F45",
-					color: "white"})
-				.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length +1))
-				.addClass("k-blocks dynamic dynamic-k")
-				.val(filter[0][i]);
+				$('<input type="text"></input>').appendTo('#k-blocks-div')
+					.attr('id', "k-block"+$(".k-blocks").length)
+					.css({width:"50px",
+						background: "#3C3F45",
+						color: "white"})
+					.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length +1))
+					.addClass("k-blocks dynamic dynamic-k")
+					.val(filter[0][i]);
 			}
 		}
 		if(tm.indexOf('Без блоков') != -1){
@@ -453,7 +456,7 @@ $(function () {
 		 	$('.n-k-blocks').detach();
 		 	$('#n-k-check')[0].checked = true;
 			$('#anti-block-minus-check')[0].checked = false;
-		 	$('<input type="text"></input>').appendTo('#n-k-blocks-div')
+		 	$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
 				.attr('id', "n-k-blocks"+$(".n-k-blocks").length)
 				.css({width:"50px",
 					background: "#3C3F45",
@@ -472,16 +475,78 @@ $(function () {
 				});
 
 			for(var i = 0; i < filter[1].length; i++){		
-			$('<input type="text"></input>').appendTo('#n-k-blocks-div')
-				.attr('id', "n-k-blocks"+$(".n-k-blocks").length)
-				.css({width:"50px",
-					background: "#3C3F45",
-					color: "white"})
-				.attr('placeholder',"Блок "+ parseInt($(".n-k-blocks").length +1))
-				.addClass("n-k-blocks dynamic dynamic-n-k")
-				.val(filter[1][i]);
+				$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
+					.attr('id', "n-k-blocks"+$(".n-k-blocks").length)
+					.css({width:"50px",
+						background: "#3C3F45",
+						color: "white"})
+					.attr('placeholder',"Блок "+ parseInt($(".n-k-blocks").length +1))
+					.addClass("n-k-blocks dynamic dynamic-n-k")
+					.val(filter[1][i]);
 			}
 		}		
+	});
+	$('#k, #n-k').on('dblclick', function(){
+		$('.n-k-blocks').detach();
+		$('.k-blocks').detach();
+		k_ = [n_k_, n_k_ = k_][0];
+		$('#k')[0].value = k_;
+		$('#n-k')[0].value = n_k_;
+
+		filter[0] = [filter[1],filter[1] = filter[0]][0];
+
+		if (filter[1].length == 0) 
+		{
+			$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
+					.attr('id', "n-k-blocks"+$(".n-k-blocks").length)
+					.css({width:"50px",
+						background: "#3C3F45",
+						color: "white"})
+					.attr('placeholder',"Блок "+ parseInt($(".n-k-blocks").length +1))
+					.addClass("n-k-blocks dynamic dynamic-n-k");
+		}else{
+			for(var i = 0; i < filter[1].length; i++){		
+				$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
+					.attr('id', "n-k-blocks"+$(".n-k-blocks").length)
+					.css({width:"50px",
+						background: "#3C3F45",
+						color: "white"})
+					.attr('placeholder',"Блок "+ parseInt($(".n-k-blocks").length +1))
+					.addClass("n-k-blocks dynamic dynamic-n-k")
+					.val(filter[1][i]);
+			}
+
+		}
+		if (filter[0].length == 0) 
+		{
+			$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
+						.attr('id', "k-block"+$(".k-blocks").length)
+						.css({width:"50px",
+							background: "#3C3F45",
+							color: "white"})
+						.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length +1))
+						.addClass("k-blocks dynamic dynamic-k");
+		}else{
+			for(var i = 0; i < filter[0].length; i++){		
+					$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
+						.attr('id', "k-block"+$(".k-blocks").length)
+						.css({width:"50px",
+							background: "#3C3F45",
+							color: "white"})
+						.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length +1))
+						.addClass("k-blocks dynamic dynamic-k")
+						.val(filter[0][i]);
+			}
+		}
+
+		$('#n-k-check')[0].checked = [
+			$('#k-check')[0].checked, 
+			$('#k-check')[0].checked = $('#n-k-check')[0].checked][0];
+		$('#anti-block-minus-check')[0].checked = [
+			$('#anti-block-plus-check')[0].checked, 
+			$('#anti-block-plus-check')[0].checked = $('#anti-block-minus-check')[0].checked][0];
+
+
 	});
 	function findVars(k_filter_combs, n_filter_combs, varAmount, upperLimit){
 		var arrConts = [];
@@ -1023,7 +1088,7 @@ $(function () {
 		$('.dynamic-k').detach();
 		filter[0] = [];	
 		if(k > 1){
-			$('<input type="text"></input>').appendTo('#k-blocks-div')
+			$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
 				.attr('id', "k-block"+$(".k-blocks").length)
 				.css({width:"50px",
 					background: "#3C3F45",
@@ -1036,7 +1101,7 @@ $(function () {
 		$('.dynamic-n-k').detach();	
 		filter[1] = [];
 		if(n_k > 1){
-			$('<input type="text"></input>').appendTo('#n-k-blocks-div')
+			$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
 				.attr('id', "n-k-block"+$(".n-k-blocks").length)
 				.css({width:"50px",
 					background: "#3C3F45",
@@ -1049,7 +1114,7 @@ $(function () {
 	function inputsForBlocks(n,k){
 		$('.dynamic').detach();	
 		if(k > 1){
-			$('<input type="text"></input>').appendTo('#k-blocks-div')
+			$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
 				.attr('id', "k-block"+$(".k-blocks").length)
 				.css({width:"50px",
 					background: "#3C3F45",
@@ -1058,7 +1123,7 @@ $(function () {
 				.addClass("k-blocks dynamic dynamic-k");
 		}
 		if(n-k > 1){
-			$('<input type="text"></input>').appendTo('#n-k-blocks-div')
+			$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
 				.attr('id', "n-k-block"+$(".n-k-blocks").length)
 				.css({width:"50px",
 					background: "#3C3F45",
@@ -1230,9 +1295,10 @@ $(function () {
 			ticketsJson.ticket[i] = [];
 			for(var j = 0; j < arr[i].length; j++){
 				var dist = 0;
-				for (var ii = j+1; ii < arr[i].length; ii++) {
+				for(var ii = j+1; ii < arr[i].length; ii++){
 					if(arr[i][j] == arr[i][ii]) break;
 					dist++;
+					if(ii == arr[i].length - 1) dist = 0;
 				}
 				var prName = "&nbsp;" + selectedTeamsJson.team[j].name + " " + selectedTeamsJson.team[j].date;
 				tCont+= parseInt(j + 1) + '. ';
