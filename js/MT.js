@@ -599,6 +599,7 @@ $(function () {
 		var countryAttr = $(this).attr('country');
 		var blockAttr = $(this).attr('block');
 		var antiCountry = $('input[country = ' + countryAttr + ']')[0].checked;
+		$('#inner-blocks-check')[0].checked = true;
 		if(!$(this).hasClass('selected')){
 			var oldSelected = $('a.button.selected[country = ' + countryAttr + ']');
 			if(oldSelected.length != 0 && oldSelected != $(this))
@@ -1349,18 +1350,22 @@ $(function () {
 						'index': j,
 						'amount': repCounter,
 						'country': selectedTeamsJson.team[j].country
-					});					
+					});	
+					repCounter = 1;		
 				}
 			}
+			var fl = true;
 			for(var c in _countries){
-				var fl = true;
+				for(var c1 in _countries) _countries[c1].fl = false;
 				for(r in reps){
-					if((
+					if(c != reps[r].country) continue;
+					if(
 							(_countries[c].block == reps[r].amount && !_countries[c].anti && _countries[c].block != undefined) ||
-							(_countries[c].block != reps[r].amount && !_countries[c].anti && _countries[c].block != undefined) ||
-							(reps[r].amount == 1 && _countries[c].anti && _countries[c].block == undefined)
-						) && 
-						c == reps[r].country){
+							(_countries[c].block != reps[r].amount && _countries[c].anti && _countries[c].block != undefined) ||
+							(reps[r].amount == 1 && _countries[c].anti && _countries[c].block == undefined) ||
+							(!_countries[c].block && !_countries[c].anti) ||
+							(_countries[c].fl == true)
+						){
 						_countries[c].fl = true;						
 					}
 				}
