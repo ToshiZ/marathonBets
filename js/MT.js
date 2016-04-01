@@ -13,6 +13,7 @@ $(function () {
 		filter = [];
 		filter[0] = []; //k block
 		filter[1] = []; //n-k blocksock;
+		_countries = {};
 	if(localStorage['teams']){
 		teamsJson =  JSON.parse(localStorage.getItem('teams'));
 		fillTeamList(teamsJson);
@@ -21,6 +22,7 @@ $(function () {
 	if(localStorage['selectedTeams']){
 			selectedTeamsJson =  JSON.parse(localStorage.getItem('selectedTeams'));
 			markSelectedTeams(selectedTeamsJson);
+			showBlocksByCountry();
 			n_ = selectedTeamsJson.team.length;
 				$('#n').val(n_ > 0? n_: "");
 	}else
@@ -270,6 +272,7 @@ $(function () {
 				popBloks(res, 0);
 			}
 		}
+		if(!$.isEmptyObject(_countries) && $('#inner-blocks-check')[0].checked) popInCountries(res);
 		print2DemArr(res);
 	});
 	//});
@@ -280,13 +283,20 @@ $(function () {
 				var obj = {};
 				obj['name'] = $(this).attr("data-name");
 				obj['date'] = $(this).attr("data-date");
+				obj['country'] = $(this).attr("data-country");
 				selectedTeamsJson.team.push(obj);
 				localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
 				$(this)
 					.removeClass('alert-standard')
 					.addClass('alert-error');
 			}else{
-				selectedTeamsJson.team.splice(selectedTeamsJson.team.indexOf(obj,1));
+				var ind = -1;
+				for(var st in selectedTeamsJson.team){
+					if(JSON.stringify(selectedTeamsJson.team[st]) == JSON.stringify(obj)){
+						ind = st;
+					}
+				}
+				selectedTeamsJson.team.splice(ind, 1);
 				localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
 				$(this)
 					.removeClass('alert-error')
@@ -548,6 +558,97 @@ $(function () {
 
 
 	});
+	$(document).on('input', '.country-input', function(){
+		
+		if($(this).parent().hasClass('alert-standard')){
+			$(this).parent()
+				.removeClass('alert-standard')
+				.addClass('alert-error');
+		}
+		var obj = {};
+		obj['name'] = $(this).parent().attr("data-name");
+		obj['date'] = $(this).parent().attr("data-date");
+		obj['country'] = $(this).parent().attr("data-country");
+		var ind = -1;
+		var ind2 = -1;
+		for(var st in selectedTeamsJson.team){
+			if(JSON.stringify(selectedTeamsJson.team[st]) == JSON.stringify(obj)){
+				ind = st;
+			}
+		}
+		for(var t in teamsJson.team){
+			if(teamsJson.team[t].date == obj.date && teamsJson.team[t].name == obj.name){
+				ind2 = t;
+			}
+		}
+		$(this).parent().attr('data-country', this.value);
+		obj['country'] = this.value;
+		teamsJson.team[ind2] = obj;
+		localStorage.setItem('teams', JSON.stringify(teamsJson));
+		if(ind == -1){
+			selectedTeamsJson.team.push(obj)
+			localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
+			n_ = selectedTeamsJson.team.length;
+		}else{
+			selectedTeamsJson.team[ind] = obj;
+			localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
+		}
+		showBlocksByCountry();
+	});
+	$(document).on('click', '.country-blocks', function(){
+		var countryAttr = $(this).attr('country');
+		var blockAttr = $(this).attr('block');
+		var antiCountry = $('input[country = ' + countryAttr + ']')[0].checked;
+		if(!$(this).hasClass('selected')){
+			var oldSelected = $('a.button.selected[country = ' + countryAttr + ']');
+			if(oldSelected.length != 0 && oldSelected != $(this))
+			{
+				_countries[oldSelected.attr('country')]['anti'] = undefined;
+				_countries[oldSelected.attr('country')]['block'] = undefined;
+				oldSelected.removeClass('selected');
+			}
+			_countries[countryAttr]['anti'] = antiCountry;
+			_countries[countryAttr]['block'] = blockAttr;
+			$(this).addClass('selected');
+		}else{
+			_countries[countryAttr]['anti'] = undefined;
+			_countries[countryAttr]['block'] = undefined;
+			$(this).removeClass('selected');
+		}
+	});
+	$(document).on('change', 'input[country]', function(){
+		_countries[$(this).attr('country')]['anti'] = this.checked;
+	});
+	function showBlocksByCountry(){
+		$('.country-el').detach();
+		_countries = {};
+		for(var i in selectedTeamsJson.team){
+			if(selectedTeamsJson.team[i].country != ""){
+				if(_countries.hasOwnProperty(selectedTeamsJson.team[i].country)){
+					_countries[selectedTeamsJson.team[i].country]['team'].push(selectedTeamsJson.team[i]);
+				}else{
+					_countries[selectedTeamsJson.team[i].country] = {'team': [selectedTeamsJson.team[i]]};
+				}
+			}
+		}
+		var eventsDiv = $('#events-div');
+		$('<label class="country-el">Внутренние блоки </span><input id="inner-blocks-check" class="country-el" type="checkBox"></br>')
+				.appendTo(eventsDiv);
+		for(var i in _countries){
+			if(_countries[i]['team'].length <= 1) continue;
+			var countryString = $('<h4 class="country-el"></h4>').text(i + " ").appendTo(eventsDiv);
+			
+			for(var j = 2; j <= _countries[i]['team'].length; j++){
+				$('<a class="button button-large country-blocks country-el">' + j + '</a>')
+					.attr('country', i)
+					.attr('block', j)
+					.appendTo(countryString);
+			}
+			$('<span class="country-el"> </span><input class="country-el" title="Отрицание" type="checkBox">')
+				.attr('country', i)
+				.appendTo(countryString);
+		}
+	}
 	function findVars(k_filter_combs, n_filter_combs, varAmount, upperLimit){
 		var arrConts = [];
 		var varNum = 0;
@@ -1140,11 +1241,14 @@ $(function () {
             if(item == null){
              //  teamsJson.team.splice(i, 1);
             }else{
+            	var country = item.country == undefined ? "" : item.country;
                 var newDiv =
                     $('<div class="alert alert-standard fade in">').appendTo($('#team-list'))
-                        .html(item.name + " " + item.date)
+                        .html(item.name + " " + item.date + "   ")
                         .attr("data-name", item.name)
+                        .attr("data-country", country)
                         .attr("data-date", item.date);
+                $('<input type="number" min="1" class="country-input" placeholder = "" style="width:35px; background: #3C3F45; color: white"></input>').val(country).appendTo(newDiv);
                 $('<a class="close" data-dismiss="alert" href="#">x</a>').appendTo(newDiv);
             }
 		});
@@ -1154,6 +1258,7 @@ $(function () {
 			var obj = {};
 			obj["name"] = $(this).attr("data-name");
 			obj["date"] = $(this).attr("data-date");
+			obj["country"] = $(this).attr("data-country");
 			var self = this;
 			$.each(selectedTeamsJson.team, function(idx, data) { 
 			   if (JSON.stringify(data) ==  JSON.stringify(obj)) {
@@ -1231,6 +1336,41 @@ $(function () {
 						break;
 					}
 			}
+	}
+	function popInCountries(arr){		
+		for(var i = 0; i < arr.length; i++){
+			var reps = [];
+			var repCounter = 1;
+			for(var j = 0; j < arr[i].length; j++){
+				if(arr[i][j] == arr[i][j+1] && selectedTeamsJson.team[j].country == selectedTeamsJson.team[j+1].country){
+					repCounter++;
+				}else{
+					reps.push({
+						'index': j,
+						'amount': repCounter,
+						'country': selectedTeamsJson.team[j].country
+					});					
+				}
+			}
+			for(var c in _countries){
+				var fl = true;
+				for(r in reps){
+					if((
+							(_countries[c].block == reps[r].amount && !_countries[c].anti && _countries[c].block != undefined) ||
+							(_countries[c].block != reps[r].amount && !_countries[c].anti && _countries[c].block != undefined) ||
+							(reps[r].amount == 1 && _countries[c].anti && _countries[c].block == undefined)
+						) && 
+						c == reps[r].country){
+						_countries[c].fl = true;						
+					}
+				}
+				fl *= _countries[c].fl;		
+			}
+			if(!fl){
+				arr.splice(i,1);	
+				i--;
+			}
+		}
 	}
 	function print2DemArr(arr){
 		$('.stp').remove();
