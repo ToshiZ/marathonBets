@@ -272,7 +272,7 @@ $(function () {
 				popBloks(res, 0);
 			}
 		}
-		if(!$.isEmptyObject(_countries) && $('#inner-blocks-check')[0].checked) popInCountries(res);
+		//if(!$.isEmptyObject(_countries) && $('#inner-blocks-check')[0].checked) popInCountries(res);
 		print2DemArr(res);
 	});
 	//});
@@ -598,28 +598,76 @@ $(function () {
 	$(document).on('click', '.country-blocks', function(){
 		var countryAttr = $(this).attr('country');
 		var blockAttr = $(this).attr('block');
-		var antiCountry = $('input[country = ' + countryAttr + ']')[0].checked;
+		var parentEl = $(this).parent();
+		//var antiCountry = $('input[country = ' + countryAttr + ']')[0].checked;
+		//showAvaibleBlocks(_countries[i]['team'].length, i, countryString);	
 		$('#inner-blocks-check')[0].checked = true;
 		if(!$(this).hasClass('selected')){
-			var oldSelected = $('a.button.selected[country = ' + countryAttr + ']');
-			if(oldSelected.length != 0 && oldSelected != $(this))
-			{
-				_countries[oldSelected.attr('country')]['anti'] = undefined;
-				_countries[oldSelected.attr('country')]['block'] = undefined;
-				oldSelected.removeClass('selected');
-			}
-			_countries[countryAttr]['anti'] = antiCountry;
-			_countries[countryAttr]['block'] = blockAttr;
 			$(this).addClass('selected');
+			$(this).removeClass('standart');
 		}else{
-			_countries[countryAttr]['anti'] = undefined;
-			_countries[countryAttr]['block'] = undefined;
 			$(this).removeClass('selected');
+			$(this).addClass('standart');
 		}
+		$('.standart[country=' + countryAttr + ']').detach();
+		var selectedSum = 0;
+		var selectedEls = $('.selected[country=' + countryAttr + ']');
+		for(var el = 0; el < selectedEls.length; el++){
+			selectedSum += parseInt(selectedEls[el].getAttribute('block'));
+		}
+		var avaibleBlocks = _countries[countryAttr].team.length - selectedSum;
+		showAvaibleBlocks(avaibleBlocks, countryAttr, parentEl);
+
+		// if(!$(this).hasClass('selected')){
+		// 	var oldSelected = $('a.button.selected[country = ' + countryAttr + ']');
+		// 	if(oldSelected.length != 0 && oldSelected != $(this))
+		// 	{
+		// 		_countries[oldSelected.attr('country')]['anti'] = undefined;
+		// 		_countries[oldSelected.attr('country')]['block'] = undefined;
+		// 		oldSelected.removeClass('selected');
+		// 		oldSelected.addClass('standart');
+		// 	}
+		// 	_countries[countryAttr]['anti'] = antiCountry;
+		// 	_countries[countryAttr]['block'] = blockAttr;
+		// 	oldSelected.removeClass('standart');
+		// 	$(this).addClass('selected');
+		// }else{
+		// 	_countries[countryAttr]['anti'] = undefined;
+		// 	_countries[countryAttr]['block'] = undefined;
+		// 	$(this).removeClass('selected');
+		// 	oldSelected.addClass('standart');
+		// }
 	});
-	$(document).on('change', 'input[country]', function(){
-		_countries[$(this).attr('country')]['anti'] = this.checked;
+	$(document).on('dblclick', '.country-blocks', function(){
 	});
+	// $(document).on('change', 'input[country]', function(){
+	// 	_countries[$(this).attr('country')]['anti'] = this.checked;
+	// });
+	// function chooseBlock(sefl, isAnti){
+	// 	var countryAttr = $(sefl).attr('country');
+	// 	var blockAttr = $(sefl).attr('block');
+	// 	var antiCountry = $('input[country = ' + countryAttr + ']')[0].checked;
+	// 	$('#inner-blocks-check')[0].checked = true;
+	// 	if(!$(sefl).hasClass('selected')){
+	// 		var oldSelected = $('a.button.selected[country = ' + countryAttr + ']');
+	// 		if(oldSelected.length != 0 && oldSelected != $(sefl))
+	// 		{
+	// 			_countries[oldSelected.attr('country')]['anti'] = undefined;
+	// 			_countries[oldSelected.attr('country')]['block'] = undefined;
+	// 			oldSelected.removeClass('selected');
+	// 			oldSelected.addClass('standart');
+	// 		}
+	// 		_countries[countryAttr]['anti'] = antiCountry;
+	// 		_countries[countryAttr]['block'] = blockAttr;
+	// 		oldSelected.removeClass('standart');
+	// 		$(sefl).addClass('selected');
+	// 	}else{
+	// 		_countries[countryAttr]['anti'] = undefined;
+	// 		_countries[countryAttr]['block'] = undefined;
+	// 		$(sefl).removeClass('selected');
+	// 		oldSelected.addClass('standart');
+	// 	}
+	// }
 	function showBlocksByCountry(){
 		$('.country-el').detach();
 		_countries = {};
@@ -639,16 +687,26 @@ $(function () {
 			if(_countries[i]['team'].length <= 1) continue;
 			var countryString = $('<h4 class="country-el"></h4>').text(i + " ").appendTo(eventsDiv);
 			
-			for(var j = 2; j <= _countries[i]['team'].length; j++){
-				$('<a class="button button-large country-blocks country-el">' + j + '</a>')
-					.attr('country', i)
-					.attr('block', j)
-					.appendTo(countryString);
-			}
-			$('<span class="country-el"> </span><input class="country-el" title="Отрицание" type="checkBox">')
-				.attr('country', i)
-				.appendTo(countryString);
+			// for(var j = 2; j <= _countries[i]['team'].length; j++){
+			// 	$('<a class="button button-large country-blocks country-el standart">' + j + '</a>')
+			// 		.attr('country', i)
+			// 		.attr('block', j)
+			// 		.appendTo(countryString);
+			// 	// $('<span class="country-el"> </span><input class="country-el" title="Отрицание" type="checkBox">')
+			// 	// 	.attr('country', i)					
+			// 	// 	.attr('block', j)
+			// 	// 	.appendTo(countryString);
+			// }	
+			showAvaibleBlocks(_countries[i]['team'].length, i, countryString);	
 		}
+	}
+	function showAvaibleBlocks(to, country, element){
+		for(var j = 2; j <= to; j++){
+			$('<a class="button button-large country-blocks country-el standart">' + j + '</a>')
+				.attr('country', country)
+				.attr('block', j)
+				.appendTo(element);				
+	}		
 	}
 	function findVars(k_filter_combs, n_filter_combs, varAmount, upperLimit){
 		var arrConts = [];
@@ -1359,12 +1417,22 @@ $(function () {
 				for(var c1 in _countries) _countries[c1].fl = false;
 				for(r in reps){
 					if(c != reps[r].country) continue;
-					if(
+					if(_countries[c].anti){
+						if((_countries[c].block == reps[r].amount && _countries[c].block != undefined)){
+							_countries[c].fl = false;							
+						}else{
+							_countries[c].fl = true;
+						}
+						if(!_countries[c].block && reps[r].amount > 1){
+								_countries[c].fl = false;
+							}else{
+								_countries[c].fl = true;
+							}
+					}else if(
 							(_countries[c].block == reps[r].amount && !_countries[c].anti && _countries[c].block != undefined) ||
-							(_countries[c].block != reps[r].amount && _countries[c].anti && _countries[c].block != undefined) ||
 							(reps[r].amount == 1 && _countries[c].anti && _countries[c].block == undefined) ||
-							(!_countries[c].block && !_countries[c].anti) ||
-							(_countries[c].fl == true)
+							(_countries[c].fl == true) ||
+							(!_countries[c].block && !_countries[c].anti)
 						){
 						_countries[c].fl = true;						
 					}
