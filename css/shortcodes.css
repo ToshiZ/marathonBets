@@ -67,6 +67,10 @@
   background: #DE5E60;
   color: #FFFFFF;
 }
+.anti-selected {
+  background: rgb(90, 154, 168);
+  color: #FFFFFF;
+}
 
 /* ==================================================
    Accordion & Toggle
