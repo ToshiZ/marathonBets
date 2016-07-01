@@ -115,10 +115,29 @@ $(function () {
 	$('#marathon-vijet').on('click', function(){
 		chrome.tabs.sendMessage(csId.id, {'askFor': 'vijet'});
 	});
-	$(document).on('input', ".k-blocks", function(){ 
-		blocksInput(this);
-	});	
 	
+	$(document).on('input', ".k-blocks", function(){ 
+		filter[0] = [];
+		$('.k-blocks').each(function() {
+				if($(this).val().length)
+					filter[0].push(parseInt($(this).val()));				 
+			});
+		if($(".k-blocks").last().val() < 2){
+			$(".k-blocks").last().val('');
+			return false;
+		}
+		if($(".k-blocks").last().val() && sumOfMas(filter[0]) < k_){		
+			$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
+				.attr('id', "k-block"+$(".k-blocks").length)
+				.css({width:"50px",
+					background: "#3C3F45",
+					color: "white"})
+				.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length +1))
+				.addClass("k-blocks dynamic dynamic-k");
+		}else{
+			$('.k-blocks').filter(function(){return !this.value;}).remove();
+		}
+	});	
 	$(document).on('input', ".n-k-blocks", function(){
 		filter[1] = [];
 		$('.n-k-blocks').each(function() {
@@ -146,7 +165,7 @@ $(function () {
 		selectedTeamsJson = {"team": []};
 		localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
 		_countries = {};
-		for(var t in teamsJson['team']){
+		for(var t = 0; t < teamsJson['team'].length; t++){
 			teamsJson['team'][t].country = "";
 		}
 		localStorage.setItem('teams', JSON.stringify(teamsJson));
@@ -156,28 +175,7 @@ $(function () {
 		n_ = selectedTeamsJson.team.length;
 		$('#n').val(n_ > 0? n_: "");
 	});
-	function blocksInput(el){
-		filter[0] = [];
-		$('.k-blocks').each(function() {
-				if($(el).val().length)
-					filter[0].push(parseInt($(el).val()));				 
-			});
-		if($(".k-blocks").last().val() < 2){
-			$(".k-blocks").last().val('');
-			return false;
-		}
-		if($(".k-blocks").last().val() && sumOfMas(filter[0]) < k_){		
-			$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
-				.attr('id', "k-block"+$(".k-blocks").length)
-				.css({width:"50px",
-					background: "#3C3F45",
-					color: "white"})
-				.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length +1))
-				.addClass("k-blocks dynamic dynamic-k");
-		}else{
-			$('.k-blocks').filter(function(){return !el.value;}).remove();
-		}
-	}	
+		
 	$(".n-k-params").on('input', function(){ 		
 		$('.dynamic').remove();
 		$(this).each(function(){
@@ -305,7 +303,7 @@ $(function () {
 					.addClass('alert-error');
 			}else{
 				var ind = -1;
-				for(var st in selectedTeamsJson.team){
+				for(var st = 0; st < selectedTeamsJson.team.length; st++){
 					if(selectedTeamsJson.team[st].name == obj.name && selectedTeamsJson.team[st].date == obj.date){
 						ind = st;
 					}
@@ -380,7 +378,7 @@ $(function () {
 					i++;
 				}
 			}
-			for(var j in k_filter_combs){
+			for(var j = 0; j < k_filter_combs.length; j++){
 				for(var i = k_filter_combs[j].length - 1; i >= 0; i--) {
 				    if(k_filter_combs[j][i] < 2) {
 				        k_filter_combs[j].splice(i, 1);
@@ -419,7 +417,7 @@ $(function () {
 					i++;
 				}			
 			}
-			for(var j in n_filter_combs){
+			for(var j = 0; j < n_filter_combs.length; j++){
 				for (var i = n_filter_combs[j].length - 1; i >= 0; i--){
 				    if (n_filter_combs[j][i] < 2) {
 				        n_filter_combs[j].splice(i, 1);
@@ -511,66 +509,7 @@ $(function () {
 			}
 		}		
 	});
-	$('#k, #n-k').on('dblclick', function(){
-		$('.n-k-blocks').detach();
-		$('.k-blocks').detach();
-		k_ = [n_k_, n_k_ = k_][0];
-		$('#k')[0].value = k_;
-		$('#n-k')[0].value = n_k_;
-
-		filter[0] = [filter[1],filter[1] = filter[0]][0];
-
-		if (filter[1].length == 0) 
-		{
-			$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
-					.attr('id', "n-k-blocks"+$(".n-k-blocks").length)
-					.css({width:"50px",
-						background: "#3C3F45",
-						color: "white"})
-					.attr('placeholder',"Блок "+ parseInt($(".n-k-blocks").length +1))
-					.addClass("n-k-blocks dynamic dynamic-n-k");
-		}else{
-			for(var i = 0; i < filter[1].length; i++){		
-				$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
-					.attr('id', "n-k-blocks"+$(".n-k-blocks").length)
-					.css({width:"50px",
-						background: "#3C3F45",
-						color: "white"})
-					.attr('placeholder',"Блок "+ parseInt($(".n-k-blocks").length +1))
-					.addClass("n-k-blocks dynamic dynamic-n-k")
-					.val(filter[1][i]);
-			}
-
-		}
-		if (filter[0].length == 0) 
-		{
-			$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
-						.attr('id', "k-block"+$(".k-blocks").length)
-						.css({width:"50px",
-							background: "#3C3F45",
-							color: "white"})
-						.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length +1))
-						.addClass("k-blocks dynamic dynamic-k");
-		}else{
-			for(var i = 0; i < filter[0].length; i++){		
-					$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
-						.attr('id', "k-block"+$(".k-blocks").length)
-						.css({width:"50px",
-							background: "#3C3F45",
-							color: "white"})
-						.attr('placeholder',"Блок "+ parseInt($(".k-blocks").length +1))
-						.addClass("k-blocks dynamic dynamic-k")
-						.val(filter[0][i]);
-			}
-		}
-
-		$('#n-k-check')[0].checked = [
-			$('#k-check')[0].checked, 
-			$('#k-check')[0].checked = $('#n-k-check')[0].checked][0];
-		$('#anti-block-minus-check')[0].checked = [
-			$('#anti-block-plus-check')[0].checked, 
-			$('#anti-block-plus-check')[0].checked = $('#anti-block-minus-check')[0].checked][0];
-	});
+	
 	$(document).on('input', '.country-input', function(){		
 		if($(this).parent().hasClass('alert-standard')){
 			$(this).parent()
@@ -583,12 +522,12 @@ $(function () {
 		obj['country'] = $(this).parent().attr("data-country");
 		var ind = -1;
 		var ind2 = -1;
-		for(var st in selectedTeamsJson.team){
+		for(var st = 0; st < selectedTeamsJson.team.length; st++){
 			if(JSON.stringify(selectedTeamsJson.team[st]) == JSON.stringify(obj)){
 				ind = st;
 			}
 		}
-		for(var t in teamsJson.team){
+		for(var t = 0; t < teamsJson.team.length; t++){
 			if(teamsJson.team[t].date == obj.date && teamsJson.team[t].name == obj.name){
 				ind2 = t;
 			}
@@ -660,7 +599,7 @@ $(function () {
 	function showBlocksByCountry(){
 		$('.country-el').detach();
 		_countries = {};
-		for(var i in selectedTeamsJson.team){
+		for(var i = 0; i < selectedTeamsJson.team.length; i++){
 			if(selectedTeamsJson.team[i].country != ""){
 				if(_countries.hasOwnProperty(selectedTeamsJson.team[i].country)){
 					_countries[selectedTeamsJson.team[i].country]['team'].push(selectedTeamsJson.team[i]);
@@ -731,7 +670,7 @@ $(function () {
 						}
 						if(fl_n || fl_k){
 							var resTmp = [];
-							for(var ii in res){
+							for(var ii = 0; ii < res.length; ii++){
 								resTmp[ii] = res[ii].slice();
 							}
 							if(fl_n && fl_k){
@@ -761,7 +700,7 @@ $(function () {
 									k_anti_check = true;
 								}
 							}
-							for(var ii in resTmp){
+							for(var ii = 0; ii < resTmp.length; ii++){
 								res[ii] = resTmp[ii].slice();
 							}
 						}
@@ -864,13 +803,6 @@ $(function () {
 						$('<div class="alert alert-info fade in span24 stp2 var-div">').appendTo(newEl);
 						newDiv.attr('tb', tCont2);
 						newDiv.attr('tm', tCont3);
-						//newDiv[0].onclick =   (function(r){alert(r);})(i);
-							
-							// if (tCont2.indexOf("ТМ: Без блоков."))
-							// {
-							// 	$('#k-block0').val(3);
-							// }
-						
 						arrConts.push(tCont2 + tCont3);
 						newDiv.html(tCont + tCont2 + tCont3);	
 						varNum++;
@@ -938,7 +870,7 @@ $(function () {
 						}
 						if(!fl_ok){
 							var resTmp = [];
-							for(var ii in res){
+							for(var ii = 0; ii < res.length; ii++){
 								resTmp[ii] = res[ii].slice();
 							}
 							if(fl_n && fl_k){
@@ -966,7 +898,7 @@ $(function () {
 									n_check = true;
 								}
 							}
-							for(var ii in resTmp){
+							for(var ii = 0; ii < resTmp; ii++){
 								res[ii] = resTmp[ii].slice();
 							}
 						}
@@ -1074,7 +1006,7 @@ $(function () {
 	}
 	function sumOfMas(m){
 		var total = 0;
-		for(var i in m){
+		for(var i  = 0; i < m.length; i++){
 			if(m[i] != undefined)
 				total += m[i];
 			else
@@ -1188,7 +1120,7 @@ $(function () {
 						for(var fComb = 0; fComb < filterComb.length; fComb++){
 							var tmp = input[i].slice();
 							var fl = true;
-							for(var blockIter in filterComb[fComb]){
+							for(var blockIter = 0; blockIter < filterComb[fComb].length; blockIter++){
 								var w = 0;
 								for(var inpIter = 0; inpIter < tmp.length - 1; inpIter++){
 									if(tmp[inpIter] == tmp[inpIter + 1] - 1)
@@ -1374,102 +1306,139 @@ $(function () {
 					}
 			}
 	}
+	// function convertArray(arr){
+	// 	var outArray = [];
+	// 	for(var i in arr){
+	// 		outArray.push()
+	// 	}
+	// }
+	function checkCountryBlock(input, filterBlocks, onlySelectedBlocks){
+		var w = 0,
+			blocks = new Array,
+			k = input.length;
+		for(var j=0; j < k-1; j++)
+			if(input[j] == input[j+1]-1){
+				w++;	
+			}else {
+				if(w!=0){
+					blocks.push(w);
+					w = 0;	
+				}
+			}
+		if(w!=0){					
+			blocks.push(w);
+			w = 0;	
+		}
+		var input = [];
+		//for(var i = 0; i < input.length; i++) input.push(i);
+		var blockCombs = combinations(blocks);
+		for(comb = 0; comb < blockCombs.length; comb++){
+			var fIter = 0;
+			var diff = blockCombs[comb][0];
+			for(b = 0; b < blockCombs[0].length; b++){
+				diff = (fIter == filterBlocks.length-1 || diff == filterBlocks[fIter])?(diff - filterBlocks[fIter]):(diff - filterBlocks[fIter] - 1);
+				if(diff < 0)
+					break;
+				if(diff > 0){
+					fIter++;
+					b--;
+				}
+				if(diff == 0){
+					fIter++;
+					diff = blockCombs[comb][b+1];
+				}					
+				if(fIter == filterBlocks.length){
+					var filterComb = combinations(filterBlocks);
+					for(var fComb = 0; fComb < filterComb.length; fComb++){
+						var tmp = input.slice();
+						var fl = true;
+						for(var blockIter = 0; blockIter < filterComb[fComb].length; blockIter++){
+							var w = 0;
+							for(var inpIter = 0; inpIter < tmp.length - 1; inpIter++){
+								if(tmp[inpIter] == tmp[inpIter + 1] - 1)
+									w++;
+								else
+									w = 0;
+								if(w == filterComb[fComb][blockIter]){
+									for(var inv = 0; inv <= w; inv++){
+										tmp[inpIter + 1 - inv] = parseInt(blockIter)*-1;
+									}
+									break;
+								}
+							}
+						}						
+						for(var t = 0; t < tmp.length - 1; t++){
+							if(tmp[t] != tmp[t + 1] && input[t] == input[t + 1] - 1){
+								fl = false;
+								break;
+							}
+						}
+						if(fl || !onlySelectedBlocks){
+							return true;
+						}else{
+							return false;
+						}
+					}
+				}
+			}
+		}		
+	}
+
+	Array.prototype.inArray = function(comparer) { 
+	    for(var i=0; i < this.length; i++) { 
+	        if(comparer(this[i])) return true; 
+	    }
+	    return false; 
+	}; 
+
+	Array.prototype.pushIfNotExist = function(element, comparer) { 
+	    if (!this.inArray(comparer)) {
+	        this.push(element);
+	    }
+	}; 
+
 	function popInCountries(arr){		
 		for(var i = 0; i < arr.length; i++){
-			for(var c in _countries) _countries[c].reps = {};
-			
-			var repCounter = 1;
-			for(var j = 0; j < arr[i].length; j++){
-				if(arr[i][j] == arr[i][j+1] && selectedTeamsJson.team[j].country == selectedTeamsJson.team[j+1].country){
-					repCounter++;
-					if(_countries[selectedTeamsJson.team[j].country].reps.hasOwnProperty(repCounter)){
-						_countries[selectedTeamsJson.team[j].country].reps[repCounter]++;
-					}else{
-						_countries[selectedTeamsJson.team[j].country].reps[repCounter] = 1;
-					}
-				}else{
-					repCounter = 1;		
-				}
-			}
 			var flArrAll = [];
-			var fl = true;
-			for(var c in _countries){
-				var flBloks = false;
-				var flBloksExist = true;
-				var flAntiBloks = true;
-				var flAntiBloksExist = true;
-				if(_countries[c].blocks && !$.isEmptyObject(_countries[c].blocks)){
-				//var flArr = [];
-				flBloksExist = false;			
-					for(var b in _countries[c].blocks){
-						for(var r in _countries[c].reps){
-							if(r == b){
-								if(_countries[c].reps[b] >= _countries[c].blocks[b]) flBloks = true;
-							}else{
-								if(_countries[c].reps[r]*parseInt(r) >= _countries[c].blocks[b]*parseInt(b)) flBloks = true;
-							}
+			for(var countryName in _countries){
+				var countryBlocks = [];
+				var step = 0;
+				for(var j = 0; j < arr[i].length - 1; j++){
+					if(selectedTeamsJson.team[j].country == countryName && selectedTeamsJson.team[j+1].country == countryName){
+						if(arr[i][j] == arr[i][j+1]){
+							countryBlocks.pushIfNotExist(j + step, e => (j + step) == e);
+							countryBlocks.pushIfNotExist(j + step + 1, e => (j + step + 1) == e);
+						}
+						if((arr[i][j] == 0 && arr[i][j+1] == 1) || (arr[i][j] == 1 && arr[i][j+1] == 0)){
+							step++;
+						}
+					}		
+				}		
+				if(_countries[countryName].blocks && !$.isEmptyObject(_countries[countryName].blocks)){
+					var filterBlocks = [];
+					for(var b in  _countries[countryName].blocks){
+						for(var inB = 0; inB < _countries[countryName].blocks[b]; inB++){
+							filterBlocks.push(parseInt(b)-1);
 						}
 					}
-					// var tmpfl = false;
-					// for(var f in flArr){
-					// 	tmpfl += flArr[f];
-					// }
-					// flBloks = tmpfl;
-				}				
-				if(_countries[c].antiBlocks && !$.isEmptyObject(_countries[c].antiBlocks)){
-					//var flArr = [];	
-					flAntiBloksExist = false;
-					for(var ab in _countries[c].antiBlocks){
-						for(var r in _countries[c].reps){
-							if(r == ab){
-								if(_countries[c].reps[ab] >= _countries[c].antiBlocks[ab]) flAntiBloks = false;
-							}else{
-								if(_countries[c].reps[r]*parseInt(r) >= _countries[c].antiBlocks[ab]*parseInt(ab)) flAntiBloks = false;
-							}
-						}
-					}
-					// var tmpfl = true;
-					// for(var f in flArr){
-					// 	tmpfl *= flArr[f];
-					// }
-					// flAntiBloks = tmpfl;
+					var fl = checkCountryBlock(countryBlocks, filterBlocks, true);
+					flArrAll.push(fl);
 				}
-				// flAntiBloks = flAntiBloks == undefined ? true : flAntiBloks;
-				// flBloks = flBloks == undefined ? true : flBloks;
-				flArrAll.push((flAntiBloks+flAntiBloksExist) * (flBloks+flBloksExist));
-				//fl = flAntiBloks * flBloks;
+				if(_countries[countryName].antiBlocks && !$.isEmptyObject(_countries[countryName].antiBlocks)){
+					var filterBlocks = [];
+					for(var b in _countries[countryName].antiBlocks){
+						for(var inB = 0; inB < _countries[countryName].antiBlocks[b]; inB++){
+							filterBlocks.push(parseInt(b)-1);
+						}
+					}
+					var fl = !checkCountryBlock(countryBlocks, filterBlocks, true);
+					flArrAll.push(fl);
+				}
 			}
-			//fl = true;
-			for(var f in flArrAll){
+			var fl = true;
+			for(var f = 0; f < flArrAll.length; f++){
 				fl *= flArrAll[f];
-			}
-			// var fl = true;
-			// for(var c in _countries){
-			// 	for(var c1 in _countries) _countries[c1].fl = false;
-			// 	for(r in reps){
-			// 		if(c != reps[r].country) continue;
-			// 		if(_countries[c].anti){
-			// 			if((_countries[c].block == reps[r].amount && _countries[c].block != undefined)){
-			// 				_countries[c].fl = false;							
-			// 			}else{
-			// 				_countries[c].fl = true;
-			// 			}
-			// 			if(!_countries[c].block && reps[r].amount > 1){
-			// 					_countries[c].fl = false;
-			// 				}else{
-			// 					_countries[c].fl = true;
-			// 				}
-			// 		}else if(
-			// 				(_countries[c].block == reps[r].amount && !_countries[c].anti && _countries[c].block != undefined) ||
-			// 				(reps[r].amount == 1 && _countries[c].anti && _countries[c].block == undefined) ||
-			// 				(_countries[c].fl == true) ||
-			// 				(!_countries[c].block && !_countries[c].anti)
-			// 			){
-			// 			_countries[c].fl = true;						
-			// 		}
-			// 	}
-			// 	fl *= _countries[c].fl;		
-			//}
+			}			
 			if(!fl){
 				arr.splice(i,1);	
 				i--;
