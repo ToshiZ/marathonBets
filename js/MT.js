@@ -551,6 +551,15 @@ $(function () {
 	$(document).on('click', '.country-blocks', function(e){		
 		chooseBlock(this, 'selected');
 	});
+	$(document).on('click', '.country-el', function(e){
+		if(this != $('#inner-blocks-check')[0] && this.tagName != 'LABEL')	{
+			$('#inner-blocks-check')[0].checked = true;
+		}
+		// }else{
+		// 	$('#inner-blocks-check')[0].checked = !$('#inner-blocks-check')[0].checked;
+		// }
+	});
+	
 	$(document).on('contextmenu', '.country-blocks', function(e){
 		e = e || window.event;
 		e.preventDefault();
@@ -615,7 +624,12 @@ $(function () {
 			if(_countries[i]['team'].length <= 1) continue;
 			var countryString = $('<h4 class="country-el"></h4>').text(i + " ").appendTo(eventsDiv);
 			showAvaibleBlocks(_countries[i]['team'].length, i, countryString);	
+			var checks = $('<div ></div>').appendTo(eventsDiv);
+			$('<label ><input type="checkBox" id="without' + i + '" class="country-el "/> Без блоков </label>').appendTo(checks);	
+			$('<label ><input type="checkBox" id="only' + i + '" class="country-el"/> Только указанные </label>').appendTo(checks);		
 		}
+
+
 	}
 	function showAvaibleBlocks(to, country, element){
 		for(var j = 2; j <= to; j++){
@@ -623,7 +637,8 @@ $(function () {
 				.attr('country', country)
 				.attr('block', j)
 				.appendTo(element);				
-	}		
+		}	
+			
 	}
 	function findVars(k_filter_combs, n_filter_combs, varAmount, upperLimit){
 		var arrConts = [];
@@ -1284,27 +1299,31 @@ $(function () {
 		return resultSet;
 	}		
 	function popBloks(arr ,v){
-		for(var i = 0; i < arr.length; i++)
+		for(var i = 0; i < arr.length; i++){
 			for(var j = 0; j < arr[i].length -1; j++){
-				if(v == 1)
+				if(v == 1){
 					if(arr[i][j] == 1 && arr[i][j+1] == 1){
 						arr.splice(i,1);
 						i--;
 						break;
 					}
-				if(v == 0)
+				}
+				if(v == 0){
 					if(arr[i][j] == 0 && arr[i][j+1] == 0){
 						arr.splice(i,1);
 						i--;
 						break;
 					}
-				if(v == 10)
+				}
+				if(v == 10){
 					if(arr[i][j] == arr[i][j+1]){
 						arr.splice(i,1);	
 						i--;
 						break;
 					}
+				}
 			}
+		}
 	}
 	// function convertArray(arr){
 	// 	var outArray = [];
@@ -1413,6 +1432,11 @@ $(function () {
 							step++;
 						}
 					}		
+				}
+				if($('input#without' + countryName)[0].checked && countryBlocks.length != 0){
+					arr.splice(i,1);	
+					i--;
+					break;
 				}		
 				if(_countries[countryName].blocks && !$.isEmptyObject(_countries[countryName].blocks)){
 					var filterBlocks = [];
