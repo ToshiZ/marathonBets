@@ -586,11 +586,14 @@ $(function () {
 		var selectedAntiEls = $('.anti-selected[country=' + countryAttr + ']');
 		_countries[countryAttr]['blocks'] = {};
 		_countries[countryAttr]['antiBlocks'] = {};
+		_countries[countryAttr]['antiBlocksOrder'] = [];
+		_countries[countryAttr]['blocksOrder'] = [];
 		for(var el = 0; el < selectedEls.length; el++){
 			selectedSum += parseInt(selectedEls[el].getAttribute('block'));
 			if(_countries[countryAttr]['blocks'].hasOwnProperty(selectedEls[el].getAttribute('block'))){
 				_countries[countryAttr]['blocks'][selectedEls[el].getAttribute('block')]++;//.push(selectedEls[el].getAttribute('block'));
 			}else{
+				_countries[countryAttr]['blocksOrder'].push(selectedEls[el].getAttribute('block'));
 				_countries[countryAttr]['blocks'][selectedEls[el].getAttribute('block')] = 1;
 			}
 		}
@@ -599,6 +602,7 @@ $(function () {
 			if(_countries[countryAttr]['antiBlocks'].hasOwnProperty(selectedAntiEls[el].getAttribute('block'))){
 				_countries[countryAttr]['antiBlocks'][selectedAntiEls[el].getAttribute('block')]++;//.push(selectedEls[el].getAttribute('block'));
 			}else{
+				_countries[countryAttr]['antiBlocksOrder'].push(selectedAntiEls[el].getAttribute('block'));
 				_countries[countryAttr]['antiBlocks'][selectedAntiEls[el].getAttribute('block')] = 1;
 			}
 		}
@@ -624,12 +628,10 @@ $(function () {
 			if(_countries[i]['team'].length <= 1) continue;
 			var countryString = $('<h4 class="country-el"></h4>').text(i + " ").appendTo(eventsDiv);
 			showAvaibleBlocks(_countries[i]['team'].length, i, countryString);	
-			var checks = $('<div ></div>').appendTo(eventsDiv);
+			var checks = $('<div class="country-el"></div>').appendTo(eventsDiv);
 			$('<label ><input type="checkBox" id="without' + i + '" class="country-el "/> Без блоков </label>').appendTo(checks);	
 			$('<label ><input type="checkBox" id="only' + i + '" class="country-el"/> Только указанные </label>').appendTo(checks);		
 		}
-
-
 	}
 	function showAvaibleBlocks(to, country, element){
 		for(var j = 2; j <= to; j++){
@@ -1348,7 +1350,7 @@ $(function () {
 			blocks.push(w);
 			w = 0;	
 		}
-		var input = [];
+		//var input = [];
 		//for(var i = 0; i < input.length; i++) input.push(i);
 		var blockCombs = combinations(blocks);
 		for(comb = 0; comb < blockCombs.length; comb++){
@@ -1422,6 +1424,7 @@ $(function () {
 			for(var countryName in _countries){
 				var countryBlocks = [];
 				var step = 0;
+				var onlyCheck = $('#only' + countryName)[0].checked;
 				for(var j = 0; j < arr[i].length - 1; j++){
 					if(selectedTeamsJson.team[j].country == countryName && selectedTeamsJson.team[j+1].country == countryName){
 						if(arr[i][j] == arr[i][j+1]){
@@ -1440,22 +1443,22 @@ $(function () {
 				}		
 				if(_countries[countryName].blocks && !$.isEmptyObject(_countries[countryName].blocks)){
 					var filterBlocks = [];
-					for(var b in  _countries[countryName].blocks){
-						for(var inB = 0; inB < _countries[countryName].blocks[b]; inB++){
-							filterBlocks.push(parseInt(b)-1);
+					for(var b = 0; b <  _countries[countryName].blocksOrder.length; b++){
+						for(var inB = 0; inB < _countries[countryName].blocks[_countries[countryName].blocksOrder[b]]; inB++){
+							filterBlocks.push(parseInt(_countries[countryName].blocksOrder[b])-1);
 						}
 					}
-					var fl = checkCountryBlock(countryBlocks, filterBlocks, true);
+					var fl = checkCountryBlock(countryBlocks, filterBlocks, onlyCheck);
 					flArrAll.push(fl);
 				}
 				if(_countries[countryName].antiBlocks && !$.isEmptyObject(_countries[countryName].antiBlocks)){
 					var filterBlocks = [];
-					for(var b in _countries[countryName].antiBlocks){
-						for(var inB = 0; inB < _countries[countryName].antiBlocks[b]; inB++){
-							filterBlocks.push(parseInt(b)-1);
+					for(var b = 0; b < _countries[countryName].antiBlocksOrder.length; b++){
+						for(var inB = 0; inB < _countries[countryName].antiBlocks[_countries[countryName].antiBlocksOrder[b]]; inB++){
+							filterBlocks.push(parseInt(_countries[countryName].antiBlocksOrder[b])-1);
 						}
 					}
-					var fl = !checkCountryBlock(countryBlocks, filterBlocks, true);
+					var fl = !checkCountryBlock(countryBlocks, filterBlocks, onlyCheck);
 					flArrAll.push(fl);
 				}
 			}
