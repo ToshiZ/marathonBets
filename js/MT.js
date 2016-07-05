@@ -1334,6 +1334,9 @@ $(function () {
 	// 	}
 	// }
 	function checkCountryBlock(input, filterBlocks, onlySelectedBlocks){
+		if(input.length == 0){
+			return filterBlocks.length == 0;
+		}
 		var w = 0,
 			blocks = new Array,
 			k = input.length;
@@ -1419,13 +1422,16 @@ $(function () {
 	}; 
 
 	function popInCountries(arr){		
-		for(var i = 0; i < arr.length; i++){
+		for(var i = 0; i < arr.length; i++) top2:{
+			console.log('i = ' + i);
 			var flArrAll = [];
 			for(var countryName in _countries){
+				console.log('countryName = ' + countryName);
 				var countryBlocks = [];
 				var step = 0;
 				var onlyCheck = $('#only' + countryName)[0].checked;
 				for(var j = 0; j < arr[i].length - 1; j++){
+					console.log('arr[i] = ' + arr[i]);
 					if(selectedTeamsJson.team[j].country == countryName && selectedTeamsJson.team[j+1].country == countryName){
 						if(arr[i][j] == arr[i][j+1]){
 							countryBlocks.pushIfNotExist(j + step, e => (j + step) == e);
@@ -1439,8 +1445,8 @@ $(function () {
 				if($('input#without' + countryName)[0].checked && countryBlocks.length != 0){
 					arr.splice(i,1);	
 					i--;
-					break;
-				}		
+					break top2;
+				}	
 				if(_countries[countryName].blocks && !$.isEmptyObject(_countries[countryName].blocks)){
 					var filterBlocks = [];
 					for(var b = 0; b <  _countries[countryName].blocksOrder.length; b++){
