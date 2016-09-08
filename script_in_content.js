@@ -11,7 +11,10 @@ var mtId,
 	markTime = localStorage.getItem('markTime')? parseInt(localStorage.getItem('markTime')): 300,
 	coast = parseInt(localStorage.getItem('coast')),
 	autoMode = localStorage.getItem('autoMode')? parseInt(localStorage.getItem('autoMode')): 0,
-	doneTickets = localStorage.getItem('doneTickets')? parseInt(localStorage.getItem('doneTickets')): [];
+	doneTickets = localStorage.getItem('doneTickets')? parseInt(localStorage.getItem('doneTickets')): [],
+    login_ = localStorage.getItem('l_l')? localStorage.getItem('l_l'): '',
+	pass_ = localStorage.getItem('p_p')? localStorage.getItem('p_p'): '';
+
 var clickEnter = function(){
 		var evt = document.createEvent('KeyboardEvent');
 		evt.initKeyboardEvent('keypress', true, true, window, false, false, false, false, 13, 13);
@@ -88,7 +91,7 @@ var betTicket = function(){
 									else{
 										$('#button_accumulator')[0].click();
 										//setTimeout(function(){setCoast(coast);}, markTime*forClick.length + 300);
-										setCoast(coast)
+										//setCoast(coast)
 									}
 							}
 							},markTime);
@@ -204,9 +207,7 @@ viewDialog = function(dialogEl){
 		.dialog('open');
 }			
 $(function () {  	
-	var tbb = $('tbody[data-event-name]');	
-	var login_ = '';
-	var pass_ = '';
+	var tbb = $('tbody[data-event-name]');		
 	tbb.each(function(j){
 		var gameDate = $(this).find('td.date').html();
 		var teamsNames = $(this).attr('data-event-name');	
@@ -227,12 +228,16 @@ $(function () {
 		}
 	});	
 	$(document).on('input', '#auth_login', function(){
-		login_ = this.value;
-		localStorage.setItem('l_l', login_);
+        if(this.value){
+            login_ = this.value;
+            localStorage.setItem('l_l', login_);
+        }
 	});
 	$(document).on('input', '#auth_login_password', function(){
-		pass_ = this.value;
-		localStorage.setItem('p_p', pass_);
+		if(this.value){
+            pass_ = this.value;
+            localStorage.setItem('p_p', pass_);
+        }
 	});
 	$(document).on('submit', '#auth', function(){
 		let p_ = localStorage.getItem('p_p');
