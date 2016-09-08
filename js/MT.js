@@ -198,16 +198,20 @@ $(function () {
 		//START
 	$(document).on('click', "#start-but", function(){
 		var tmpObj = {};
-		tmpObj.selectedTeams = selectedTeamsJson;
-		tmpObj.plus = k_;
-		tmpObj.minus = n_k_;
-		tmpObj.plusBlocks = filter[0];
-		tmpObj.minusBlocks = filter[1];
-		tmpObj.plusWithoutBloks = $('#k-check').prop("checked");
-		tmpObj.minusWithoutBloks = $('#n-k-check').prop("checked");
-		tmpObj.coast = parseInt($('#coast').val());
-		tmpObj.auto = $('#auto').data('state');
-		tmpObj.who = 'mt';
+		tmpObj['date'] = new Date;
+		tmpObj['selectedTeams'] = selectedTeamsJson;
+		tmpObj['plus'] = k_;
+		tmpObj['minus'] = n_k_;
+		tmpObj['plusBlocks'] = filter[0];
+		tmpObj['minusBlocks'] = filter[1];
+		tmpObj['plusWithoutBloks'] = $('#k-check').prop("checked");
+		tmpObj['minusWithoutBloks'] = $('#n-k-check').prop("checked");
+		tmpObj['onlySelectedPlus'] = $('#anti-block-plus-check').prop("checked");
+		tmpObj['onlySelectedMinus'] = $('#anti-block-minus-check').prop("checked");
+		tmpObj['coast'] = parseInt($('#coast').val());
+		tmpObj['auto'] = $('#auto').data('state');
+		tmpObj['inCountriesBlocks'] = Object.assign({}, _countries);
+		tmpObj['who'] = 'mt ';
 
 		chrome.tabs.sendMessage(csId.id, {'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson), 'params': JSON.stringify(tmpObj), 'coast':  parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val()*1000), 'markTime': parseInt($('#markTime').val()), 'auto': $('#auto').data('state')});
 		localStorage.setItem('tickets', JSON.stringify(ticketsJson));
@@ -1423,15 +1427,15 @@ $(function () {
 
 	function popInCountries(arr){		
 		for(var i = 0; i < arr.length; i++) top2:{
-			console.log('i = ' + i);
+			//console.log('i = ' + i);
 			var flArrAll = [];
 			for(var countryName in _countries){
-				console.log('countryName = ' + countryName);
+				//console.log('countryName = ' + countryName);
 				var countryBlocks = [];
 				var step = 0;
 				var onlyCheck = $('#only' + countryName)[0].checked;
 				for(var j = 0; j < arr[i].length - 1; j++){
-					console.log('arr[i] = ' + arr[i]);
+					//console.log('arr[i] = ' + arr[i]);
 					if(selectedTeamsJson.team[j].country == countryName && selectedTeamsJson.team[j+1].country == countryName){
 						if(arr[i][j] == arr[i][j+1]){
 							countryBlocks.pushIfNotExist(j + step, e => (j + step) == e);

