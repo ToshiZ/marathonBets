@@ -1121,10 +1121,10 @@ $(function () {
 				w = 0;	
 			}
 			var blockCombs = combinations(blocks);
-			for(comb = 0; comb < blockCombs.length; comb++){
+			for(var comb = 0; comb < blockCombs.length; comb++){
 				var fIter = 0;
 				var diff = blockCombs[comb][0];
-				for(b = 0; b < blockCombs[0].length; b++){
+				for(var b = 0; b < blockCombs[0].length; b++){
 					diff = (fIter == filter.length-1 || diff == filter[fIter])?(diff - filter[fIter]):(diff - filter[fIter] - 1);
 					if(diff < 0)
 						break;
@@ -1344,7 +1344,7 @@ $(function () {
 		var w = 0,
 			blocks = new Array,
 			k = input.length;
-		for(var j=0; j < k-1; j++)
+		for(var j=0; j < k-1; j++){
 			if(input[j] == input[j+1]-1){
 				w++;	
 			}else {
@@ -1353,6 +1353,7 @@ $(function () {
 					w = 0;	
 				}
 			}
+        }
 		if(w!=0){					
 			blocks.push(w);
 			w = 0;	
@@ -1360,10 +1361,10 @@ $(function () {
 		//var input = [];
 		//for(var i = 0; i < input.length; i++) input.push(i);
 		var blockCombs = combinations(blocks);
-		for(comb = 0; comb < blockCombs.length; comb++){
+		for(var comb = 0; comb < blockCombs.length; comb++){
 			var fIter = 0;
 			var diff = blockCombs[comb][0];
-			for(b = 0; b < blockCombs[0].length; b++){
+			for(var b = 0; b < blockCombs[0].length; b++){
 				diff = (fIter == filterBlocks.length-1 || diff == filterBlocks[fIter])?(diff - filterBlocks[fIter]):(diff - filterBlocks[fIter] - 1);
 				if(diff < 0)
 					break;
