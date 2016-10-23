@@ -164,7 +164,7 @@ var setBets = function(){
 viewDialog = function(dialogEl){
 	var nn = i == 0? i: parseInt(i+1);
 	dialogEl.dialog({ autoOpen: true,
-			position:  ['left', 'top'],
+			position:  ['left', 'center'],
 			show: 'slide',
 			buttons: [
 				{
@@ -205,6 +205,7 @@ viewDialog = function(dialogEl){
 	dialogEl
 		.dialog({title: "Готово" + i + '/' + ticketsJson.ticket.length})
 		.dialog('open');
+        $('.ui-dialog').css('z-index','1000000');
 }			
 $(function () {  	
 	var tbb = $('tbody[data-event-name]');		
