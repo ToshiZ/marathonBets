@@ -211,12 +211,16 @@ $(function () {
 	var tbb = $('tbody[data-event-name]');		
 	tbb.each(function(j){
 		var gameDate = $(this).find('td.date').html();
-		var teamsNames = $(this).attr('data-event-name');	
+		var teamsNames = $(this).attr('data-event-name');
+        var TMFactor = JSON.parse($(this).find('tr').first().find('td')[15].getAttribute('data-sel')).epr
+        var TBFactor = JSON.parse($(this).find('tr').first().find('td')[16].getAttribute('data-sel')).epr
 		if(gameDate && teamsNames && $(this).find('td.price').length > 0){		
 			gameDate = gameDate.trim();
 			var obj = {};
 			obj['name'] = teamsNames;
 			obj['date'] =  gameDate;
+            obj['TMFactor'] = TMFactor;
+            obj['TBFactor'] = TBFactor;
 			teamsJson.team[j] = obj;		
 			tbodyTeams.push($(this));
 		}

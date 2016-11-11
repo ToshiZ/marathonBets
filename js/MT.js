@@ -299,6 +299,8 @@ $(function () {
 			obj['name'] = $(this).attr("data-name");
 			obj['date'] = $(this).attr("data-date");
 			obj['country'] = $(this).attr("data-country");
+            obj["TBFactor"] = $(this).attr("data-TBFactor");
+            obj["TMFactor"] = $(this).attr("data-TMFactor");
 			if($(this).hasClass('alert-standard')){				
 				selectedTeamsJson.team.push(obj);
 				localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
@@ -524,6 +526,8 @@ $(function () {
 		obj['name'] = $(this).parent().attr("data-name");
 		obj['date'] = $(this).parent().attr("data-date");
 		obj['country'] = $(this).parent().attr("data-country");
+        obj["TBFactor"] = $(this).attr("data-TBFactor");
+        obj["TMFactor"] = $(this).attr("data-TMFactor");
 		var ind = -1;
 		var ind2 = -1;
 		for(var st = 0; st < selectedTeamsJson.team.length; st++){
@@ -1237,7 +1241,9 @@ $(function () {
                         .html(item.name + " " + item.date + "   ")
                         .attr("data-name", item.name)
                         .attr("data-country", country)
-                        .attr("data-date", item.date);
+                        .attr("data-date", item.date)
+                        .attr('data-TBFactor', item.TBFactor)
+                        .attr('data-TMFactor', item.TMFactor);
                 $('<input type="number" min="1" class="country-input" placeholder = "" style="width:35px; background: #3C3F45; color: white"></input>').val(country).appendTo(newDiv);
                 $('<a class="close" data-dismiss="alert" href="#">x</a>').appendTo(newDiv);
             }
@@ -1249,6 +1255,8 @@ $(function () {
 			obj["name"] = $(this).attr("data-name");
 			obj["date"] = $(this).attr("data-date");
 			obj["country"] = $(this).attr("data-country");
+            obj["TBFactor"] = $(this).attr("data-TBFactor");
+            obj["TMFactor"] = $(this).attr("data-TMFactor");
 			var self = this;
 			$.each(selectedTeamsJson.team, function(idx, data) { 
 			   if (JSON.stringify(data) ==  JSON.stringify(obj)) {
@@ -1532,7 +1540,9 @@ $(function () {
 		var totalTickets = arr.length;
 		var plusSymbol = '<span style="color: #333;font-size: 140%"> + </span>';
 		var minusSymbol = '<span style="color:#333;font-size: 145%"> - </span>';
-		for(var i = 0; i < arr.length; i++){							
+		for(var i = 0; i < arr.length; i++){
+            let coeff = 1,
+                coeff2 = 1;
 			var newEl = $('<div class="row cont stp">').appendTo('#steps-area .accordion-inner')
 				.attr('data-ticket-num', i);
 			var newDiv = (i%2 == 0) ?
@@ -1541,8 +1551,8 @@ $(function () {
 			var newDiv2 = (i%2 == 0) ?
 			$('<div class="alert alert-error fade in span24 stp">').appendTo(newEl) :
 			$('<div class="alert alert-info fade in span24 stp">').appendTo(newEl);
-			tCont = "Билет №" + parseInt(i+1) + "</br>";
-			tCont2 = "Билет №" + parseInt(i+1) + "</br>";
+			tCont = "";
+			tCont2 = "";
 			ticketsJson.ticket[i] = [];
 			for(var j = 0; j < arr[i].length; j++){
 				var dist = 0;
@@ -1551,6 +1561,8 @@ $(function () {
 					dist++;
 					if(ii == arr[i].length - 1) dist = 0;
 				}
+                coeff = arr[i][j] == 1 ? parseFloat(selectedTeamsJson.team[j].TBFactor) * coeff : parseFloat(selectedTeamsJson.team[j].TMFactor) * coeff;
+                coeff2 = arr[i][j] == 0 ? parseFloat(selectedTeamsJson.team[j].TBFactor) * coeff2 : parseFloat(selectedTeamsJson.team[j].TMFactor) * coeff2;
 				var prName = "&nbsp;" + selectedTeamsJson.team[j].name + " " + selectedTeamsJson.team[j].date;
 				tCont+= parseInt(j + 1) + '. ';
 				tCont2 += parseInt(j + 1) + '. ';
@@ -1563,8 +1575,11 @@ $(function () {
 				obj['name'] =  selectedTeamsJson.team[j].name;	
 				obj['date'] =  selectedTeamsJson.team[j].date;		
 				obj['bet'] =  arr[i][j];	
+                obj['coeff'] = coeff;
 				ticketsJson.ticket[i][j] = obj;
-			}				
+			}
+            tCont = "Билет №" + parseInt(i+1) + ' x' + coeff.toFixed(3) + "</br>" + tCont;
+            tCont2 = "Билет №" + parseInt(i+1) + ' x' + coeff2.toFixed(3) + "</br>" + tCont2;
 			newDiv.html(tCont);		
 			newDiv2.html(tCont2);		
 			document.title = parseInt(i+1) + " из " + totalTickets;
