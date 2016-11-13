@@ -217,6 +217,7 @@ $(function () {
         }
     });
     $('#coeffSlider').nstSlider('set_position', coeffLeft, coeffRight);
+    $('#coeff-check').prop('checked', false);
     $('#coeffSlider').on('dblclick', function(e){
         if(e.target.id == ('coeffRightGrip')){
             $('#coeffSlider').nstSlider('set_position', coeffLeft, 1000);
