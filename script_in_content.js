@@ -213,8 +213,9 @@ $(function () {
 		var gameDate = $(this).find('td.date').html();
 		var teamsNames = $(this).attr('data-event-name');
         let line = $(this).find('tr').first().find('td');
-        var TMFactor = JSON.parse(line[line.length-2].getAttribute('data-sel')).epr
-        var TBFactor = JSON.parse(line[line.length-1].getAttribute('data-sel')).epr
+        let champ = $(this).parents().eq(3).find('h2').find('span').text();
+        let TMFactor = JSON.parse(line[line.length-2].getAttribute('data-sel')).epr
+        let TBFactor = JSON.parse(line[line.length-1].getAttribute('data-sel')).epr
 		if(gameDate && teamsNames && $(this).find('td.price').length > 0){		
 			gameDate = gameDate.trim();
 			var obj = {};
@@ -222,6 +223,7 @@ $(function () {
 			obj['date'] =  gameDate;
             obj['TMFactor'] = TMFactor;
             obj['TBFactor'] = TBFactor;
+            obj['champ'] = champ;
 			teamsJson.team[j] = obj;		
 			tbodyTeams.push($(this));
 		}

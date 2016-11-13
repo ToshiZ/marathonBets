@@ -555,8 +555,8 @@ $(function () {
 		obj['name'] = $(this).parent().attr("data-name");
 		obj['date'] = $(this).parent().attr("data-date");
 		obj['country'] = $(this).parent().attr("data-country");
-        obj["TBFactor"] = $(this).attr("data-TBFactor");
-        obj["TMFactor"] = $(this).attr("data-TMFactor");
+        obj["TBFactor"] = $(this).parent().attr("data-tbfactor");
+        obj["TMFactor"] = $(this).parent().attr("data-tmfactor");
 		var ind = -1;
 		var ind2 = -1;
 		for(var st = 0; st < selectedTeamsJson.team.length; st++){
@@ -1260,6 +1260,10 @@ $(function () {
 	}	
 	function fillTeamList(teamsJson){
 		$('#team-list > div').remove();
+//        let champs = [];
+//        teamsJson.team.forEach(function(item, i){
+//            champs.pushIfNotExist();
+//        });
 		teamsJson.team.forEach(function(item, i){
             if(item == null){
              //  teamsJson.team.splice(i, 1);
@@ -1271,8 +1275,8 @@ $(function () {
                         .attr("data-name", item.name)
                         .attr("data-country", country)
                         .attr("data-date", item.date)
-                        .attr('data-TBFactor', item.TBFactor)
-                        .attr('data-TMFactor', item.TMFactor);
+                        .attr('data-tbfactor', item.TBFactor)
+                        .attr('data-tmfactor', item.TMFactor);
                 $('<input type="number" min="1" class="country-input" placeholder = "" style="width:35px; background: #3C3F45; color: white"></input>').val(country).appendTo(newDiv);
                 $('<a class="close" data-dismiss="alert" href="#">x</a>').appendTo(newDiv);
             }
@@ -1284,8 +1288,8 @@ $(function () {
 			obj["name"] = $(this).attr("data-name");
 			obj["date"] = $(this).attr("data-date");
 			obj["country"] = $(this).attr("data-country");
-            obj["TBFactor"] = $(this).attr("data-TBFactor");
-            obj["TMFactor"] = $(this).attr("data-TMFactor");
+            obj["TBFactor"] = $(this).attr("data-tbfactor");
+            obj["TMFactor"] = $(this).attr("data-tmfactor");
 			var self = this;
 			$.each(selectedTeamsJson.team, function(idx, data) { 
 			   if (JSON.stringify(data) ==  JSON.stringify(obj)) {
