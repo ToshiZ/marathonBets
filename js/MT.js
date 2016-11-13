@@ -17,6 +17,18 @@ $(function () {
 		filter[0] = []; //k block
 		filter[1] = []; //n-k blocksock;
 		_countries = {};
+    Array.prototype.inArray = function(comparer) { 
+	    for(var i=0; i < this.length; i++) { 
+	        if(comparer(this[i])) return true; 
+	    }
+	    return false; 
+	}; 
+
+	Array.prototype.pushIfNotExist = function(element, comparer) { 
+	    if (!this.inArray(comparer)) {
+	        this.push(element);
+	    }
+	}; 
 	if(localStorage['teams']){
 		teamsJson =  JSON.parse(localStorage.getItem('teams'));
 		fillTeamList(teamsJson);
@@ -330,6 +342,7 @@ $(function () {
 			obj['country'] = $(this).attr("data-country");
             obj["TBFactor"] = $(this).attr("data-TBFactor");
             obj["TMFactor"] = $(this).attr("data-TMFactor");
+            obj["champ"] = $(this).attr("data-champ");
 			if($(this).hasClass('alert-standard')){				
 				selectedTeamsJson.team.push(obj);
 				localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
@@ -567,6 +580,7 @@ $(function () {
 		obj['country'] = $(this).parent().attr("data-country");
         obj["TBFactor"] = $(this).parent().attr("data-tbfactor");
         obj["TMFactor"] = $(this).parent().attr("data-tmfactor");
+        obj["champ"] = $(this).parent().attr("data-champ");
 		var ind = -1;
 		var ind2 = -1;
 		for(var st = 0; st < selectedTeamsJson.team.length; st++){
@@ -1268,19 +1282,26 @@ $(function () {
 		$('<a id="run" class="button button-large dynamic">Предпросмотр</a>')
 			.appendTo('#buttons');
 	}	
+    
+	
+
+
 	function fillTeamList(teamsJson){
 		$('#team-list > div').remove();
-//        let champs = [];
-//        teamsJson.team.forEach(function(item, i){
-//            champs.pushIfNotExist();
-//        });
+        var champs = [];
+        teamsJson.team.forEach(function(item, i){
+            champs.pushIfNotExist(item.champ, (e) => (item.champ) == e);
+        });
+        champs.forEach(function(item, i){
+            $('<div id="champ'+ i +'">' + item + '</div>').appendTo($('#team-list'));
+        });
 		teamsJson.team.forEach(function(item, i){
             if(item == null){
              //  teamsJson.team.splice(i, 1);
             }else{
             	var country = item.country == undefined ? "" : item.country;
                 var newDiv =
-                    $('<div class="alert alert-standard fade in">').appendTo($('#team-list'))
+                    $('<div class="alert alert-standard fade in">').appendTo($('#team-list div:contains("' + item.champ + '")'))
                         .html(item.name + " " + item.date + "   ")
                         .attr("data-name", item.name)
                         .attr("data-country", country)
@@ -1463,20 +1484,6 @@ $(function () {
 			}
 		}		
 	}
-
-	Array.prototype.inArray = function(comparer) { 
-	    for(var i=0; i < this.length; i++) { 
-	        if(comparer(this[i])) return true; 
-	    }
-	    return false; 
-	}; 
-
-	Array.prototype.pushIfNotExist = function(element, comparer) { 
-	    if (!this.inArray(comparer)) {
-	        this.push(element);
-	    }
-	}; 
-
 	function popInCountries(arr){		
 		for(var i = 0; i < arr.length; i++) top2:{
 			//console.log('i = ' + i);

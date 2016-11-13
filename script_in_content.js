@@ -210,12 +210,23 @@ viewDialog = function(dialogEl){
 $(function () {  	
 	var tbb = $('tbody[data-event-name]');		
 	tbb.each(function(j){
+//        console.log(j);
+//        if(j == 236)
+//            {
+//                let me = 123;
+//            }
 		var gameDate = $(this).find('td.date').html();
 		var teamsNames = $(this).attr('data-event-name');
         let line = $(this).find('tr').first().find('td');
         let champ = $(this).parents().eq(3).find('h2').find('span').text();
-        let TMFactor = JSON.parse(line[line.length-2].getAttribute('data-sel')).epr
-        let TBFactor = JSON.parse(line[line.length-1].getAttribute('data-sel')).epr
+        let TMFactor = 1;
+        let TBFactor = 1;
+        if(line.length == 17 && line[line.length-2].getAttribute('data-sel')){
+            TMFactor = JSON.parse(line[line.length-2].getAttribute('data-sel')).epr
+        }
+        if(line.length == 17 && line[line.length-1].getAttribute('data-sel')){
+            TBFactor = JSON.parse(line[line.length-1].getAttribute('data-sel')).epr
+        }
 		if(gameDate && teamsNames && $(this).find('td.price').length > 0){		
 			gameDate = gameDate.trim();
 			var obj = {};
