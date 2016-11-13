@@ -368,7 +368,17 @@ $(function () {
 		}
 
 	});
-	$(document).keypress(function(e) {
+	$(document).keydown(function(e) {
+	    if(e.which == 37) {
+	    	$('#coeffSlider').nstSlider('set_position', parseInt(coeffLeft)-1, coeffRight);
+	    }
+	});
+    $(document).keydown(function(e) {
+	    if(e.which == 39) {
+	    	$('#coeffSlider').nstSlider('set_position', parseInt(coeffLeft)+1, coeffRight);
+	    }
+	});
+    $(document).keypress(function(e) {
 	    if(e.which == 13) {
 	    	$('#var-ok').click();
 	    }
