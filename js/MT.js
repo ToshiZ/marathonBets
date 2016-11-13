@@ -1,16 +1,19 @@
-$(function () {    
+$(function () {
 	var n_,
 		k_ = $('#k'),
 		n_k_,
 		teamsJson,
 		selectedTeamsJson,
-		csId = localStorage.getItem('contentId')? JSON.parse(localStorage.getItem('contentId')): {},
-		ticketsJson = {"ticket":[]},
-		errorInfoJson = localStorage.getItem('errorInfo')? JSON.parse(localStorage.getItem('errorInfo')): {"error":[]},
-		errorTicketsJson = localStorage.getItem('errorTickets')? JSON.parse(localStorage.getItem('errorTickets')): {"ticket":[]},
+		csId = localStorage.getItem('contentId') ? JSON.parse(localStorage.getItem('contentId')) : {},
+		ticketsJson = {"ticket" : []},
+		errorInfoJson = localStorage.getItem('errorInfo') ? JSON.parse(localStorage.getItem('errorInfo')) : {"error" : []},
+		errorTicketsJson = localStorage.getItem('errorTickets') ? JSON.parse(localStorage.getItem('errorTickets')) : {"ticket" : []},
 		pauseFl = true,
 		sendRefreshTimer,
-		filter = [];
+        coeffLeft = localStorage.getItem('coeffLeft') ? JSON.parse(localStorage.getItem('coeffLeft')) : 50,
+        coeffRight = localStorage.getItem('coeffRight') ? JSON.parse(localStorage.getItem('coeffRight')) : 1000,
+		filter = [],
+        kostil = false;
 		filter[0] = []; //k block
 		filter[1] = []; //n-k blocksock;
 		_countries = {};
@@ -195,6 +198,30 @@ $(function () {
 			}
 		});
 	});
+    $('#coeffSlider').nstSlider({
+        "crossable_handles": false,
+        "left_grip_selector": "#coeffLeftGrip",
+        "right_grip_selector": "#coeffRightGrip",
+        "value_bar_selector": "#coeffSliderBar",
+        "value_changed_callback": function(cause, leftValue, rightValue) {
+            $('#coeff-check').prop("checked", true);
+            if(kostil){
+                coeffLeft = leftValue;
+                coeffRight = rightValue;
+                localStorage.setItem('coeffLeft', leftValue);
+                localStorage.setItem('coeffRight', rightValue);
+            }
+            $(this).parent().find('#coeffLeftLabel').text(leftValue);
+            $(this).parent().find('#coeffRightLabel').text(rightValue);
+            kostil = true;
+        }
+    });
+    $('#coeffSlider').nstSlider('set_position', coeffLeft, coeffRight);
+    $('#coeffSlider').on('dblclick', function(e){
+        if(e.target.id == ('coeffRightGrip')){
+            $('#coeffSlider').nstSlider('set_position', coeffLeft, 1000);
+        }
+    });
 		//START
 	$(document).on('click', "#start-but", function(){
 		var tmpObj = {};
@@ -289,6 +316,7 @@ $(function () {
 			}
 		}
 		if(!$.isEmptyObject(_countries) && $('#inner-blocks-check')[0].checked) popInCountries(res);
+        if($('#coeff-check').prop('checked')) popByCoeff(res);
 		print2DemArr(res);
 	});
 	//});
@@ -1491,6 +1519,18 @@ $(function () {
 			}
 		}
 	}
+    function popByCoeff(arr){
+        for(var i = 0; i < arr.length; i++){
+            let coeff = 1;
+			for(var j = 0; j < arr[i].length; j++){
+                coeff = arr[i][j] == 1 ? parseFloat(selectedTeamsJson.team[j].TBFactor) * coeff : parseFloat(selectedTeamsJson.team[j].TMFactor) * coeff;
+            }
+            if(coeff < coeffLeft || (coeff > coeffRight && coeffRight != 1000)){
+                arr.splice(i,1);	
+				i--;
+            }
+        }
+    }
 	function print2DemArr(arr){
 		$('.stp').remove();
 		ticketsJson = {"ticket":[]};
