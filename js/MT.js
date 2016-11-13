@@ -11,7 +11,7 @@ $(function () {
 		pauseFl = true,
 		sendRefreshTimer,
         coeffLeft = localStorage.getItem('coeffLeft') ? JSON.parse(localStorage.getItem('coeffLeft')) : 50,
-        coeffRight = localStorage.getItem('coeffRight') ? JSON.parse(localStorage.getItem('coeffRight')) : 1000,
+        coeffRight = localStorage.getItem('coeffRight') ? JSON.parse(localStorage.getItem('coeffRight')) : 20000,
 		filter = [],
         kostil = false;
 		filter[0] = []; //k block
@@ -220,7 +220,7 @@ $(function () {
     $('#coeff-check').prop('checked', false);
     $('#coeffSlider').on('dblclick', function(e){
         if(e.target.id == ('coeffRightGrip')){
-            $('#coeffSlider').nstSlider('set_position', coeffLeft, 1000);
+            $('#coeffSlider').nstSlider('set_position', coeffLeft, 20000);
         }
     });
 		//START
@@ -1530,7 +1530,7 @@ $(function () {
 			for(var j = 0; j < arr[i].length; j++){
                 coeff = arr[i][j] == 1 ? parseFloat(selectedTeamsJson.team[j].TBFactor) * coeff : parseFloat(selectedTeamsJson.team[j].TMFactor) * coeff;
             }
-            if(coeff < coeffLeft || (coeff > coeffRight && coeffRight != 1000)){
+            if(coeff < coeffLeft || (coeff > coeffRight && coeffRight != 20000)){
                 arr.splice(i,1);	
 				i--;
             }
