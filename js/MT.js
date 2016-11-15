@@ -11,7 +11,8 @@ $(function () {
 		pauseFl = true,
 		sendRefreshTimer,
         coeffLeft = localStorage.getItem('coeffLeft') ? JSON.parse(localStorage.getItem('coeffLeft')) : 50,
-        coeffRight = localStorage.getItem('coeffRight') ? JSON.parse(localStorage.getItem('coeffRight')) : 20000,
+        coeffRight = localStorage.getItem('coeffRight') ? JSON.parse(localStorage.getItem('coeffRight')) : 200,
+        coeffMax = localStorage.getItem('coeffMax') ? JSON.parse(localStorage.getItem('coeffMax')) : 500
 		filter = [],
         kostil = false;
 		filter[0] = []; //k block
@@ -40,8 +41,11 @@ $(function () {
 			showBlocksByCountry();
 			n_ = selectedTeamsJson.team.length;
 				$('#n').val(n_ > 0? n_: "");
-	}else
+	}else{
 		selectedTeamsJson = {"team": []};
+    }
+    
+    rebuidCoeff(coeffLeft, coeffRight, coeffMax);
 		
 	chrome.runtime.onMessage.addListener(
 		 function(request, sender, sendResponse) {		
@@ -210,30 +214,28 @@ $(function () {
 			}
 		});
 	});
-    $('#coeffSlider').nstSlider({
-        "crossable_handles": false,
-        "left_grip_selector": "#coeffLeftGrip",
-        "right_grip_selector": "#coeffRightGrip",
-        "value_bar_selector": "#coeffSliderBar",
-        "value_changed_callback": function(cause, leftValue, rightValue) {
-            $('#coeff-check').prop("checked", true);
-            if(kostil){
-                coeffLeft = leftValue;
-                coeffRight = rightValue;
-                localStorage.setItem('coeffLeft', leftValue);
-                localStorage.setItem('coeffRight', rightValue);
-            }
-            $(this).parent().find('#coeffLeftLabel').text(leftValue);
-            $(this).parent().find('#coeffRightLabel').text(rightValue);
-            kostil = true;
+    
+   // $('#coeffSlider').nstSlider('set_position', coeffLeft, coeffRight);
+    $('#coeff-check').prop('checked', false);
+    
+    $(document).on('input', '#coeffRightInput', (e) => {
+        $('#coeff-check').prop('checked', true);
+        let inpMax = parseInt($('#coeffSlider').attr('data-range_max'));
+        let inpVal = parseInt($('#coeffRightInput').val());
+        if(inpVal > inpMax){
+            coeffMax = parseInt(inpVal + inpVal*0.3);
+            localStorage.setItem('coeffMax', coeffMax);
+            rebuidCoeff(coeffLeft, inpVal, coeffMax);
+        }
+        if(inpVal < inpMax*0.7){
+            coeffMax = parseInt(inpVal + inpVal*0.3);
+            localStorage.setItem('coeffMax', coeffMax);
+            rebuidCoeff(coeffLeft, inpVal, coeffMax);
         }
     });
-    $('#coeffSlider').nstSlider('set_position', coeffLeft, coeffRight);
-    $('#coeff-check').prop('checked', false);
-    $('#coeffSlider').on('dblclick', function(e){
-        if(e.target.id == ('coeffRightGrip')){
-            $('#coeffSlider').nstSlider('set_position', coeffLeft, 20000);
-        }
+    $('#coeffLeftInput').on('input', (e) => {
+        let inpVal = $('#coeffLeftInput').val();
+        $('#coeffSlider').nstSlider('set_position', inpVal, coeffRight);
     });
 		//START
 	$(document).on('click', "#start-but", function(){
@@ -670,6 +672,40 @@ $(function () {
 		var avaibleBlocks = _countries[countryAttr].team.length - selectedSum;
 		showAvaibleBlocks(avaibleBlocks, countryAttr, parentEl);
 	}
+    function rebuidCoeff(cLeft, cRight, cMax){
+        if($('#coeffSlider').length != 0) $('#coeffSlider').detach();
+        let newSlider = $('<div id="coeffSlider" class="nstSlider" data-range_min="0" data-range_max="' +
+          cMax + 
+          '" data-cur_min="' + 
+          cLeft + 
+          '" data-cur_max="' +
+          cRight
+          + '"><div id="coeffSliderBar" class="bar"></div><div id="coeffLeftGrip" class="leftGrip"></div> <div id="coeffRightGrip" class="rightGrip"></div></div>')
+            .appendTo('#coeffContainer');
+            newSlider.nstSlider({
+            "crossable_handles": false,
+            "left_grip_selector": "#coeffLeftGrip",
+            "right_grip_selector": "#coeffRightGrip",
+            "value_bar_selector": "#coeffSliderBar",
+            "value_changed_callback": function(cause, leftValue, rightValue) {
+                $('#coeff-check').prop("checked", true);
+                if(kostil){
+                    coeffLeft = leftValue;
+                    coeffRight = rightValue;
+                    localStorage.setItem('coeffLeft', leftValue);
+                    localStorage.setItem('coeffRight', rightValue);
+                }
+                $('#coeffLeftInput').val(leftValue);
+                $('#coeffRightInput').val(rightValue);
+                kostil = true;
+            }
+        });
+        newSlider.on('dblclick', function(e){
+                if(e.target.id == ('coeffRightGrip')){
+                    newSlider.nstSlider('set_position', coeffLeft, coeffMax);
+                }
+        });
+    };
 	function showBlocksByCountry(){
 		$('.country-el').detach();
 		_countries = {};

@@ -104,15 +104,11 @@
 </div>
 <div class="span12" style="display: inline-block;">
     <label> <input type="checkBox" id="coeff-check"/> Коэффициент</label>
-    <div id="coeffLeftLabel" class="leftLabel" style="display: inline-block; width: 30px;"></div>
-    <div id="coeffSlider" class="nstSlider" data-range_min="0" data-range_max="20000" 
-           data-cur_min="50"    data-cur_max="20000">
-        <div id="coeffSliderBar" class="bar"></div>                
-        <div id="coeffLeftGrip" class="leftGrip"></div>
-        <div id="coeffRightGrip" class="rightGrip"></div>
-    </div>
-
-    <div id="coeffRightLabel" class="rightLabel" style="display: inline-block;"></div>
+<!--    <div id="coeffLeftLabel" class="leftInp" style="display: inline-block; width: 30px;"></div>-->
+    <input type="number" id="coeffLeftInput" class="coeffInp" style="width:70px; background: #3C3F45; color: white" value="50"></input>
+    <div id="coeffContainer" style="display: inline-block;"></div>
+<!--    <div id="coeffRightLabel" class="rightLabel" style="display: inline-block;"></div>-->
+    <input type="number" id="coeffRightInput" class="coeffInp" style="width:70px; background: #3C3F45; color: white" value="500"></input>
 </div>
 	<div class="row"></div>
 
