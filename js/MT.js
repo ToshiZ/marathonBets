@@ -1666,9 +1666,11 @@ $(function () {
 				tCont2 += parseInt(j + 1) + '. ';
 				var plusArrow = k_ <= n_-k_ && dist != 0 ? ('<span style="color:black;font-size: 120%">' + " &darr; " + dist + '</span>') : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 				var minusArrow = k_ > n_-k_ && dist != 0 ? ('<span style="color:black;font-size: 120%">' + " &darr; " + dist + '</span>') : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+				let TBCoeff = ' <span style="color:black;font-size: 120%">x' +  parseFloat(selectedTeamsJson.team[j].TBFactor).toFixed(2) + '</span>';
+				let TMCoeff = ' <span style="color:black;font-size: 120%">x' + parseFloat(selectedTeamsJson.team[j].TMFactor).toFixed(2) + '</span>';
 
-				tCont += (arr[i][j] == 1) ? (plusSymbol + plusArrow + prName + "</br>") : (minusSymbol + minusArrow + prName + "</br>");
-				tCont2 += (arr[i][j] == 0) ? plusSymbol + (plusArrow + prName + "</br>") : (minusSymbol +  minusArrow + prName + "</br>");
+				tCont += (arr[i][j] == 1) ? (plusSymbol + plusArrow + prName + TBCoeff + "</br>") : (minusSymbol + minusArrow + prName + TMCoeff + "</br>");
+				tCont2 += (arr[i][j] == 0) ? plusSymbol + (plusArrow + prName + TBCoeff + "</br>") : (minusSymbol +  minusArrow + prName + TMCoeff + "</br>");
 				var obj = {};
 				obj['name'] =  selectedTeamsJson.team[j].name;	
 				obj['date'] =  selectedTeamsJson.team[j].date;		
