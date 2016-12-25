@@ -44,6 +44,7 @@ $(function () {
 	if (localStorage['selectedTeams']) {
 		selectedTeamsJson = JSON.parse(localStorage.getItem('selectedTeams'));
 		markSelectedTeams(selectedTeamsJson);
+		showSelectedTeamsList();
 		showBlocksByCountry();
 		n_ = selectedTeamsJson.team.length;
 		$('#n').val(n_ > 0 ? n_ : "");
@@ -262,6 +263,7 @@ $(function () {
 		localStorage.setItem('teams', JSON.stringify(teamsJson));
 		fillTeamList(teamsJson);
 		markSelectedTeams(selectedTeamsJson);
+		showSelectedTeamsList();
 		showBlocksByCountry();
 		n_ = selectedTeamsJson.team.length;
 		$('#n').val(n_ > 0 ? n_ : "");
@@ -447,6 +449,7 @@ $(function () {
 					.removeClass('alert-error')
 					.addClass('alert-standard');
 			}
+			showSelectedTeamsList();
 			showBlocksByCountry();
 			n_ = selectedTeamsJson.team.length;
 			$('#n').val(n_ > 0 ? n_ : "");
@@ -700,6 +703,7 @@ $(function () {
 		}
 		n_ = selectedTeamsJson.team.length;
 		$('#n').val(n_ > 0 ? n_ : "");
+		showSelectedTeamsList();
 		showBlocksByCountry();
 	});
 	$(document).on('click', '.country-blocks', function (e) {
@@ -718,6 +722,9 @@ $(function () {
 		e = e || window.event;
 		e.preventDefault();
 		chooseBlock(this, 'anti-selected');
+	});
+	$(document).on('input', '.tm-coeff-inp', (e) => {
+
 	});
 	function chooseBlock(sefl, addedClass) {
 		var countryAttr = $(sefl).attr('country');
@@ -818,16 +825,18 @@ $(function () {
 				}
 			}
 		}
-		var eventsDiv = $('#events-div');
-		$('<label class="country-el">Внутренние блоки </span><input id="inner-blocks-check" class="country-el" type="checkBox"></br>')
-			.appendTo(eventsDiv);
-		for (var i in _countries) {
-			if (_countries[i]['team'].length <= 1) continue;
-			var countryString = $('<h4 class="country-el"></h4>').text(i + " ").appendTo(eventsDiv);
-			showAvaibleBlocks(_countries[i]['team'].length, i, countryString);
-			var checks = $('<div class="country-el"></div>').appendTo(eventsDiv);
-			$('<label ><input type="checkBox" id="without' + i + '" class="country-el "/> Без блоков </label>').appendTo(checks);
-			$('<label ><input type="checkBox" id="only' + i + '" class="country-el"/> Только указанные </label>').appendTo(checks);
+		if (!$.isEmptyObject(_countries)){
+			var eventsDiv = $('<div class="country-el" style="display: inline-block; margin-left: 30px; float: right;"></div>').appendTo($('#events-div'));
+			$('<label class="country-el">Внутренние блоки </span><input id="inner-blocks-check" class="country-el" type="checkBox"></br>')
+				.appendTo(eventsDiv);
+			for (var i in _countries) {
+				if (_countries[i]['team'].length <= 1) continue;
+				var countryString = $('<h4 class="country-el"></h4>').text(i + " ").appendTo(eventsDiv);
+				showAvaibleBlocks(_countries[i]['team'].length, i, countryString);
+				var checks = $('<div class="country-el"></div>').appendTo(eventsDiv);
+				$('<label ><input type="checkBox" id="without' + i + '" class="country-el "/> Без блоков </label>').appendTo(checks);
+				$('<label ><input type="checkBox" id="only' + i + '" class="country-el"/> Только указанные </label>').appendTo(checks);
+			}
 		}
 	}
 	function showAvaibleBlocks(to, country, element) {
@@ -838,6 +847,26 @@ $(function () {
 				.appendTo(element);
 		}
 
+	}
+	function showSelectedTeamsList() {
+		$('.selected-teams-list').detach();
+		let eventsDiv = $('<blockquote class="selected-teams-list" style="display: inline-block;"></blockquote>').appendTo($('#events-div'));
+		for (var i = 0; i < selectedTeamsJson.team.length; i++) {
+			let country = selectedTeamsJson.team[i].country == undefined ? "" : selectedTeamsJson.team[i].country;
+			//let itemCoeff = `<span style="color:black;font-size: 120%"> ТБ х${parseFloat(selectedTeamsJson.team[i].TBFactor).toFixed(2)} ТМ х${parseFloat(selectedTeamsJson.team[i].TMFactor).toFixed(2)}</span>`;
+			//listContent += `${country} `;
+			let newDiv =
+				$('<div class="selected-teams-list">').appendTo(eventsDiv)
+					.html(`<span style="color:black;font-size: 120%">${country}</span> ${selectedTeamsJson.team[i].name} ${selectedTeamsJson.team[i].date} `)
+					.attr("data-name", selectedTeamsJson.team[i].name)
+					.attr("data-country", country)
+					.attr("data-date", selectedTeamsJson.team[i].date)
+					.attr('data-tbfactor', selectedTeamsJson.team[i].TBFactor)
+					.attr('data-tmfactor', selectedTeamsJson.team[i].TMFactor);
+			let rightDiv = $(`<div style="display: inline-block;"></div>`).appendTo(newDiv);
+			$('<span style="color:black; font-size: 120%; display: inline-block;">&uarr;</span><input type="number" min="0" step="0.01" class="selected-teams-list tb-coeff-inp" placeholder = "" style="width:50px; background: #3C3F45; color: white; display: inline-block;"></input>').val(selectedTeamsJson.team[i].TBFactor).appendTo(rightDiv);
+			$('<input type="number" min="0" step="0.01" class="selected-teams-list tm-coeff-inp" placeholder = "" style="width:50px; background: #3C3F45; color: white; margin-left: 10px;"></input><span style="color: black;font-size: 120%;">&darr;</span>').val(selectedTeamsJson.team[i].TMFactor).appendTo(rightDiv);
+		}
 	}
 	function findVars(k_filter_combs, n_filter_combs, varAmount, upperLimit) {
 		var arrConts = [];
@@ -1427,9 +1456,6 @@ $(function () {
 			.appendTo('#buttons');
 	}
 
-
-
-
 	function fillTeamList(teamsJson) {
 		$('#team-list > div').remove();
 		var champs = [];
@@ -1444,6 +1470,7 @@ $(function () {
 				//  teamsJson.team.splice(i, 1);
 			} else {
 				var country = item.country == undefined ? "" : item.country;
+				let itemCoeff = `<span style="color:black;font-size: 120%"> ТБ х${parseFloat(item.TBFactor).toFixed(2)} ТМ х${parseFloat(item.TMFactor).toFixed(2)}</span>`;
 				var newDiv =
 					$('<div class="alert alert-standard fade in">').appendTo($('#team-list div:contains("' + item.champ + '")'))
 						.html(item.name + " " + item.date + "   ")
@@ -1453,6 +1480,7 @@ $(function () {
 						.attr('data-tbfactor', item.TBFactor)
 						.attr('data-tmfactor', item.TMFactor);
 				$('<input type="number" min="1" class="country-input" placeholder = "" style="width:35px; background: #3C3F45; color: white"></input>').val(country).appendTo(newDiv);
+				$(itemCoeff).appendTo(newDiv);
 				$('<a class="close" data-dismiss="alert" href="#">x</a>').appendTo(newDiv);
 			}
 		});
@@ -1547,12 +1575,6 @@ $(function () {
 			}
 		}
 	}
-	// function convertArray(arr){
-	// 	var outArray = [];
-	// 	for(var i in arr){
-	// 		outArray.push()
-	// 	}
-	// }
 	function checkCountryBlock(input, filterBlocks, onlySelectedBlocks) {
 		if (input.length == 0) {
 			return filterBlocks.length == 0;
@@ -1574,8 +1596,6 @@ $(function () {
 			blocks.push(w);
 			w = 0;
 		}
-		//var input = [];
-		//for(var i = 0; i < input.length; i++) input.push(i);
 		var blockCombs = combinations(blocks);
 		for (var comb = 0; comb < blockCombs.length; comb++) {
 			var fIter = 0;
@@ -1630,15 +1650,12 @@ $(function () {
 	}
 	function popInCountries(arr) {
 		for (var i = 0; i < arr.length; i++) top2: {
-			//console.log('i = ' + i);
 			var flArrAll = [];
 			for (var countryName in _countries) {
-				//console.log('countryName = ' + countryName);
 				var countryBlocks = [];
 				var step = 0;
 				var onlyCheck = $('#only' + countryName)[0].checked;
 				for (var j = 0; j < arr[i].length - 1; j++) {
-					//console.log('arr[i] = ' + arr[i]);
 					if (selectedTeamsJson.team[j].country == countryName && selectedTeamsJson.team[j + 1].country == countryName) {
 						if (arr[i][j] == arr[i][j + 1]) {
 							countryBlocks.pushIfNotExist(j + step, e => (j + step) == e);
@@ -1746,10 +1763,6 @@ $(function () {
 				}
 			}
 		}
-		// if ($('#plus-coeff-slider-check').prop('checked')) {
-
-		// }
-
 	}
 	function print2DemArr(arr) {
 		$('.stp').remove();
