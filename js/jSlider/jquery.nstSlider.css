@@ -14,6 +14,10 @@
   background: #3C3F45;
     display: inline-block;
 }
+.small {
+   width: 300px;
+   margin-left: 20px
+}
 .nstSlider .leftGrip.gripHighlighted {
   background: #3C3F45;
 }

