@@ -293,11 +293,9 @@ $(function () {
 	$('#total-coeff-coeff-check').prop('checked', false);
 	$(document).on('click', '#plus-coeff-slider, #plus-coeff-value', (e) => {
 		$('#plus-coeff-slider-check').prop('checked', true);
-		$('#total-coeff-coeff-check').prop('checked', true);
 	});
 	$(document).on('click', '#minus-coeff-slider, #minus-coeff-value', (e) => {
 		$('#minus-coeff-slider-check').prop('checked', true);
-		$('#total-coeff-coeff-check').prop('checked', true);
 	});
 	$(document).on('input', '#total-coeff-RightInput', (e) => {
 		$('#total-coeff-coeff-check').prop('checked', true);
