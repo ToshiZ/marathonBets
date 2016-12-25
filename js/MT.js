@@ -160,6 +160,8 @@ $(function () {
 			localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
 			n_ = selectedTeamsJson.team.length;
 			$('#n').val(n_ > 0 ? n_ : "");
+			showSelectedTeamsList();
+			showBlocksByCountry();
 		});
 	});
 	$('#clear').on('click', function () {
@@ -177,6 +179,8 @@ $(function () {
 		clearInterval(sendRefreshTimer);
 		pauseFl = true;
 		chrome.tabs.sendMessage(csId.id, { 'askFor': 'stop' });
+		showSelectedTeamsList();
+		showBlocksByCountry();
 	});
 	$('#auto').on('click', function () {
 		if ($(this).data('state') === 'manual') {
@@ -848,22 +852,24 @@ $(function () {
 	}
 	function showSelectedTeamsList() {
 		$('.selected-teams-list').detach();
-		let eventsDiv = $('<blockquote class="selected-teams-list" style="display: inline-block;"></blockquote>').appendTo($('#events-div'));
-		for (var i = 0; i < selectedTeamsJson.team.length; i++) {
-			let country = selectedTeamsJson.team[i].country == undefined ? "" : selectedTeamsJson.team[i].country;
-			//let itemCoeff = `<span style="color:black;font-size: 120%"> ТБ х${parseFloat(selectedTeamsJson.team[i].TBFactor).toFixed(2)} ТМ х${parseFloat(selectedTeamsJson.team[i].TMFactor).toFixed(2)}</span>`;
-			//listContent += `${country} `;
-			let newDiv =
-				$('<div class="selected-teams-list">').appendTo(eventsDiv)
-					.html(`<span style="color:black;font-size: 120%">${country}</span> ${selectedTeamsJson.team[i].name} ${selectedTeamsJson.team[i].date} `)
-					.attr("data-name", selectedTeamsJson.team[i].name)
-					.attr("data-country", country)
-					.attr("data-date", selectedTeamsJson.team[i].date)
-					.attr('data-tbfactor', selectedTeamsJson.team[i].TBFactor)
-					.attr('data-tmfactor', selectedTeamsJson.team[i].TMFactor);
-			let rightDiv = $(`<div style="display: inline-block;"></div>`).appendTo(newDiv);
-			$('<span style="color:black; font-size: 120%; display: inline-block;">&uarr;</span><input type="number" min="0" step="0.01" class="selected-teams-list tb-coeff-inp" placeholder = "" style="width:50px; background: #3C3F45; color: white; display: inline-block;"></input>').val(selectedTeamsJson.team[i].TBFactor).appendTo(rightDiv);
-			$('<input type="number" min="0" step="0.01" class="selected-teams-list tm-coeff-inp" placeholder = "" style="width:50px; background: #3C3F45; color: white; margin-left: 10px;"></input><span style="color: black;font-size: 120%;">&darr;</span>').val(selectedTeamsJson.team[i].TMFactor).appendTo(rightDiv);
+		if (selectedTeamsJson.team.length) {
+			let eventsDiv = $('<blockquote class="selected-teams-list" style="display: inline-block;"></blockquote>').appendTo($('#events-div'));
+			for (var i = 0; i < selectedTeamsJson.team.length; i++) {
+				let country = selectedTeamsJson.team[i].country == undefined ? "" : selectedTeamsJson.team[i].country;
+				//let itemCoeff = `<span style="color:black;font-size: 120%"> ТБ х${parseFloat(selectedTeamsJson.team[i].TBFactor).toFixed(2)} ТМ х${parseFloat(selectedTeamsJson.team[i].TMFactor).toFixed(2)}</span>`;
+				//listContent += `${country} `;
+				let newDiv =
+					$('<div class="selected-teams-list">').appendTo(eventsDiv)
+						.html(`<span style="color:black;font-size: 120%">${country}</span> ${selectedTeamsJson.team[i].name} ${selectedTeamsJson.team[i].date} `)
+						.attr("data-name", selectedTeamsJson.team[i].name)
+						.attr("data-country", country)
+						.attr("data-date", selectedTeamsJson.team[i].date)
+						.attr('data-tbfactor', selectedTeamsJson.team[i].TBFactor)
+						.attr('data-tmfactor', selectedTeamsJson.team[i].TMFactor);
+				let rightDiv = $(`<div style="display: inline-block;"></div>`).appendTo(newDiv);
+				$('<span style="color:black; font-size: 120%; display: inline-block;">&uarr;</span><input type="number" min="0" step="0.01" class="selected-teams-list tb-coeff-inp" placeholder = "" style="width:50px; background: #3C3F45; color: white; display: inline-block;"></input>').val(selectedTeamsJson.team[i].TBFactor).appendTo(rightDiv);
+				$('<input type="number" min="0" step="0.01" class="selected-teams-list tm-coeff-inp" placeholder = "" style="width:50px; background: #3C3F45; color: white; margin-left: 10px;"></input><span style="color: black;font-size: 120%;">&darr;</span>').val(selectedTeamsJson.team[i].TMFactor).appendTo(rightDiv);
+			}
 		}
 	}
 	function findVars(k_filter_combs, n_filter_combs, varAmount, upperLimit) {
