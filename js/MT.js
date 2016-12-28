@@ -1758,7 +1758,7 @@ $(function () {
 				if ((TBCounter < coeffLeftTB || TBCounter > coeffRightTB) && $('#plus-coeff-slider-check').prop('checked')) {
 					flag = true;
 				}
-				if ((TMCounter < coeffLeftTM || TMCounter < coeffRightTM) && $('#minus-coeff-slider-check').prop('checked')) {
+				if ((TMCounter < coeffLeftTM || TMCounter > coeffRightTM) && $('#minus-coeff-slider-check').prop('checked')) {
 					flag = true;
 				}
 				if (flag) {

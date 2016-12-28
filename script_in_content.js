@@ -211,11 +211,6 @@ viewDialog = function (dialogEl) {
 $(function () {
 	var tbb = $('tbody[data-event-name]');
 	tbb.each(function (j) {
-		//        console.log(j);
-		//        if(j == 236)
-		//            {
-		//                let me = 123;
-		//            }
 		var gameDate = $(this).find('td.date').html();
 		var teamsNames = $(this).attr('data-event-name');
 		let line = $(this).find('tr').first().find('td');
