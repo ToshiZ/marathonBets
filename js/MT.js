@@ -1467,7 +1467,7 @@ $(function () {
 			champs.pushIfNotExist(item.champ, (e) => (item.champ) == e);
 		});
 		champs.forEach(function (item, i) {
-			$('<div id="champ' + i + '">' + item + '</div>').appendTo($('#team-list'));
+			$('<div id="champ' + i + '" champ-name="' + item + '">' + item + '</div>').appendTo($('#team-list'));
 		});
 		teamsJson.team.forEach(function (item, i) {
 			if (item == null) {
@@ -1475,8 +1475,9 @@ $(function () {
 			} else {
 				var country = item.country == undefined ? "" : item.country;
 				let itemCoeff = `<span style="color:black;font-size: 120%"> ТБ х${parseFloat(item.TBFactor).toFixed(2)} ТМ х${parseFloat(item.TMFactor).toFixed(2)}</span>`;
+				let champDiv = $(`#team-list div[champ-name="${item.champ}"`);
 				var newDiv =
-					$('<div class="alert alert-standard fade in">').appendTo($('#team-list div:contains("' + item.champ + '")'))
+					$('<div class="alert alert-standard fade in">').appendTo(champDiv)
 						.html(item.name + " " + item.date + "   ")
 						.attr("data-name", item.name)
 						.attr("data-country", country)
