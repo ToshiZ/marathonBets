@@ -53,6 +53,7 @@ $(function () {
 	}
 
 	rebuidCoeff('total-coeff', coeffLeft, coeffRight, coeffMax);
+	rebuidSlider('blocks-slider', 0, selectedTeamsJson.team.length, selectedTeamsJson.team.length);
 
 	$('#plus-coeff-value').nstSlider({
 		"left_grip_selector": "#plus-coeff-value-leftGrip",
@@ -162,6 +163,7 @@ $(function () {
 			$('#n').val(n_ > 0 ? n_ : "");
 			showSelectedTeamsList();
 			showBlocksByCountry();
+			//rebuidSlider('blocks-slider', 0, selectedTeamsJson.team.length, selectedTeamsJson.team.length);
 		});
 	});
 	$('#clear').on('click', function () {
@@ -414,6 +416,7 @@ $(function () {
 			}
 		}
 		if (!$.isEmptyObject(_countries) && $('#inner-blocks-check')[0].checked) popInCountries(res);
+		if ($('#blocks-slider-check').prop('checked')) popByBloksAmount(res, parseInt($('#blocks-slider-leftLabel').text()), parseInt($('#blocks-slider-rightLabel').text()));
 		if ($('#total-coeff-coeff-check').prop('checked') ||
 			$('#plus-coeff-slider-check').prop('checked') ||
 			$('#minus-coeff-slider-check').prop('checked')) {
@@ -453,6 +456,7 @@ $(function () {
 			}
 			showSelectedTeamsList();
 			showBlocksByCountry();
+			rebuidSlider('blocks-slider', 0, selectedTeamsJson.team.length, selectedTeamsJson.team.length);
 			n_ = selectedTeamsJson.team.length;
 			$('#n').val(n_ > 0 ? n_ : "");
 		}
@@ -707,6 +711,7 @@ $(function () {
 		$('#n').val(n_ > 0 ? n_ : "");
 		showSelectedTeamsList();
 		showBlocksByCountry();
+		rebuidSlider('blocks-slider', 0, selectedTeamsJson.team.length, selectedTeamsJson.team.length);
 	});
 	$(document).on('click', '.country-blocks', function (e) {
 		chooseBlock(this, 'selected');
@@ -772,6 +777,44 @@ $(function () {
 		var avaibleBlocks = _countries[countryAttr].team.length - selectedSum;
 		showAvaibleBlocks(avaibleBlocks, countryAttr, parentEl);
 	}
+	function rebuidSlider(tagId, cLeft, cRight, cMax) {
+		if ($('#' + tagId).length != 0) {
+			$('#' + tagId).detach();
+			$(`#${tagId}-leftLabel`).detach();
+			$(`#${tagId}-rightLabel`).detach();
+		}
+		let newSlider = $(`<div id="${tagId}" 
+								class="nstSlider small" 
+								data-range_min="0" 
+								data-range_max="${cMax}"
+								data-cur_min="${cLeft}"
+								data-cur_max="${cRight}">
+									<div id="${tagId}-SliderBar" 
+										class="bar">
+									</div>
+									<div id="${tagId}-LeftGrip" 
+										class="leftGrip">
+									</div>
+									<div id="${tagId}-RightGrip" 
+										class="rightGrip">
+									</div>
+							</div>`)
+			.appendTo(`#${tagId}-Container`);
+		newSlider.nstSlider({
+			"crossable_handles": false,
+			"left_grip_selector": `#${tagId}-LeftGrip`,
+			"right_grip_selector": `#${tagId}-RightGrip`,
+			"value_bar_selector": `#${tagId}-SliderBar`,
+			"value_changed_callback": function (cause, leftValue, rightValue) {
+				$(`#${tagId}-check`).prop("checked", true);
+				$(`#${tagId}-leftLabel`).text(leftValue);
+				$(`#${tagId}-rightLabel`).text(rightValue);
+			}
+		});
+		$(`<span id="${tagId}-leftLabel"></span>`).prependTo(`#${tagId}-Container`).text(cLeft);
+		$(`<span id="${tagId}-rightLabel"></span>`).appendTo(`#${tagId}-Container`).text(" " + cRight);
+		$(`#${tagId}-check`).prop("checked", false);
+	};
 	function rebuidCoeff(tagId, cLeft, cRight, cMax) {
 		if ($('#' + tagId).length != 0) $('#' + tagId).detach();
 		let newSlider = $(`<div id="${tagId}" 
@@ -827,7 +870,7 @@ $(function () {
 				}
 			}
 		}
-		if (!$.isEmptyObject(_countries)){
+		if (!$.isEmptyObject(_countries)) {
 			var eventsDiv = $('<div class="country-el" style="display: inline-block; margin-left: 30px; float: right;"></div>').appendTo($('#events-div'));
 			$('<label class="country-el">Внутренние блоки </span><input id="inner-blocks-check" class="country-el" type="checkBox"></br>')
 				.appendTo(eventsDiv);
@@ -1319,6 +1362,7 @@ $(function () {
 		}
 		return output;
 	}
+	
 	function block(input, filter, n, onlySelectedBlocks) {
 		if (filter.length == 0)
 			return input;
@@ -1707,6 +1751,26 @@ $(function () {
 			}
 		}
 	}
+	function popByBloksAmount(teamsArray, fromBlock, toBlock) {
+		for(let i = 0; i < teamsArray.length; i++) {
+			let blocksCounter = 0;
+			let blockSize = 1;
+			for (let j = 0; j < teamsArray[i].length; j++) {
+				if(teamsArray[i][j] == teamsArray[i][j+1]) {
+					blockSize += 1;
+				}else{
+					if(blockSize > 1){
+						blocksCounter += 1;
+						blockSize = 1;
+					}
+				}
+			}
+			if(blocksCounter < fromBlock || blocksCounter > toBlock ){
+				teamsArray.splice(i, 1);
+				i--;
+			}
+		}
+	}
 	function popByCoeff(arr) {
 		if ($('#total-coeff-coeff-check').prop('checked') || $('#plus-coeff-slider-check').prop('checked') || $('#minus-coeff-slider-check').prop('checked')) {
 			for (var i = 0; i < arr.length; i++) {
@@ -1719,16 +1783,16 @@ $(function () {
 						if (coeffTB > 0 && arr[i][j] == 1) {
 							if ($('#plus-strong-check').prop('checked') && parseFloat(selectedTeamsJson.team[j].TBFactor) > parseFloat(coeffTB)) {
 								TBCounter += 1;
-							} 
+							}
 							if (!$('#plus-strong-check').prop('checked') && parseFloat(selectedTeamsJson.team[j].TBFactor) >= parseFloat(coeffTB)) {
 								TBCounter += 1;
 							}
 						}
 						if (coeffTB < 0 && arr[i][j] == 1) {
-							if ($('#minus-strong-check').prop('checked') && parseFloat(selectedTeamsJson.team[j].TBFactor) < parseFloat(coeffTB)*-1) {
+							if ($('#minus-strong-check').prop('checked') && parseFloat(selectedTeamsJson.team[j].TBFactor) < parseFloat(coeffTB) * -1) {
 								TBCounter += 1;
-							} 
-							if (!$('#minus-strong-check').prop('checked') && parseFloat(selectedTeamsJson.team[j].TBFactor) <= parseFloat(coeffTB)*-1) {
+							}
+							if (!$('#minus-strong-check').prop('checked') && parseFloat(selectedTeamsJson.team[j].TBFactor) <= parseFloat(coeffTB) * -1) {
 								TBCounter += 1;
 							}
 						}
@@ -1737,16 +1801,16 @@ $(function () {
 						if (coeffTM > 0 && arr[i][j] == 0) {
 							if ($('#minus-strong-check').prop('checked') && parseFloat(selectedTeamsJson.team[j].TMFactor) > parseFloat(coeffTM)) {
 								TMCounter += 1;
-							} 
+							}
 							if (!$('#minus-strong-check').prop('checked') && parseFloat(selectedTeamsJson.team[j].TMFactor) >= parseFloat(coeffTM)) {
 								TMCounter += 1;
 							}
 						}
 						if (coeffTM < 0 && arr[i][j] == 0) {
-							if ($('#minus-strong-check').prop('checked') && parseFloat(selectedTeamsJson.team[j].TMFactor) < parseFloat(coeffTM)*-1) {
+							if ($('#minus-strong-check').prop('checked') && parseFloat(selectedTeamsJson.team[j].TMFactor) < parseFloat(coeffTM) * -1) {
 								TMCounter += 1;
-							} 
-							if (!$('#minus-strong-check').prop('checked') && parseFloat(selectedTeamsJson.team[j].TMFactor) <= parseFloat(coeffTM)*-1) {
+							}
+							if (!$('#minus-strong-check').prop('checked') && parseFloat(selectedTeamsJson.team[j].TMFactor) <= parseFloat(coeffTM) * -1) {
 								TMCounter += 1;
 							}
 						}
