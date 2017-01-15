@@ -53,7 +53,7 @@ $(function () {
 	}
 
 	rebuidCoeff('total-coeff', coeffLeft, coeffRight, coeffMax);
-	rebuidSlider('blocks-slider', 0, selectedTeamsJson.team.length, selectedTeamsJson.team.length);
+	rebuidSlider('blocks-slider', 0, parseInt(selectedTeamsJson.team.length/2), parseInt(selectedTeamsJson.team.length/2));
 
 	$('#plus-coeff-value').nstSlider({
 		"left_grip_selector": "#plus-coeff-value-leftGrip",
@@ -456,7 +456,7 @@ $(function () {
 			}
 			showSelectedTeamsList();
 			showBlocksByCountry();
-			rebuidSlider('blocks-slider', 0, selectedTeamsJson.team.length, selectedTeamsJson.team.length);
+			rebuidSlider('blocks-slider', 0, parseInt(selectedTeamsJson.team.length/2), parseInt(selectedTeamsJson.team.length/2));
 			n_ = selectedTeamsJson.team.length;
 			$('#n').val(n_ > 0 ? n_ : "");
 		}
@@ -711,8 +711,7 @@ $(function () {
 		$('#n').val(n_ > 0 ? n_ : "");
 		showSelectedTeamsList();
 		showBlocksByCountry();
-		rebuidSlider('blocks-slider', 0, selectedTeamsJson.team.length, selectedTeamsJson.team.length);
-	});
+		rebuidSlider('blocks-slider', 0, parseInt(selectedTeamsJson.team.length/2), parseInt(selectedTeamsJson.team.length/2));	});
 	$(document).on('click', '.country-blocks', function (e) {
 		chooseBlock(this, 'selected');
 	});
