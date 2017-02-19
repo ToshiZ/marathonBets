@@ -25,12 +25,11 @@
 </head>
 
 <body>
-	<div id="top-div" class="span24">
+	<div id="top-div" class="span24" >
 		<div class="span24">
-			<div id="n-k-params-div" class="span4">
+			<div id="n-k-params-div" class="span3">
 				<input id="n" readonly type="number" min="1" name="n" class="n-k-params" placeholder="Всего" style="width:80px; background: #3C3F45; color: white"></input>
 				</br>
-
 				<input id="k" type="number" min="1" name="k" class="n-k-params" placeholder="Плюсов" style="width:80px; background: #3C3F45; color: white"></input>
 				<a id="clean-k">очистить</a>
 				<label> <input type="checkBox"  name="check" id="k-check"/> Плюсы без блоков </label>
@@ -40,14 +39,12 @@
 				<label> <input type="checkBox"  name="check" id="n-k-check"/> Минусы без блоков </label>
 				<label> <input type="checkBox"  name="check" id="anti-block-minus-check"/> Только указанные</label>
 
-				<div style="display: inline;">
-					<label> <input type="checkBox" id="plus-slider-check"/>Интервал</label>
+				<div style="display: inline; margin: 10px;">
+					<label> <input type="checkBox" id="plus-slider-check"/>Интервал плюсов</label>
 					<div id="plus-slider-Container"></div>
 				</div>
-
-
 				
-				<input id="coast" type="text" name="coast" class="coast" placeholder="Сумма" style="width:80px; background: #3C3F45; color: white"></input>
+				<input id="coast" type="text" name="coast" class="coast" placeholder="Сумма" style="width:80px; background: #3C3F45; color: white; margin-top:15px"></input>
 				<label>Выделение команд, мс</label>
 				<input id="markTime" type="text" name="refreshTime" class="coast" placeholder="минимум 300" style="width:100px; background: #3C3F45; color: white"></input>
 				<label>Задержка после ставки, сек</label>
@@ -98,18 +95,18 @@
 				<blockquote>
 					<div class="span12" style="display: inline-block;">
 						<input id="var-amount" type="number" min="1" class="" placeholder="Количество билетов" style="display: inline-block; width:160px; background: #3C3F45; color: white"></input>
-						<div>
+						<a id="clean-vars">очистить</a>
+						</br>
+						<div style="margin-top: 10px;">
 							<label> <input type="checkBox" id="vars-slider-check"/>Интервал</label>
 							<div id="vars-slider-Container"></div>
 						</div>
-						<div>
-							<a id="clean-vars">очистить</a>
-						</div>
+
 
 					</div>
 					</br>
 					</br>
-					<div class="pull-right">
+					<div class="">
 						<a id="var-ok" class="button button-large">Ok</a>
 					</div>
 
