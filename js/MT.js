@@ -54,6 +54,13 @@ $(function () {
 
 	rebuidCoeff('total-coeff', coeffLeft, coeffRight, coeffMax);
 	rebuidSlider('blocks-slider', 0, parseInt(selectedTeamsJson.team.length/2), parseInt(selectedTeamsJson.team.length/2));
+	if (n_) {
+		rebuidSlider('vars-slider', 0, math.combinations(n_, parseInt(n_/2)), math.combinations(n_, parseInt(n_/2)));
+		rebuidSlider('plus-slider', 0, n_, n_);
+	} else {
+		rebuidSlider('vars-slider', 0, 0, 0);
+		rebuidSlider('plus-slider', 0, 0, 0);
+	}
 
 	$('#plus-coeff-value').nstSlider({
 		"left_grip_selector": "#plus-coeff-value-leftGrip",
@@ -160,6 +167,8 @@ $(function () {
 			localStorage.setItem('tickets', JSON.stringify(ticketsJson));
 			localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
 			n_ = selectedTeamsJson.team.length;
+			rebuidSlider('vars-slider', 0, math.combinations(n_, parseInt(n_/2)), math.combinations(n_, parseInt(n_/2)));
+			rebuidSlider('plus-slider', 0, n_, n_);
 			$('#n').val(n_ > 0 ? n_ : "");
 			showSelectedTeamsList();
 			showBlocksByCountry();
@@ -458,6 +467,8 @@ $(function () {
 			showBlocksByCountry();
 			rebuidSlider('blocks-slider', 0, parseInt(selectedTeamsJson.team.length/2), parseInt(selectedTeamsJson.team.length/2));
 			n_ = selectedTeamsJson.team.length;
+			rebuidSlider('vars-slider', 0, math.combinations(n_, parseInt(n_/2)), math.combinations(n_, parseInt(n_/2)));
+			rebuidSlider('plus-slider', 0, n_, n_);
 			$('#n').val(n_ > 0 ? n_ : "");
 		}
 	});
@@ -492,6 +503,9 @@ $(function () {
 	});
 	$('#clean-vars').on('click', function (e) {
 		$('#var-amount')[0].value = "";
+	});
+	$('#var-amount').on('input', (e) => {
+		$('#vars-slider-check').prop("checked", false);
 	});
 	$('#var-ok').on('click', function (e) {
 		$('.stp2').remove();
@@ -703,11 +717,15 @@ $(function () {
 			selectedTeamsJson.team.push(obj)
 			localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
 			n_ = selectedTeamsJson.team.length;
+			rebuidSlider('vars-slider', 0, math.combinations(n_, parseInt(n_/2)), math.combinations(n_, parseInt(n_/2)));
+			rebuidSlider('plus-slider', 0, n_, n_);
 		} else {
 			selectedTeamsJson.team[ind] = obj;
 			localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
 		}
 		n_ = selectedTeamsJson.team.length;
+		rebuidSlider('vars-slider', 0, math.combinations(n_, parseInt(n_/2)), math.combinations(n_, parseInt(n_/2)));
+		rebuidSlider('plus-slider', 0, n_, n_);
 		$('#n').val(n_ > 0 ? n_ : "");
 		showSelectedTeamsList();
 		showBlocksByCountry();
@@ -811,7 +829,7 @@ $(function () {
 			}
 		});
 		$(`<span id="${tagId}-leftLabel"></span>`).prependTo(`#${tagId}-Container`).text(cLeft);
-		$(`<span id="${tagId}-rightLabel"></span>`).appendTo(`#${tagId}-Container`).text(" " + cRight);
+		$(`<span id="${tagId}-rightLabel" style="margin-left: 10px;"></span>`).appendTo(`#${tagId}-Container`).text(" " + cRight);
 		$(`#${tagId}-check`).prop("checked", false);
 	};
 	function rebuidCoeff(tagId, cLeft, cRight, cMax) {
