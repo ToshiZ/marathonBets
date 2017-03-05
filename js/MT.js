@@ -3,6 +3,7 @@ $(function () {
 		k_ = $('#k').val(),
 		n_k_,
 		teamsJson,
+		varTicketsRes = [],
 		selectedTeamsJson,
 		csId = localStorage.getItem('contentId') ? JSON.parse(localStorage.getItem('contentId')) : {},
 		ticketsJson = { "ticket": [] },
@@ -549,7 +550,9 @@ $(function () {
 		inputsForBlocksN(n_ - k_);
 	});
 	$('#var-tikets').on('click', function (e) {
-		//
+		if (varTicketsRes.length.length != 0) {
+			print2DemArr(varTicketsRes);
+		}
 	});
 	$(document).on('click', ".var-div", function () {
 		var tb = this.getAttribute('tb');
@@ -917,6 +920,9 @@ $(function () {
 	function findVars(k_filter_combs, n_filter_combs, varAmount, fromPlus, toPlus) {
 		var arrConts = [];
 		var varNum = 0;
+		varTicketsRes = [];
+		let allTicketsAmount = 0;
+		let allVars = 0;
 		for (let plusRange = fromPlus; plusRange <= toPlus; plusRange++) {
 			let minusRange = n_ - plusRange;
 			for (var i = 0; i < k_filter_combs.length; i++) {
@@ -933,9 +939,9 @@ $(function () {
 						fl_k = true;
 					var res = [];
 					res[0] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], true, true);
-					res[1] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], false, true);
-					res[2] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], true, false);
-					res[3] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], false, false);
+					//res[1] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], false, true);
+					//res[2] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], true, false);
+				//	res[3] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], false, false);
 
 					var fl_ok = false;
 					var ticketsAmount;
@@ -944,77 +950,77 @@ $(function () {
 						if ($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
 							if (varAmount.indexOf(res[0].length) != -1 && !fl_k && !fl_n) {
 								fl_ok = true;
-								ticketsAmount = res[0].length;
+								//ticketsAmount = res[0].length;
 								k_anti_check = true;
 								n_anti_check = true;
 								//continue;
 							}
-							if (varAmount.indexOf(res[1].length) == -1 || varAmount.indexOf(res[2].length) == -1) {
-								if (varAmount.indexOf(res[1].length) != -1 && !fl_k) {
-									fl_ok = true;
-									ticketsAmount = res[1].length;
-									k_anti_check = true;
-									//continue;
-								}
-								if (varAmount.indexOf(res[2].length) != -1 && !fl_n) {
-									fl_ok = true;
-									ticketsAmount = res[2].length;
-									n_anti_check = true;
-									//continue;
-								}
-							}
-							if (varAmount.indexOf(res[3].length) != -1) {
-								fl_ok = true;
-								ticketsAmount = res[3].length;
-								//continue;
-							}
+							// if (varAmount.indexOf(res[1].length) == -1 || varAmount.indexOf(res[2].length) == -1) {
+							// 	if (varAmount.indexOf(res[1].length) != -1 && !fl_k) {
+							// 		fl_ok = true;
+							// 		//ticketsAmount = res[1].length;
+							// 		k_anti_check = true;
+							// 		//continue;
+							// 	}
+							// 	if (varAmount.indexOf(res[2].length) != -1 && !fl_n) {
+							// 		fl_ok = true;
+							// 		//ticketsAmount = res[2].length;
+							// 		n_anti_check = true;
+							// 		//continue;
+							// 	}
+							// }
+							// if (varAmount.indexOf(res[3].length) != -1) {
+							// 	fl_ok = true;
+							// 	//ticketsAmount = res[3].length;
+							// 	//continue;
+							// }
 							if (fl_n || fl_k) {
-								var resTmp = [];
-								for (var ii = 0; ii < res.length; ii++) {
-									resTmp[ii] = res[ii].slice();
-								}
+								// var resTmp = [];
+								// //for (var ii = 0; ii < res.length; ii++) {
+								// 	resTmp = res[0].slice();
+								// //}
 								if (fl_n && fl_k) {
-									for (var ii = 0; ii < 4; ii++) {
-										let tt = popBloks(res[ii], 10);
+									//for (var ii = 0; ii < 4; ii++) {
+										let tt = popBloks(res[0], 10);
 										if (varAmount.indexOf(tt.length) != -1) {
 											fl_ok = true;
 											k_check = true;
 											n_check = true;
-											ticketsAmount = tt.length;
+											//ticketsAmount = tt.length;
 											//break;
 										}
 										//if(fl_ok) continue;
-									}
+									//}
 								}
 								if (!fl_n && fl_k) {
-									for (var ii = 0; ii < 4; ii++)
-										popBloks(res[ii], 1);
-									if (varAmount.indexOf(res[2].length) != -1) {
+									//for (var ii = 0; ii < 4; ii++)
+										popBloks(res[0], 1);
+									if (varAmount.indexOf(res[0].length) != -1) {
 										fl_ok = true;
 										k_check = true;
 										n_anti_check = true;
-										ticketsAmount = res[2].length;
+										//ticketsAmount = res[2].length;
 										//continue;
 									}
 								}
 								if (!fl_k && fl_n) {
-									for (var ii = 0; ii < 4; ii++)
-										popBloks(res[ii], 0);
-									if (varAmount.indexOf(res[1].length) != -1) {
+									//for (var ii = 0; ii < 4; ii++)
+										popBloks(res[0], 0);
+									if (varAmount.indexOf(res[0].length) != -1) {
 										fl_ok = true;
 										n_check = true;
 										k_anti_check = true;
-										ticketsAmount = res[1].length;
+										//ticketsAmount = res[1].length;
 										//continue;
 									}
 								}
-								for (var ii = 0; ii < resTmp.length; ii++) {
-									res[ii] = resTmp[ii].slice();
-								}
+								// for (var ii = 0; ii < resTmp.length; ii++) {
+								// 	res[ii] = resTmp[ii].slice();
+								// }
 							}
 						} else {
-							for (var ii = 0; ii < 4; ii++)
-								popBloks(res[ii], 10);
+							//for (var ii = 0; ii < 4; ii++)
+								popBloks(res[0], 10);
 							k_check = true;
 							n_check = true;
 
@@ -1022,75 +1028,76 @@ $(function () {
 								fl_ok = true;
 								k_anti_check = true;
 								n_anti_check = true;
-								ticketsAmount = res[0].length;
+								//ticketsAmount = res[0].length;
 								//continue;
 							}
-							if (varAmount.indexOf(res[1].length) == -1 || varAmount.indexOf(res[2].length) == -1) {
-								if (varAmount.indexOf(res[1].length) != -1) {
-									fl_ok = true;
-									k_anti_check = true;
-									//continue;
-								}
-								if (varAmount.indexOf(res[2].length) != -1) {
-									fl_ok = true;
-									n_anti_check = true;
-									ticketsAmount = res[2].length;
-									//continue;
-								}
-							}
-							if (varAmount.indexOf(res[3].length) != -1) {
-								fl_ok = true;
-								ticketsAmount = res[3].length;
-								//continue;
-							}
+							// if (varAmount.indexOf(res[1].length) == -1 || varAmount.indexOf(res[2].length) == -1) {
+							// 	if (varAmount.indexOf(res[1].length) != -1) {
+							// 		fl_ok = true;
+							// 		k_anti_check = true;
+							// 		//continue;
+							// 	}
+							// 	if (varAmount.indexOf(res[2].length) != -1) {
+							// 		fl_ok = true;
+							// 		n_anti_check = true;
+							// 		//ticketsAmount = res[2].length;
+							// 		//continue;
+							// 	}
+							// }
+							// if (varAmount.indexOf(res[3].length) != -1) {
+							// 	fl_ok = true;
+							// 	//ticketsAmount = res[3].length;
+							// 	//continue;
+							// }
 						}
 					} else {
 						if ($('#k-check').prop("checked")) {
-							for (var ii = 0; ii < 4; ii++)
-								popBloks(res[ii], 1);
+							//for (var ii = 0; ii < 4; ii++)
+								popBloks(res[0], 1);
 							k_check = true;
 						}
 						if ($('#n-k-check').prop("checked")) {
-							for (var ii = 0; ii < 4; ii++)
-								popBloks(res[ii], 0);
+							//for (var ii = 0; ii < 4; ii++)
+								popBloks(res[0], 0);
 							n_check = true;
 						}
-						if (!$('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")) {
-							if (varAmount.indexOf(res[3].length) != -1) {
-								fl_ok = true;
-								ticketsAmount = res[3].length;
-								//continue;
-							}
-						}
+						// if (!$('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")) {
+						// 	if (varAmount.indexOf(res[3].length) != -1) {
+						// 		fl_ok = true;
+						// 		//ticketsAmount = res[3].length;
+						// 		//continue;
+						// 	}
+						// }
 						if ($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
 							if (varAmount.indexOf(res[0].length) != -1) {
 								fl_ok = true;
 								k_anti_check = true;
 								n_anti_check = true;
-								ticketsAmount = res[0].length;
+								//ticketsAmount = res[0].length;
 								//continue;
 							}
 						}
-						if (!$('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
-							if (varAmount.indexOf(res[1].length) != -1) {
-								fl_ok = true;
-								k_anti_check = true;
-								ticketsAmount = res[1].length;
-								//continue;
-							}
-						}
-						if ($('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")) {
-							if (varAmount.indexOf(res[2].length) != -1) {
-								fl_ok = true;
-								n_anti_check = true;
-								ticketsAmount = res[2].length;
-								//continue;
-							}
-						}
+						// if (!$('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
+						// 	if (varAmount.indexOf(res[1].length) != -1) {
+						// 		fl_ok = true;
+						// 		k_anti_check = true;
+						// 		//ticketsAmount = res[1].length;
+						// 		//continue;
+						// 	}
+						// }
+						// if ($('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")) {
+						// 	if (varAmount.indexOf(res[2].length) != -1) {
+						// 		fl_ok = true;
+						// 		n_anti_check = true;
+						// 		//ticketsAmount = res[2].length;
+						// 		//continue;
+						// 	}
+						// }
 					}
 
 					if (fl_ok) {
-						var tCont = `#${parseInt(varNum + 1)} | ${plusRange}/${n_} | (${ticketsAmount}) </br>`;
+						allTicketsAmount += res[0].length;
+						var tCont = `#${parseInt(varNum + 1)} | ${plusRange}/${n_} | (${res[0].length}) </br>`;
 						var tCont2 = "";
 						var tCont3 = "";
 						if (plusRange == 1) {
@@ -1105,7 +1112,7 @@ $(function () {
 							}
 						} else {
 							if (k_anti_check) {
-								tCont2 += "ТБ: " + k_filter_combs[i] + "+" + "</br>";
+								tCont2 += "ТБ: " + k_filter_combs[i] + "</br>";
 							}
 						}
 						if (fl_n) {
@@ -1114,7 +1121,7 @@ $(function () {
 							}
 						} else {
 							if (n_anti_check) {
-								tCont3 += "ТМ: " + n_filter_combs[j] + "+";
+								tCont3 += "ТМ: " + n_filter_combs[j];
 							}
 						}
 						if (arrConts.indexOf(tCont2 + tCont3) == -1 && tCont2.length != 0 && tCont3.length != 0) {
@@ -1131,10 +1138,11 @@ $(function () {
 							varNum++;
 						}
 					}
+					varTicketsRes = varTicketsRes.concat(res[0]);
 				}
 			}
 		}
-		$('#var-num').html('Варианты (' + varNum + ')');
+		$('#var-num').html(`Варианты (${varNum}/${allTicketsAmount})`);
 	}
 
 	function getComposotions(sum) {
