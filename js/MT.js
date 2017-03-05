@@ -924,7 +924,7 @@ $(function () {
 				let rightDiv = $(`<div style="display: inline-block;"></div>`).appendTo(newDiv);
 				// $(`<span style="color:black; font-size: 120%; display: inline-block;"> Тотал (${selectedTeamsJson.team[i].totalValue}) &uarr;</span><input type="number" min="0" step="0.01" class="selected-teams-list tb-coeff-inp" placeholder = "" style="width:50px; background: #3C3F45; color: white; display: inline-block;"></input>`).val(selectedTeamsJson.team[i].TBFactor).appendTo(rightDiv);
 				// $('<input type="number" min="0" step="0.01" class="selected-teams-list tm-coeff-inp" placeholder = "" style="width:50px; background: #3C3F45; color: white; margin-left: 10px;"></input><span style="color: black;font-size: 120%;">&darr;</span>').val(selectedTeamsJson.team[i].TMFactor).appendTo(rightDiv);
-				$(`<span style="color:black; font-size: 120%; display: inline-block;"> Тотал (${selectedTeamsJson.team[i].totalValue}): &uarr;x${selectedTeamsJson.team[i].TBFactor} &darr;x${selectedTeamsJson.team[i].TMFactor}</span>`)
+				$(`<span style="color:black; font-size: 120%; display: inline-block;"> Тотал (${selectedTeamsJson.team[i].totalValue}): &uarr;x${parseFloat(selectedTeamsJson.team[i].TBFactor).toFixed(2)} &darr;x${parseFloat(selectedTeamsJson.team[i].TMFactor).toFixed(2)}</span>`)
 					.val(selectedTeamsJson.team[i].TBFactor).appendTo(rightDiv);
 
 				// let switcher = $(`<div class="nstSlider" id="switcher-${i}" data-range_min="-1" data-range_max="1"
