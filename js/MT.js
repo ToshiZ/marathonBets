@@ -456,6 +456,7 @@ $(function () {
 			obj['date'] = $(this).attr("data-date");
 			obj['country'] = $(this).attr("data-country");
 			obj["TBFactor"] = $(this).attr("data-TBFactor");
+			obj["totalValue"] = $(this).attr("data-totalValue");
 			obj["TMFactor"] = $(this).attr("data-TMFactor");
 			obj["champ"] = $(this).attr("data-champ");
 			if ($(this).hasClass('alert-standard')) {
@@ -647,6 +648,7 @@ $(function () {
 		obj['date'] = $(this).parent().attr("data-date");
 		obj['country'] = $(this).parent().attr("data-country");
 		obj["TBFactor"] = $(this).parent().attr("data-tbfactor");
+		obj["totalValue"] = $(this).attr("data-totalValue");
 		obj["TMFactor"] = $(this).parent().attr("data-tmfactor");
 		obj["champ"] = $(this).parent().attr("data-champ");
 		var ind = -1;
@@ -910,10 +912,13 @@ $(function () {
 						.attr("data-country", country)
 						.attr("data-date", selectedTeamsJson.team[i].date)
 						.attr('data-tbfactor', selectedTeamsJson.team[i].TBFactor)
+						.attr('data-totalValue', selectedTeamsJson.team[i].totalValue)
 						.attr('data-tmfactor', selectedTeamsJson.team[i].TMFactor);
 				let rightDiv = $(`<div style="display: inline-block;"></div>`).appendTo(newDiv);
-				$('<span style="color:black; font-size: 120%; display: inline-block;">&uarr;</span><input type="number" min="0" step="0.01" class="selected-teams-list tb-coeff-inp" placeholder = "" style="width:50px; background: #3C3F45; color: white; display: inline-block;"></input>').val(selectedTeamsJson.team[i].TBFactor).appendTo(rightDiv);
-				$('<input type="number" min="0" step="0.01" class="selected-teams-list tm-coeff-inp" placeholder = "" style="width:50px; background: #3C3F45; color: white; margin-left: 10px;"></input><span style="color: black;font-size: 120%;">&darr;</span>').val(selectedTeamsJson.team[i].TMFactor).appendTo(rightDiv);
+				// $(`<span style="color:black; font-size: 120%; display: inline-block;"> Тотал (${selectedTeamsJson.team[i].totalValue}) &uarr;</span><input type="number" min="0" step="0.01" class="selected-teams-list tb-coeff-inp" placeholder = "" style="width:50px; background: #3C3F45; color: white; display: inline-block;"></input>`).val(selectedTeamsJson.team[i].TBFactor).appendTo(rightDiv);
+				// $('<input type="number" min="0" step="0.01" class="selected-teams-list tm-coeff-inp" placeholder = "" style="width:50px; background: #3C3F45; color: white; margin-left: 10px;"></input><span style="color: black;font-size: 120%;">&darr;</span>').val(selectedTeamsJson.team[i].TMFactor).appendTo(rightDiv);
+				$(`<span style="color:black; font-size: 120%; display: inline-block;"> Тотал (${selectedTeamsJson.team[i].totalValue}): &uarr;x${selectedTeamsJson.team[i].TBFactor} &darr;x${selectedTeamsJson.team[i].TMFactor}</span>`).val(selectedTeamsJson.team[i].TBFactor).appendTo(rightDiv);
+				// $('<input type="number" min="0" step="0.01" class="selected-teams-list tm-coeff-inp" placeholder = "" style="width:50px; background: #3C3F45; color: white; margin-left: 10px;"></input><span style="color: black;font-size: 120%;">&darr;</span>').val(selectedTeamsJson.team[i].TMFactor).appendTo(rightDiv);
 			}
 		}
 	}
@@ -1601,7 +1606,7 @@ $(function () {
 				//  teamsJson.team.splice(i, 1);
 			} else {
 				var country = item.country == undefined ? "" : item.country;
-				let itemCoeff = `<span style="color:black;font-size: 120%"> ТБ х${parseFloat(item.TBFactor).toFixed(2)} ТМ х${parseFloat(item.TMFactor).toFixed(2)}</span>`;
+				let itemCoeff = `<span style="color:black;font-size: 120%"> Тотал (${item.totalValue}): &uarr;x${parseFloat(item.TBFactor).toFixed(2)} &darr;х${parseFloat(item.TMFactor).toFixed(2)}</span>`;
 				let champDiv = $(`#team-list div[champ-name="${item.champ}"`);
 				var newDiv =
 					$('<div class="alert alert-standard fade in">').appendTo(champDiv)
@@ -1610,6 +1615,7 @@ $(function () {
 						.attr("data-country", country)
 						.attr("data-date", item.date)
 						.attr('data-tbfactor', item.TBFactor)
+						.attr('data-totalValue', item.totalValue)
 						.attr('data-tmfactor', item.TMFactor);
 				$('<input type="number" min="1" class="country-input" placeholder = "" style="width:35px; background: #3C3F45; color: white"></input>').val(country).appendTo(newDiv);
 				$(itemCoeff).appendTo(newDiv);
@@ -1624,6 +1630,7 @@ $(function () {
 			obj["date"] = $(this).attr("data-date");
 			obj["country"] = $(this).attr("data-country");
 			obj["TBFactor"] = $(this).attr("data-tbfactor");
+			obj["totalValue"] = $(this).attr("data-totalValue");
 			obj["TMFactor"] = $(this).attr("data-tmfactor");
 			var self = this;
 			$.each(selectedTeamsJson.team, function (idx, data) {

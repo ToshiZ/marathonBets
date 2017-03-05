@@ -217,11 +217,21 @@ $(function () {
 		let champ = $(this).parents().eq(3).find('h2').find('span').text();
 		let TMFactor = 1;
 		let TBFactor = 1;
-		if ((line[line.length - 2].innerHTML.indexOf('2.5') != -1 || line[line.length - 2].innerHTML.indexOf('3.5') != 1) && line[line.length - 2].getAttribute('data-sel')) {
-			TMFactor = JSON.parse(line[line.length - 2].getAttribute('data-sel')).epr
+		let totalValue = '';
+		if ((line[line.length - 2].innerHTML.indexOf('(4.5)') != -1 || line[line.length - 2].innerHTML.indexOf('(2.5)') != -1 || line[line.length - 2].innerHTML.indexOf('(3.5)') != 1) && line[line.length - 2].getAttribute('data-sel')) {
+			TMFactor = JSON.parse(line[line.length - 2].getAttribute('data-sel')).epr;
 		}
-		if ((line[line.length - 1].innerHTML.indexOf('2.5') != -1 || line[line.length - 1].innerHTML.indexOf('3.5') != 1) && line[line.length - 1].getAttribute('data-sel')) {
-			TBFactor = JSON.parse(line[line.length - 1].getAttribute('data-sel')).epr
+		if ((line[line.length - 1].innerHTML.indexOf('(4.5)') != -1 || line[line.length - 1].innerHTML.indexOf('(2.5)') != -1 || line[line.length - 1].innerHTML.indexOf('(3.5)') != 1) && line[line.length - 1].getAttribute('data-sel')) {
+			TBFactor = JSON.parse(line[line.length - 1].getAttribute('data-sel')).epr;
+		}
+		if ((line[line.length - 1].innerHTML.indexOf('(2.5)') != -1) || (line[line.length - 2].innerHTML.indexOf('(2.5)') != -1)) {
+			totalValue = 2.5;
+		}
+		if ((line[line.length - 1].innerHTML.indexOf('(3.5)') != -1) || (line[line.length - 2].innerHTML.indexOf('(3.5)') != -1)) {
+			totalValue = 3.5;
+		}
+		if ((line[line.length - 1].innerHTML.indexOf('(4.5)') != -1) || (line[line.length - 2].innerHTML.indexOf('(4.5)') != -1)) {
+			totalValue = 4.5;
 		}
 		if (gameDate && teamsNames && $(this).find('td.price').length > 0) {
 			gameDate = gameDate.trim();
@@ -230,6 +240,7 @@ $(function () {
 			obj['date'] = gameDate;
 			obj['TMFactor'] = TMFactor;
 			obj['TBFactor'] = TBFactor;
+			obj['totalValue'] = totalValue;
 			obj['champ'] = champ;
 			teamsJson.team[j] = obj;
 			tbodyTeams.push($(this));
