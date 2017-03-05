@@ -30,11 +30,11 @@
 			<div id="n-k-params-div" class="span3">
 				<input id="n" readonly type="number" min="1" name="n" class="n-k-params" placeholder="Всего" style="width:80px; background: #3C3F45; color: white"></input>
 				</br>
-				<input id="k" type="number" min="1" name="k" class="n-k-params" placeholder="Плюсов" style="width:80px; background: #3C3F45; color: white"></input>
+				<input id="k" type="number" min="0" name="k" class="n-k-params" placeholder="Плюсов" style="width:80px; background: #3C3F45; color: white"></input>
 				<a id="clean-k">очистить</a>
 				<label> <input type="checkBox"  name="check" id="k-check"/> Плюсы без блоков </label>
 				<label> <input type="checkBox"  name="check" id="anti-block-plus-check"/> Только указанные</label>
-				<input id="n-k" type="number" min="1" name="n-k" class="n-k-params" placeholder="Минусов" style="width:80px; background: #3C3F45; color: white"></input>
+				<input id="n-k" type="number" min="0" name="n-k" class="n-k-params" placeholder="Минусов" style="width:80px; background: #3C3F45; color: white"></input>
 				<a id="clean-n-k">очистить</a>
 				<label> <input type="checkBox"  name="check" id="n-k-check"/> Минусы без блоков </label>
 				<label> <input type="checkBox"  name="check" id="anti-block-minus-check"/> Только указанные</label>
@@ -106,10 +106,9 @@
 					</div>
 					</br>
 					</br>
-					<div class="">
-						<a id="var-ok" class="button button-large">Ok</a>
-					</div>
-
+					<a id="var-ok" class="button button-large">Варианты</a>
+					<a id="var-tikets" class="button button-large">Билеты</a>
+					
 					<div class="row"></div>
 					<hr>
 					<div class="accordion" id="accordionArea2">

@@ -1,6 +1,6 @@
 $(function () {
 	var n_,
-		k_ = $('#k'),
+		k_ = $('#k').val(),
 		n_k_,
 		teamsJson,
 		selectedTeamsJson,
@@ -53,9 +53,9 @@ $(function () {
 	}
 
 	rebuidCoeff('total-coeff', coeffLeft, coeffRight, coeffMax);
-	rebuidSlider('blocks-slider', 'small', 'span', 0, 0, parseInt(selectedTeamsJson.team.length/2), parseInt(selectedTeamsJson.team.length/2));
+	rebuidSlider('blocks-slider', 'small', 'span', 0, 0, parseInt(selectedTeamsJson.team.length / 2), parseInt(selectedTeamsJson.team.length / 2));
 	if (n_) {
-		rebuidSlider('vars-slider', 'small', 'input', 1, 1, math.combinations(n_, parseInt(n_/2)), math.combinations(n_, parseInt(n_/2)));
+		rebuidSlider('vars-slider', 'small', 'input', 1, 1, math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)), math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)));
 		rebuidSlider('plus-slider', 'xsmall', 'span', 0, 0, n_, n_);
 	} else {
 		rebuidSlider('vars-slider', 'small', 'input', 0, 0, 0, 0);
@@ -167,7 +167,7 @@ $(function () {
 			localStorage.setItem('tickets', JSON.stringify(ticketsJson));
 			localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
 			n_ = selectedTeamsJson.team.length;
-			rebuidSlider('vars-slider', 'small', 'input', 1, 1, math.combinations(n_, parseInt(n_/2)), math.combinations(n_, parseInt(n_/2)));
+			rebuidSlider('vars-slider', 'small', 'input', 1, 1, math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)), math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)));
 			rebuidSlider('plus-slider', 'xsmall', 'span', 0, 0, n_, n_);
 			$('#n').val(n_ > 0 ? n_ : "");
 			showSelectedTeamsList();
@@ -286,6 +286,7 @@ $(function () {
 
 	$(".n-k-params").on('input', function () {
 		$('.dynamic').remove();
+		$('#plus-slider-check').prop('checked', false);
 		$(this).each(function () {
 			if ($(this).val().length != 0) {
 				if ($(this).attr('id') == 'k') {
@@ -406,21 +407,33 @@ $(function () {
 	});
 	//RUN
 	$(document).on('click', "#run", function () {
-		if (sumOfMas(filter[0]) > k_)
+		if (sumOfMas(filter[0]) > k_) {
 			filter[0] = filter[0].slice(0, -1);
-		if (sumOfMas(filter[1]) > n_ - k_)
+		}
+		if (sumOfMas(filter[1]) > n_ - k_) {
 			filter[1] = filter[1].slice(0, -1);
-		var res = cBlocksBin(n_, k_, filter[0], filter[1], $('#anti-block-minus-check').prop("checked"), $('#anti-block-plus-check').prop("checked"));
+		}
+
+		let fromPlus = k_;
+		let toPlus = k_;
+		if ($('#plus-slider-check').prop("checked")) {
+			fromPlus = parseInt($('#plus-slider-leftLabel').text());
+			toPlus = parseInt($('#plus-slider-rightLabel').text());
+		} 
+		let res = [];
+		for (let i = fromPlus; i <= toPlus; i++) {
+			res = res.concat(cBlocksBin(n_, i, filter[0], filter[1], $('#anti-block-minus-check').prop("checked"), $('#anti-block-plus-check').prop("checked")));
+		}
 		if ($('#k-check').prop("checked") && $('#n-k-check').prop("checked")) {
-			var res = cBlocksBin(n_, k_, [], [], $('#anti-block-minus-check').prop("checked"), $('#anti-block-plus-check').prop("checked"));
+			 res = cBlocksBin(n_, k_, [], [], $('#anti-block-minus-check').prop("checked"), $('#anti-block-plus-check').prop("checked"));
 			popBloks(res, 10);
 		} else {
 			if ($('#k-check').prop("checked")) {
-				var res = cBlocksBin(n_, k_, [], filter[1], $('#anti-block-minus-check').prop("checked"), $('#anti-block-plus-check').prop("checked"));
+				 res = cBlocksBin(n_, k_, [], filter[1], $('#anti-block-minus-check').prop("checked"), $('#anti-block-plus-check').prop("checked"));
 				popBloks(res, 1);
 			}
 			if ($('#n-k-check').prop("checked")) {
-				var res = cBlocksBin(n_, k_, filter[0], [], $('#anti-block-minus-check').prop("checked"), $('#anti-block-plus-check').prop("checked"));
+				 res = cBlocksBin(n_, k_, filter[0], [], $('#anti-block-minus-check').prop("checked"), $('#anti-block-plus-check').prop("checked"));
 				popBloks(res, 0);
 			}
 		}
@@ -465,9 +478,9 @@ $(function () {
 			}
 			showSelectedTeamsList();
 			showBlocksByCountry();
-			rebuidSlider('blocks-slider', 'small', 'span', 0, 0, parseInt(selectedTeamsJson.team.length/2), parseInt(selectedTeamsJson.team.length/2));
+			rebuidSlider('blocks-slider', 'small', 'span', 0, 0, parseInt(selectedTeamsJson.team.length / 2), parseInt(selectedTeamsJson.team.length / 2));
 			n_ = selectedTeamsJson.team.length;
-			rebuidSlider('vars-slider', 'small', 'input', 1, 1, math.combinations(n_, parseInt(n_/2)), math.combinations(n_, parseInt(n_/2)));
+			rebuidSlider('vars-slider', 'small', 'input', 1, 1, math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)), math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)));
 			rebuidSlider('plus-slider', 'xsmall', 'span', 0, 0, n_, n_);
 			$('#n').val(n_ > 0 ? n_ : "");
 		}
@@ -510,104 +523,33 @@ $(function () {
 	$('#var-ok').on('click', function (e) {
 		$('.stp2').remove();
 		var varAmount = [];
-		if ($('#vars-slider-check').prop("checked")){
+		if ($('#vars-slider-check').prop("checked")) {
 			for (let i = parseInt($('#vars-slider-leftLabel').val()); i <= parseInt($('#vars-slider-rightLabel').val()); i++) {
 				varAmount.push(i);
 			}
 		} else {
 			varAmount.push(parseInt($('#var-amount').val()));
+		}
+		let fromPlus = k_;
+		let toPlus = k_;
+		if ($('#plus-slider-check').prop("checked")) {
+			fromPlus = parseInt($('#plus-slider-leftLabel').text());
+			toPlus = parseInt($('#plus-slider-rightLabel').text());
 		} 
-		var n_filter_combs = [[0, 0, 0]];
-		var k_filter_combs = [[0, 0, 0]];
-		var fl = true;
-		var i = 0;
-		if (sumOfMas(filter[0]) > k_)
-			filter[0] = filter[0].slice(0, -1);
-		if (sumOfMas(filter[1]) > n_ - k_)
-			filter[1] = filter[1].slice(0, -1);
-		if (filter[0].length == 0) {
-			while (fl) {
-				if (sumOfMas(k_filter_combs[i]) <= parseInt(k_) - 1) {
-					k_filter_combs[i + 1] = k_filter_combs[i].slice();
-					k_filter_combs[i + 1][0] += 1;
-					i++;
-				} else {
-					if (k_filter_combs[i][1] < Math.ceil(k_ / 2) && (((k_filter_combs[i][1] + 1) * 2 + (k_filter_combs[i][2])) <= k_)) {
-						k_filter_combs[i + 1] = k_filter_combs[i].slice();
-						k_filter_combs[i + 1][1] += 1;
-						k_filter_combs[i + 1][0] = k_filter_combs[i + 1][1];
-					} else {
-						if (k_filter_combs[i][2] < Math.ceil(k_ / 2)) {
-							if ((k_filter_combs[i][2] + 1) * 3 <= k_) {
-								k_filter_combs[i + 1] = k_filter_combs[i].slice();
-								k_filter_combs[i + 1][2] += 1;
-								k_filter_combs[i + 1][1] = k_filter_combs[i + 1][2];
-								k_filter_combs[i + 1][0] = k_filter_combs[i + 1][1];
-							} else {
-								fl = false;
-							}
-						}
-					}
-					i += 1;
-				}
-			}
-			for (var j = 0; j < k_filter_combs.length; j++) {
-				for (var i = k_filter_combs[j].length - 1; i >= 0; i--) {
-					if (k_filter_combs[j][i] < 2) {
-						k_filter_combs[j].splice(i, 1);
-						i += 1;
-					}
-				}
-			}
-		} else {
-			k_filter_combs[0] = filter[0].slice();
-		}
-		fl = true;
-		i = 0;
-		if (filter[1].length == 0) {
-			while (fl) {
-				if (sumOfMas(n_filter_combs[i]) <= parseInt(n_ - k_) - 1) {
-					n_filter_combs[i + 1] = n_filter_combs[i].slice();
-					n_filter_combs[i + 1][0]++;
-					i += 1;
-				} else {
-					if (n_filter_combs[i][1] < Math.ceil(n_ - k_ / 2) && (((n_filter_combs[i][1] + 1) * 2 + (n_filter_combs[i][2])) <= n_ - k_)) {
-						n_filter_combs[i + 1] = n_filter_combs[i].slice();
-						n_filter_combs[i + 1][1]++;
-						n_filter_combs[i + 1][0] = n_filter_combs[i + 1][1];
-					} else {
-						if (n_filter_combs[i][2] < Math.ceil(n_ - k_ / 2)) {
-							if ((n_filter_combs[i][2] + 1) * 3 <= n_ - k_) {
-								n_filter_combs[i + 1] = n_filter_combs[i].slice();
-								n_filter_combs[i + 1][2]++;
-								n_filter_combs[i + 1][1] = n_filter_combs[i + 1][2];
-								n_filter_combs[i + 1][0] = n_filter_combs[i + 1][1];
-							} else {
-								fl = false;
-							}
-						}
-					}
-					i += 1;
-				}
-			}
-			for (var j = 0; j < n_filter_combs.length; j++) {
-				for (var i = n_filter_combs[j].length - 1; i >= 0; i--) {
-					if (n_filter_combs[j][i] < 2) {
-						n_filter_combs[j].splice(i, 1);
-						i++;
-					}
-				}
-			}
-		} else {
-			n_filter_combs[0] = filter[1].slice();
-		}
-		findVars(k_filter_combs, n_filter_combs, varAmount);
+
+		let n_filter_combs = getComposotions(n_ - k_);
+		let k_filter_combs = k_ == n_ - k_? n_filter_combs.slice(): getComposotions(k_);
+
+		findVars(k_filter_combs, n_filter_combs, varAmount, fromPlus, toPlus);
 	});
 	$('#clean-k').on('click', function (e) {
 		inputsForBlocksK(k_);
 	});
 	$('#clean-n-k').on('click', function (e) {
 		inputsForBlocksN(n_ - k_);
+	});
+	$('#var-tikets').on('click', function (e) {
+		//
 	});
 	$(document).on('click', ".var-div", function () {
 		var tb = this.getAttribute('tb');
@@ -724,19 +666,20 @@ $(function () {
 			selectedTeamsJson.team.push(obj)
 			localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
 			n_ = selectedTeamsJson.team.length;
-			rebuidSlider('vars-slider', 'small', 'input', 1, 1, math.combinations(n_, parseInt(n_/2)), math.combinations(n_, parseInt(n_/2)));
+			rebuidSlider('vars-slider', 'small', 'input', 1, 1, math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)), math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)));
 			rebuidSlider('plus-slider', 'xsmall', 'span', 0, 0, n_, n_);
 		} else {
 			selectedTeamsJson.team[ind] = obj;
 			localStorage.setItem('selectedTeams', JSON.stringify(selectedTeamsJson));
 		}
 		n_ = selectedTeamsJson.team.length;
-		rebuidSlider('vars-slider', 'small', 'input', 1, 1, math.combinations(n_, parseInt(n_/2)), math.combinations(n_, parseInt(n_/2)));
+		rebuidSlider('vars-slider', 'small', 'input', 1, 1, math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)), math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)));
 		rebuidSlider('plus-slider', 'xsmall', 'span', 0, 0, n_, n_);
 		$('#n').val(n_ > 0 ? n_ : "");
 		showSelectedTeamsList();
 		showBlocksByCountry();
-		rebuidSlider('blocks-slider', 'small', 'span', 0, 0, parseInt(selectedTeamsJson.team.length/2), parseInt(selectedTeamsJson.team.length/2));	});
+		rebuidSlider('blocks-slider', 'small', 'span', 0, 0, parseInt(selectedTeamsJson.team.length / 2), parseInt(selectedTeamsJson.team.length / 2));
+	});
 	$(document).on('click', '.country-blocks', function (e) {
 		chooseBlock(this, 'selected');
 	});
@@ -757,6 +700,16 @@ $(function () {
 	$(document).on('input', '.tm-coeff-inp', (e) => {
 
 	});
+	$('#plus-slider-check').change(function() {
+        if($(this).is(":checked") && $('#run').length == 0) {
+            $('<a id="run" class="button button-large dynamic">Предпросмотр</a>')
+				.appendTo('#buttons');
+        } else {
+			if ($('#k-blocks-div').children().length == 0 && $('#n-k-blocks-div').children().length == 0) {
+				$('.dynamic').detach();
+			}
+		}       
+    });
 	function chooseBlock(sefl, addedClass) {
 		var countryAttr = $(sefl).attr('country');
 		var blockAttr = $(sefl).attr('block');
@@ -845,14 +798,14 @@ $(function () {
 		let rLbl = $(`<${valueTag}  id="${tagId}-rightLabel" style="margin-left: 10px;"></${valueTag} >`).appendTo(`#${tagId}-Container`);
 		if (valueTag == 'input') {
 			lLbl.attr('type', 'number');
-			lLbl.css( "width", "70px" );
-			lLbl.css( "background", "#3C3F45" );
-			lLbl.css( "color", "white" );
+			lLbl.css("width", "70px");
+			lLbl.css("background", "#3C3F45");
+			lLbl.css("color", "white");
 			lLbl.val(cLeft);
 			rLbl.attr('type', 'number');
-			rLbl.css( "width", "70px" );
-			rLbl.css( "background", "#3C3F45" );
-			rLbl.css( "color", "white" );
+			rLbl.css("width", "70px");
+			rLbl.css("background", "#3C3F45");
+			rLbl.css("color", "white");
 			rLbl.val(cRight);
 		}
 		if (valueTag == 'span') {
@@ -961,121 +914,172 @@ $(function () {
 			}
 		}
 	}
-	function findVars(k_filter_combs, n_filter_combs, varAmount, upperLimit) {
+	function findVars(k_filter_combs, n_filter_combs, varAmount, fromPlus, toPlus) {
 		var arrConts = [];
 		var varNum = 0;
-		for (var i = 0; i < k_filter_combs.length; i++) {
-			for (var j = 0; j < n_filter_combs.length; j++) {
-				var fl_k = false;
-				var fl_n = false;
-				var k_check = false;
-				var n_check = false;
-				var k_anti_check = false;
-				var n_anti_check = false;
-				if (n_filter_combs[j].length == 0 || sumOfMas(n_filter_combs[j]) == 0)
-					fl_n = true;
-				if (k_filter_combs[i].length == 0 || sumOfMas(k_filter_combs[i]) == 0)
-					fl_k = true;
-				var res = [];
-				res[0] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], true, true);
-				res[1] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], false, true);
-				res[2] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], true, false);
-				res[3] = cBlocksBin(n_, k_, k_filter_combs[i], n_filter_combs[j], false, false);
+		for (let plusRange = fromPlus; plusRange <= toPlus; plusRange++) {
+			let minusRange = n_ - plusRange;
+			for (var i = 0; i < k_filter_combs.length; i++) {
+				for (var j = 0; j < n_filter_combs.length; j++) {
+					var fl_k = false;
+					var fl_n = false;
+					var k_check = false;
+					var n_check = false;
+					var k_anti_check = false;
+					var n_anti_check = false;
+					if (n_filter_combs[j].length == 0 || sumOfMas(n_filter_combs[j]) == 0)
+						fl_n = true;
+					if (k_filter_combs[i].length == 0 || sumOfMas(k_filter_combs[i]) == 0)
+						fl_k = true;
+					var res = [];
+					res[0] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], true, true);
+					res[1] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], false, true);
+					res[2] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], true, false);
+					res[3] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], false, false);
 
-				var fl_ok = false;
-				var ticketsAmount;
+					var fl_ok = false;
+					var ticketsAmount;
 
-				if ($('#k-check').prop("checked") && $('#n-k-check').prop("checked")) {
-					if ($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
-						if (varAmount.indexOf(res[0].length) != -1  && !fl_k && !fl_n) {
-							fl_ok = true;
-							ticketsAmount = res[0].length;
-							k_anti_check = true;
-							n_anti_check = true;
-							//continue;
-						}
-						if (varAmount.indexOf(res[1].length) == -1 || varAmount.indexOf(res[2].length) == -1) {
-							if (varAmount.indexOf(res[1].length) != -1 && !fl_k) {
+					if ($('#k-check').prop("checked") && $('#n-k-check').prop("checked")) {
+						if ($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
+							if (varAmount.indexOf(res[0].length) != -1 && !fl_k && !fl_n) {
 								fl_ok = true;
-								ticketsAmount = res[1].length;
+								ticketsAmount = res[0].length;
 								k_anti_check = true;
-								//continue;
-							}
-							if (varAmount.indexOf(res[2].length) != -1 && !fl_n) {
-								fl_ok = true;
-								ticketsAmount = res[2].length;
 								n_anti_check = true;
 								//continue;
 							}
-						}
-						if (varAmount.indexOf(res[3].length) != -1) {
-							fl_ok = true;
-							ticketsAmount = res[3].length;
-							//continue;
-						}
-						if (fl_n || fl_k) {
-							var resTmp = [];
-							for (var ii = 0; ii < res.length; ii++) {
-								resTmp[ii] = res[ii].slice();
-							}
-							if (fl_n && fl_k) {
-								for (var ii = 0; ii < 4; ii++){
-									let tt = popBloks(res[ii], 10);
-									if (varAmount.indexOf(tt.length) != -1) {
-										fl_ok = true;
-										k_check = true;
-										n_check = true;
-										ticketsAmount = tt.length;
-										//break;
-									}
-									//if(fl_ok) continue;
+							if (varAmount.indexOf(res[1].length) == -1 || varAmount.indexOf(res[2].length) == -1) {
+								if (varAmount.indexOf(res[1].length) != -1 && !fl_k) {
+									fl_ok = true;
+									ticketsAmount = res[1].length;
+									k_anti_check = true;
+									//continue;
+								}
+								if (varAmount.indexOf(res[2].length) != -1 && !fl_n) {
+									fl_ok = true;
+									ticketsAmount = res[2].length;
+									n_anti_check = true;
+									//continue;
 								}
 							}
-							if (!fl_n && fl_k) {
-								for (var ii = 0; ii < 4; ii++)
-									popBloks(res[ii], 1);
+							if (varAmount.indexOf(res[3].length) != -1) {
+								fl_ok = true;
+								ticketsAmount = res[3].length;
+								//continue;
+							}
+							if (fl_n || fl_k) {
+								var resTmp = [];
+								for (var ii = 0; ii < res.length; ii++) {
+									resTmp[ii] = res[ii].slice();
+								}
+								if (fl_n && fl_k) {
+									for (var ii = 0; ii < 4; ii++) {
+										let tt = popBloks(res[ii], 10);
+										if (varAmount.indexOf(tt.length) != -1) {
+											fl_ok = true;
+											k_check = true;
+											n_check = true;
+											ticketsAmount = tt.length;
+											//break;
+										}
+										//if(fl_ok) continue;
+									}
+								}
+								if (!fl_n && fl_k) {
+									for (var ii = 0; ii < 4; ii++)
+										popBloks(res[ii], 1);
+									if (varAmount.indexOf(res[2].length) != -1) {
+										fl_ok = true;
+										k_check = true;
+										n_anti_check = true;
+										ticketsAmount = res[2].length;
+										//continue;
+									}
+								}
+								if (!fl_k && fl_n) {
+									for (var ii = 0; ii < 4; ii++)
+										popBloks(res[ii], 0);
+									if (varAmount.indexOf(res[1].length) != -1) {
+										fl_ok = true;
+										n_check = true;
+										k_anti_check = true;
+										ticketsAmount = res[1].length;
+										//continue;
+									}
+								}
+								for (var ii = 0; ii < resTmp.length; ii++) {
+									res[ii] = resTmp[ii].slice();
+								}
+							}
+						} else {
+							for (var ii = 0; ii < 4; ii++)
+								popBloks(res[ii], 10);
+							k_check = true;
+							n_check = true;
+
+							if (varAmount.indexOf(res[0].length) != -1) {
+								fl_ok = true;
+								k_anti_check = true;
+								n_anti_check = true;
+								ticketsAmount = res[0].length;
+								//continue;
+							}
+							if (varAmount.indexOf(res[1].length) == -1 || varAmount.indexOf(res[2].length) == -1) {
+								if (varAmount.indexOf(res[1].length) != -1) {
+									fl_ok = true;
+									k_anti_check = true;
+									//continue;
+								}
 								if (varAmount.indexOf(res[2].length) != -1) {
 									fl_ok = true;
-									k_check = true;
 									n_anti_check = true;
 									ticketsAmount = res[2].length;
 									//continue;
 								}
 							}
-							if (!fl_k && fl_n) {
-								for (var ii = 0; ii < 4; ii++)
-									popBloks(res[ii], 0);
-								if (varAmount.indexOf(res[1].length) != -1) {
-									fl_ok = true;
-									n_check = true;
-									k_anti_check = true;
-									ticketsAmount = res[1].length;
-									//continue;
-								}
-							}
-							for (var ii = 0; ii < resTmp.length; ii++) {
-								res[ii] = resTmp[ii].slice();
+							if (varAmount.indexOf(res[3].length) != -1) {
+								fl_ok = true;
+								ticketsAmount = res[3].length;
+								//continue;
 							}
 						}
 					} else {
-						for (var ii = 0; ii < 4; ii++)
-							popBloks(res[ii], 10);
-						k_check = true;
-						n_check = true;
-
-						if (varAmount.indexOf(res[0].length) != -1) {
-							fl_ok = true;
-							k_anti_check = true;
-							n_anti_check = true;
-							ticketsAmount = res[0].length;
-							//continue;
+						if ($('#k-check').prop("checked")) {
+							for (var ii = 0; ii < 4; ii++)
+								popBloks(res[ii], 1);
+							k_check = true;
 						}
-						if (varAmount.indexOf(res[1].length) == -1 || varAmount.indexOf(res[2].length) == -1) {
+						if ($('#n-k-check').prop("checked")) {
+							for (var ii = 0; ii < 4; ii++)
+								popBloks(res[ii], 0);
+							n_check = true;
+						}
+						if (!$('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")) {
+							if (varAmount.indexOf(res[3].length) != -1) {
+								fl_ok = true;
+								ticketsAmount = res[3].length;
+								//continue;
+							}
+						}
+						if ($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
+							if (varAmount.indexOf(res[0].length) != -1) {
+								fl_ok = true;
+								k_anti_check = true;
+								n_anti_check = true;
+								ticketsAmount = res[0].length;
+								//continue;
+							}
+						}
+						if (!$('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
 							if (varAmount.indexOf(res[1].length) != -1) {
 								fl_ok = true;
 								k_anti_check = true;
+								ticketsAmount = res[1].length;
 								//continue;
 							}
+						}
+						if ($('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")) {
 							if (varAmount.indexOf(res[2].length) != -1) {
 								fl_ok = true;
 								n_anti_check = true;
@@ -1083,102 +1087,93 @@ $(function () {
 								//continue;
 							}
 						}
-						if (varAmount.indexOf(res[3].length) != -1) {
-							fl_ok = true;
-							ticketsAmount = res[3].length;
-							//continue;
-						}
 					}
-				} else {
-					if ($('#k-check').prop("checked")) {
-						for (var ii = 0; ii < 4; ii++)
-							popBloks(res[ii], 1);
-						k_check = true;
-					}
-					if ($('#n-k-check').prop("checked")) {
-						for (var ii = 0; ii < 4; ii++)
-							popBloks(res[ii], 0);
-						n_check = true;
-					}
-					if (!$('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")) {
-						if (varAmount.indexOf(res[3].length) != -1) {
-							fl_ok = true;
-							ticketsAmount = res[3].length;
-							//continue;
-						}
-					}
-					if ($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
-						if (varAmount.indexOf(res[0].length) != -1) {
-							fl_ok = true;
-							k_anti_check = true;
-							n_anti_check = true;
-							ticketsAmount = res[0].length;
-							//continue;
-						}
-					}
-					if (!$('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
-						if (varAmount.indexOf(res[1].length) != -1) {
-							fl_ok = true;
-							k_anti_check = true;
-							ticketsAmount = res[1].length;
-							//continue;
-						}
-					}
-					if ($('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")) {
-						if (varAmount.indexOf(res[2].length) != -1) {
-							fl_ok = true;
-							n_anti_check = true;
-							ticketsAmount = res[2].length;
-							//continue;
-						}
-					}
-				}
 
-				if (fl_ok) {
-					var tCont = `Вариант №${parseInt(varNum + 1)} (${ticketsAmount}) </br>`;
-					var tCont2 = "";
-					var tCont3 = "";
-					if (k_ == 1) {
-						k_check = true;
-					}
-					if (n_ - k_ == 1) {
-						n_check = true;
-					}
-					if (fl_k) {
-						if (k_check) {
-							tCont2 += "ТБ: Без блоков." + "</br>";
+					if (fl_ok) {
+						var tCont = `#${parseInt(varNum + 1)} | ${plusRange}/${n_} | (${ticketsAmount}) </br>`;
+						var tCont2 = "";
+						var tCont3 = "";
+						if (plusRange == 1) {
+							k_check = true;
 						}
-					} else {
-						if (k_anti_check) {
-							tCont2 += "ТБ: " + k_filter_combs[i] + "+" + "</br>";
+						if (n_ - plusRange == 1) {
+							n_check = true;
 						}
-					}
-					if (fl_n) {
-						if (n_check) {
-							tCont3 += "ТМ: Без блоков."
+						if (fl_k) {
+							if (k_check) {
+								tCont2 += "ТБ: Без блоков." + "</br>";
+							}
+						} else {
+							if (k_anti_check) {
+								tCont2 += "ТБ: " + k_filter_combs[i] + "+" + "</br>";
+							}
 						}
-					} else {
-						if (n_anti_check) {
-							tCont3 += "ТМ: " + n_filter_combs[j] + "+";
+						if (fl_n) {
+							if (n_check) {
+								tCont3 += "ТМ: Без блоков."
+							}
+						} else {
+							if (n_anti_check) {
+								tCont3 += "ТМ: " + n_filter_combs[j] + "+";
+							}
 						}
-					}
-					if (arrConts.indexOf(tCont2 + tCont3) == -1 && tCont2.length != 0 && tCont3.length != 0) {
-						var newEl = $('<div class="row cont stp2">')
-							.appendTo('#accordionArea2 .accordion-inner')
-							.attr('data-var-num', i);
-						var newDiv = (varNum % 2 == 0) ?
-							$('<div class="alert alert-error fade in span24 stp2 var-div">').appendTo(newEl) :
-							$('<div class="alert alert-info fade in span24 stp2 var-div">').appendTo(newEl);
-						newDiv.attr('tb', tCont2);
-						newDiv.attr('tm', tCont3);
-						arrConts.push(tCont2 + tCont3);
-						newDiv.html(tCont + tCont2 + tCont3);
-						varNum++;
+						if (arrConts.indexOf(tCont2 + tCont3) == -1 && tCont2.length != 0 && tCont3.length != 0) {
+							var newEl = $('<div class="row cont stp2">')
+								.appendTo('#accordionArea2 .accordion-inner')
+								.attr('data-var-num', i);
+							var newDiv = (varNum % 2 == 0) ?
+								$('<div class="alert alert-error fade in span24 stp2 var-div">').appendTo(newEl) :
+								$('<div class="alert alert-info fade in span24 stp2 var-div">').appendTo(newEl);
+							newDiv.attr('tb', tCont2);
+							newDiv.attr('tm', tCont3);
+							arrConts.push(tCont2 + tCont3);
+							newDiv.html(tCont + tCont2 + tCont3);
+							varNum++;
+						}
 					}
 				}
 			}
 		}
 		$('#var-num').html('Варианты (' + varNum + ')');
+	}
+
+	function getComposotions(sum) {
+		let output = [[0]];
+		for (let i = sum; i >= 2; i--) output.push([i]);
+
+		for (let arrSize = 2; arrSize <= parseInt(sum / 2); arrSize++) {
+			for (let currentSum = sum; currentSum >= parseInt(sum / arrSize); currentSum--) {
+				let firstSummand = currentSum - (arrSize - 1) * 2;
+				if (firstSummand < 2) break;
+				let firstComposotion = [firstSummand];
+				for (let i = 1; i < arrSize; i++) {
+					firstComposotion[i] = 2;
+				}
+				output.push(firstComposotion);
+
+				if(firstComposotion[0] > firstComposotion[1] + 1) {
+					let i = 0;
+					while (i < arrSize - 1) {
+						let lastComp = output[output.length - 1].slice();
+						if (lastComp[i] == lastComp[i + 1]) break;
+						if (lastComp[i] == lastComp[i + 1] + 1) {
+							if (i >= arrSize - 3) break;
+							lastComp[i] -= 1;
+							lastComp[i + 2] += 1;
+							output.push(lastComp);
+							i++;
+						}
+						if (lastComp[i] >= lastComp[i + 1] + 2) {
+							lastComp[i] -= 1;
+							lastComp[i + 1] += 1;
+							output.push(lastComp);
+							if (lastComp[i] == lastComp[i + 1]) i++;
+						}
+					}
+				}
+			}
+		}
+		return output;
 	}
 
 	function isArraysEqual(a, b) {
@@ -1441,7 +1436,7 @@ $(function () {
 		}
 		return output;
 	}
-	
+
 	function block(input, filter, n, onlySelectedBlocks) {
 		if (filter.length == 0)
 			return input;
@@ -1832,20 +1827,20 @@ $(function () {
 		}
 	}
 	function popByBloksAmount(teamsArray, fromBlock, toBlock) {
-		for(let i = 0; i < teamsArray.length; i++) {
+		for (let i = 0; i < teamsArray.length; i++) {
 			let blocksCounter = 0;
 			let blockSize = 1;
 			for (let j = 0; j < teamsArray[i].length; j++) {
-				if(teamsArray[i][j] == teamsArray[i][j+1]) {
+				if (teamsArray[i][j] == teamsArray[i][j + 1]) {
 					blockSize += 1;
-				}else{
-					if(blockSize > 1){
+				} else {
+					if (blockSize > 1) {
 						blocksCounter += 1;
 						blockSize = 1;
 					}
 				}
 			}
-			if(blocksCounter < fromBlock || blocksCounter > toBlock ){
+			if (blocksCounter < fromBlock || blocksCounter > toBlock) {
 				teamsArray.splice(i, 1);
 				i--;
 			}
