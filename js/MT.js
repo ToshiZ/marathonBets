@@ -552,6 +552,13 @@ $(function () {
 	});
 	$('#var-tikets').on('click', function (e) {
 		if (varTicketsRes.length != 0) {
+			if (!$.isEmptyObject(_countries) && $('#inner-blocks-check')[0].checked) popInCountries(varTicketsRes);
+			if ($('#blocks-slider-check').prop('checked')) popByBloksAmount(varTicketsRes, parseInt($('#blocks-slider-leftLabel').text()), parseInt($('#blocks-slider-rightLabel').text()));
+			if ($('#total-coeff-coeff-check').prop('checked') ||
+				$('#plus-coeff-slider-check').prop('checked') ||
+				$('#minus-coeff-slider-check').prop('checked')) {
+				popByCoeff(varTicketsRes);
+			}
 			print2DemArr(varTicketsRes);
 		}
 	});
