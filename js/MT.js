@@ -550,7 +550,7 @@ $(function () {
 		inputsForBlocksN(n_ - k_);
 	});
 	$('#var-tikets').on('click', function (e) {
-		if (varTicketsRes.length.length != 0) {
+		if (varTicketsRes.length != 0) {
 			print2DemArr(varTicketsRes);
 		}
 	});
@@ -1097,6 +1097,7 @@ $(function () {
 
 					if (fl_ok) {
 						allTicketsAmount += res[0].length;
+						varTicketsRes = varTicketsRes.concat(res[0]);
 						var tCont = `#${parseInt(varNum + 1)} | ${plusRange}/${n_} | (${res[0].length}) </br>`;
 						var tCont2 = "";
 						var tCont3 = "";
@@ -1138,7 +1139,7 @@ $(function () {
 							varNum++;
 						}
 					}
-					varTicketsRes = varTicketsRes.concat(res[0]);
+					
 				}
 			}
 		}
