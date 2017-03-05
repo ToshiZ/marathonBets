@@ -1101,8 +1101,6 @@ $(function () {
 					}
 
 					if (fl_ok) {
-						allTicketsAmount += res[0].length;
-						varTicketsRes = varTicketsRes.concat(res[0]);
 						var tCont = `#${parseInt(varNum + 1)} | ${plusRange}/${n_} | (${res[0].length}) </br>`;
 						var tCont2 = "";
 						var tCont3 = "";
@@ -1142,6 +1140,8 @@ $(function () {
 							arrConts.push(tCont2 + tCont3);
 							newDiv.html(tCont + tCont2 + tCont3);
 							varNum++;
+							allTicketsAmount += res[0].length;
+							varTicketsRes = varTicketsRes.concat(res[0]);
 						}
 					}
 					
