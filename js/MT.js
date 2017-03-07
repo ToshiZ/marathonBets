@@ -568,17 +568,21 @@ $(function () {
 	});
 	$('#var-tikets').on('click', function (e) {
 		if (varTicketsRes.length != 0) {
-			if (!$.isEmptyObject(_countries) && $('#inner-blocks-check')[0].checked) popInCountries(varTicketsRes);
+			if (!$.isEmptyObject(_countries) && $('#inner-blocks-check')[0].checked) {
+				for (let ticketObj of varTicketsRes) {
+					popInCountries(ticketObj.tickets);
+				}
+			}
 			if ($('#blocks-slider-check').prop('checked')) {
 				for (let ticketObj of varTicketsRes) {
-					popByBloksAmount(varTicketsRes.tickets, parseInt($('#blocks-slider-leftLabel').text()), parseInt($('#blocks-slider-rightLabel').text()));
+					popByBloksAmount(ticketObj.tickets, parseInt($('#blocks-slider-leftLabel').text()), parseInt($('#blocks-slider-rightLabel').text()));
 				}
 			}
 			if ($('#total-coeff-coeff-check').prop('checked') ||
 				$('#plus-coeff-slider-check').prop('checked') ||
 				$('#minus-coeff-slider-check').prop('checked')) {
 					for (let ticketObj of varTicketsRes) {
-						popByCoeff(varTicketsRes.tickets);
+						popByCoeff(ticketObj.tickets);
 					}
 			}
 			print2DemArr(varTicketsRes);
