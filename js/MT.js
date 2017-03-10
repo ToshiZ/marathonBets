@@ -555,9 +555,6 @@ $(function () {
 			toPlus = parseInt($('#plus-slider-rightLabel').text());
 		}
 
-		//let n_filter_combs = getComposotions(n_ - k_);
-		//let k_filter_combs = k_ == n_ - k_ ? n_filter_combs.slice() : getComposotions(k_);
-
 		findVars(varAmount, fromPlus, toPlus);
 	});
 	$('#clean-k').on('click', function (e) {
@@ -581,9 +578,9 @@ $(function () {
 			if ($('#total-coeff-coeff-check').prop('checked') ||
 				$('#plus-coeff-slider-check').prop('checked') ||
 				$('#minus-coeff-slider-check').prop('checked')) {
-					for (let ticketObj of varTicketsRes) {
-						popByCoeff(ticketObj.tickets);
-					}
+				for (let ticketObj of varTicketsRes) {
+					popByCoeff(ticketObj.tickets);
+				}
 			}
 			print2DemArr(varTicketsRes);
 		}
@@ -725,9 +722,6 @@ $(function () {
 		if (this != $('#inner-blocks-check')[0] && this.tagName != 'LABEL') {
 			$('#inner-blocks-check')[0].checked = true;
 		}
-		// }else{
-		// 	$('#inner-blocks-check')[0].checked = !$('#inner-blocks-check')[0].checked;
-		// }
 	});
 
 	$(document).on('contextmenu', '.country-blocks', function (e) {
@@ -742,10 +736,6 @@ $(function () {
 		if ($(this).is(":checked") && $('#run').length == 0) {
 			$('<a id="run" class="button button-large dynamic">Предпросмотр</a>')
 				.appendTo('#buttons');
-		} else {
-			if ($('#k-blocks-div').children().length == 0 && $('#n-k-blocks-div').children().length == 0) {
-				$('.dynamic').detach();
-			}
 		}
 	});
 	function chooseBlock(sefl, addedClass) {
@@ -982,19 +972,14 @@ $(function () {
 		let allTicketsAmount = 0;
 		let allVars = 0;
 		let ticketsArr = [];
-		
-
-		//let n_filter_combs = getComposotions(n_ - k_);
-		//let k_filter_combs = k_ == n_ - k_ ? n_filter_combs.slice() : getComposotions(k_);
 
 		for (let plusRange = fromPlus; plusRange <= toPlus; plusRange++) {
 			let n_filter_combs = getComposotions(n_ - plusRange);
 			let k_filter_combs = plusRange == n_ - plusRange ? n_filter_combs.slice() : getComposotions(plusRange);
 			for (let combK of k_filter_combs) {
 				for (let combN of n_filter_combs) {
-					
+
 					let addons = cBlocksBin(n_, plusRange, combK, combN, true, true);
-					// let inverse = cBlocksBin(n_, plusRange, combN, combK, true, true);
 
 					addons['isEmptyKFilter'] = combK.length == 0 || sumOfMas(combK) == 0;
 					addons['isEmptyNFilter'] = combN.length == 0 || sumOfMas(combN) == 0;
@@ -1002,281 +987,101 @@ $(function () {
 					addons['nFilter'] = combN;
 					addons['dynamic'] = false;
 
-					// inverse['isEmptyKFilter'] = combN.length == 0 || sumOfMas(combN) == 0;
-					// inverse['isEmptyNFilter'] = combK.length == 0 || sumOfMas(combK) == 0;
-					// inverse['kFilter'] = combN;
-					// inverse['nFilter'] = combK;
-					// inverse['inverse'] = true;
-
 					ticketsArr.push(addons);
-					// ticketsArr.push(inverse);
 				}
 			}
 		}
 		for (let ticketsObj of ticketsArr) {
-			//var fl_k = false;
-		//	var fl_n = false;
 			var k_check = false;
 			var n_check = false;
-			var k_anti_check = false;
-			var n_anti_check = false;
-			let dynamic = {'tf': [], 'ft': [], 'ff': []};
-			// if (n_filter_combs[j].length == 0 || sumOfMas(n_filter_combs[j]) == 0)
-			// 	fl_n = true;
-			// if (k_filter_combs[i].length == 0 || sumOfMas(k_filter_combs[i]) == 0)
-			// 	fl_k = true;
-
-			//res[1] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], false, true);
-			//res[2] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], true, false);
-			//	res[3] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], false, false);
+			let dynamic = { 'tf': [], 'ft': [], 'ff': [] };
 
 			var fl_ok = false;
-			//var ticketsAmount;
 
 			if ($('#k-check').prop("checked") && $('#n-k-check').prop("checked")) {
 				if ($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
 					if (varAmount.indexOf(ticketsObj.tickets.length) != -1 && !ticketsObj.isEmptyKFilter && !ticketsObj.isEmptyNFilter) {
 						fl_ok = true;
-						//ticketsAmount = res[0].length;
-					//	k_anti_check = true;
-						//n_anti_check = true;
-						//continue;
 					}
-					// if (varAmount.indexOf(res[1].length) == -1 || varAmount.indexOf(res[2].length) == -1) {
-					// 	if (varAmount.indexOf(res[1].length) != -1 && !fl_k) {
-					// 		fl_ok = true;
-					// 		//ticketsAmount = res[1].length;
-					// 		k_anti_check = true;
-					// 		//continue;
-					// 	}
-					// 	if (varAmount.indexOf(res[2].length) != -1 && !fl_n) {
-					// 		fl_ok = true;
-					// 		//ticketsAmount = res[2].length;
-					// 		n_anti_check = true;
-					// 		//continue;
-					// 	}
-					// }
-					// if (varAmount.indexOf(res[3].length) != -1) {
-					// 	fl_ok = true;
-					// 	//ticketsAmount = res[3].length;
-					// 	//continue;
-					// }
-					//if (ticketsObj.isEmptyNFilter || ticketsObj.isEmptyKFilter) {
-						// var resTmp = [];
-						// //for (var ii = 0; ii < res.length; ii++) {
-						// 	resTmp = res[0].slice();
-						// //}
-						// if (ticketsObj.isEmptyNFilter && ticketsObj.isEmptyKFilter) {
-						// 	//for (var ii = 0; ii < 4; ii++) {
-						// 	let tt = popBloks(ticketsObj.tickets, 10);
-						// 	if (varAmount.indexOf(tt.length) != -1) {
-						// 		fl_ok = true;
-						// 		k_check = true;
-						// 		n_check = true;
-						// 		//ticketsAmount = tt.length;
-						// 		//break;
-						// 	}
-						// 	//if(fl_ok) continue;
-						// 	//}
-						// }
-						if (!ticketsObj.isEmptyNFilter && ticketsObj.isEmptyKFilter) {
-							//for (var ii = 0; ii < 4; ii++)
-							//if (!ticketsObj.inverse) {
-								//let tmp = ticketsObj.tickets.slice();
-							dynamic.tf = cBlocksBin(ticketsObj.events, ticketsObj.ratio, ticketsObj.kFilter, ticketsObj.nFilter, true, false);
-							let tmp = dynamic.tf.tickets;
-							popBloks(tmp, 1);
-							if (varAmount.indexOf(tmp.length) != -1) {
-								fl_ok = true;
-								k_check = true;
-								ticketsObj.dynamic = 'tf';
-								//n_anti_check = true;
-								//ticketsAmount = res[2].length;
-								//continue;
-							}
-							// } else {
-							// 	//let tmp = ticketsObj.tickets.slice();
-							// 	popBloks(ticketsObj.tickets, 0);
-							// 	if (varAmount.indexOf(ticketsObj.tickets.length) != -1) {
-							// 		fl_ok = true;
-							// 		n_check = true;
-							// 		//n_anti_check = true;
-							// 		//ticketsAmount = res[2].length;
-							// 		//continue;
-							// 	}
-							// }
+					if (!ticketsObj.isEmptyNFilter && ticketsObj.isEmptyKFilter) {
+						dynamic.tf = cBlocksBin(ticketsObj.events, ticketsObj.ratio, ticketsObj.kFilter, ticketsObj.nFilter, true, false);
+						let tmp = dynamic.tf.tickets;
+						popBloks(tmp, 1);
+						if (varAmount.indexOf(tmp.length) != -1) {
+							fl_ok = true;
+							k_check = true;
+							ticketsObj.dynamic = 'tf';
 						}
-						if (!ticketsObj.isEmptyKFilter && ticketsObj.isEmptyNFilter) {
-							//for (var ii = 0; ii < 4; ii++)
-							//if (!ticketsObj.inverse) {
-								//let tmp = ticketsObj.tickets.slice();
-							dynamic.ft = cBlocksBin(ticketsObj.events, ticketsObj.ratio, ticketsObj.kFilter, ticketsObj.nFilter, false, true);
-								let tmp = dynamic.ft.tickets;
-								popBloks(tmp, 0);
-								if (varAmount.indexOf(tmp.length) != -1) {
-									fl_ok = true;
-									n_check = true;
-									ticketsObj.dynamic = 'ft';
-									//n_anti_check = true;
-									//ticketsAmount = res[2].length;
-									//continue;
-								}
-
-
-								// popBloks(ticketsObj.tickets, 0);
-								// if (varAmount.indexOf(ticketsObj.tickets.length) != -1) {
-								// 	fl_ok = true;
-								// 	n_check = true;
-								// 	//k_anti_check = true;
-								// 	//ticketsAmount = res[1].length;
-								// 	//continue;
-								// }
-							// } else {
-							// 	//let tmp = ticketsObj.tickets.slice();
-							// 	popBloks(ticketsObj.tickets, 1);
-							// 	if (varAmount.indexOf(ticketsObj.tickets.length) != -1) {
-							// 		fl_ok = true;
-							// 		k_check = true;
-							// 		//n_anti_check = true;
-							// 		//ticketsAmount = res[1].length;
-							// 		//continue;
-							// 	}
-							// }
+					}
+					if (!ticketsObj.isEmptyKFilter && ticketsObj.isEmptyNFilter) {
+						dynamic.ft = cBlocksBin(ticketsObj.events, ticketsObj.ratio, ticketsObj.kFilter, ticketsObj.nFilter, false, true);
+						let tmp = dynamic.ft.tickets;
+						popBloks(tmp, 0);
+						if (varAmount.indexOf(tmp.length) != -1) {
+							fl_ok = true;
+							n_check = true;
+							ticketsObj.dynamic = 'ft';
 						}
-							if (ticketsObj.isEmptyKFilter && ticketsObj.isEmptyNFilter) {
-								dynamic.ff = cBlocksBin(ticketsObj.events, ticketsObj.ratio, ticketsObj.kFilter, ticketsObj.nFilter, false, false);
-								let tmp = dynamic.ff.tickets;
-								popBloks(tmp, 10);
-								if (varAmount.indexOf(tmp.length) != -1) {
-									fl_ok = true;
-									k_check = true;
-									n_check = true;
-									ticketsObj.dynamic = 'ff';
-									//n_anti_check = true;
-									//ticketsAmount = res[2].length;
-									//continue;
-								}
-							}
-						// for (var ii = 0; ii < resTmp.length; ii++) {
-						// 	res[ii] = resTmp[ii].slice();
-						// }
-				//	}
+					}
+					if (ticketsObj.isEmptyKFilter && ticketsObj.isEmptyNFilter) {
+						dynamic.ff = cBlocksBin(ticketsObj.events, ticketsObj.ratio, ticketsObj.kFilter, ticketsObj.nFilter, false, false);
+						let tmp = dynamic.ff.tickets;
+						popBloks(tmp, 10);
+						if (varAmount.indexOf(tmp.length) != -1) {
+							fl_ok = true;
+							k_check = true;
+							n_check = true;
+							ticketsObj.dynamic = 'ff';
+						}
+					}
 				} else {
-					//for (var ii = 0; ii < 4; ii++)
 					popBloks(ticketsObj.tickets, 10);
 					k_check = true;
 					n_check = true;
 
 					if (varAmount.indexOf(ticketsObj.tickets.length) != -1) {
 						fl_ok = true;
-					//	k_anti_check = true;
-					//	n_anti_check = true;
-						//ticketsAmount = res[0].length;
-						//continue;
 					}
-					// if (varAmount.indexOf(res[1].length) == -1 || varAmount.indexOf(res[2].length) == -1) {
-					// 	if (varAmount.indexOf(res[1].length) != -1) {
-					// 		fl_ok = true;
-					// 		k_anti_check = true;
-					// 		//continue;
-					// 	}
-					// 	if (varAmount.indexOf(res[2].length) != -1) {
-					// 		fl_ok = true;
-					// 		n_anti_check = true;
-					// 		//ticketsAmount = res[2].length;
-					// 		//continue;
-					// 	}
-					// }
-					// if (varAmount.indexOf(res[3].length) != -1) {
-					// 	fl_ok = true;
-					// 	//ticketsAmount = res[3].length;
-					// 	//continue;
-					// }
 				}
 			} else {
 				if ($('#k-check').prop("checked")) {
-					//for (var ii = 0; ii < 4; ii++)
-					//if (!ticketsObj.inverse) {
-						popBloks(ticketsObj.tickets, 1);
-						k_check = true;
-					// } else {
-					// 	popBloks(ticketsObj.tickets, 0);
-					// 	n_check = true;
-					// }
+					popBloks(ticketsObj.tickets, 1);
+					k_check = true;
 				}
 				if ($('#n-k-check').prop("checked")) {
-					//for (var ii = 0; ii < 4; ii++)
-				//	if (!ticketsObj.inverse) {
-						popBloks(ticketsObj.tickets, 0);
-						n_check = true;
-					// } else {
-					// 	popBloks(ticketsObj.tickets, 1);
-					// 	k_check = true;
-					// }
+					popBloks(ticketsObj.tickets, 0);
+					n_check = true;
 				}
-				// if (!$('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")) {
-				// 	if (varAmount.indexOf(res[3].length) != -1) {
-				// 		fl_ok = true;
-				// 		//ticketsAmount = res[3].length;
-				// 		//continue;
-				// 	}
-				// }
 				if ($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
 					if (varAmount.indexOf(ticketsObj.tickets.length) != -1) {
 						fl_ok = true;
-						//k_anti_check = true;
-						//n_anti_check = true;
-						//ticketsAmount = res[0].length;
-						//continue;
 					}
 				}
-				// if (!$('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
-				// 	if (varAmount.indexOf(res[1].length) != -1) {
-				// 		fl_ok = true;
-				// 		//k_anti_check = true;
-				// 		//ticketsAmount = res[1].length;
-				// 		//continue;
-				// 	}
-				// }
-				// if ($('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")) {
-				// 	if (varAmount.indexOf(res[2].length) != -1) {
-				// 		fl_ok = true;
-				// 		//n_anti_check = true;
-				// 		//ticketsAmount = res[2].length;
-				// 		//continue;
-				// 	}
-				// }
 			}
 
 			if (fl_ok) {
 				let ticketsAmount = ticketsObj.tickets.length;
-				if (ticketsObj.dynamic) ticketsAmount = dynamic[ticketsObj.dynamic].tickets.length;
+				if (ticketsObj.dynamic) {
+					ticketsAmount = dynamic[ticketsObj.dynamic].tickets.length;
+					ticketsObj.tickets = dynamic[ticketsObj.dynamic].tickets.slice();
+				}
 				var tCont = `#${parseInt(varNum + 1)} | ${ticketsObj.ratio}/${ticketsObj.events - ticketsObj.ratio} | (${ticketsAmount}) </br>`;
 				var tCont2 = "";
 				var tCont3 = "";
-				// if (ticketsObj.ratio == 1) {
-				// 	k_check = true;
-				// }
-				// if (n_ - ticketsObj.ratio == 1) {
-				// 	n_check = true;
-				// }
+
 				if (ticketsObj.isEmptyKFilter) {
 					if (k_check) {
 						tCont2 += "ТБ: Без блоков." + "</br>";
 					}
 				} else {
-					//if (k_anti_check) {
-						tCont2 += "ТБ: " + ticketsObj.kFilter + "</br>";
-					//}
+					tCont2 += "ТБ: " + ticketsObj.kFilter + "</br>";
 				}
 				if (ticketsObj.isEmptyNFilter) {
 					if (n_check) {
 						tCont3 += "ТМ: Без блоков."
 					}
 				} else {
-					//if (n_anti_check) {
-						tCont3 += "ТМ: " + ticketsObj.nFilter;
-					//}
+					tCont3 += "ТМ: " + ticketsObj.nFilter;
 				}
 				if (arrConts.indexOf(tCont2 + tCont3 + ticketsObj.ratio) == -1 && tCont2.length != 0 && tCont3.length != 0) {
 					var newEl = $('<div class="row cont stp2">')
@@ -2125,7 +1930,7 @@ $(function () {
 
 		var tCont = "",
 			tCont2 = "";
-		//var totalTickets = arr.length;
+
 		var plusSymbol = '<span style="color: #333;font-size: 140%"> + </span>';
 		var minusSymbol = '<span style="color:#333;font-size: 145%"> - </span>';
 		let currentIter = 1;
