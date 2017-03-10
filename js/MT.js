@@ -1941,15 +1941,15 @@ $(function () {
 					coeff2 = 1;
 				var newEll = $('<div class="row cont stp">').appendTo('#steps-area .accordion-inner')
 					.attr('data-ticket-num', i);
-				var newDiv = (i % 2 == 0) ?
+				var newDiv = (currentIter % 2 == 0) ?
 					$('<div class="alert alert-error fade in span24 stp">').appendTo(newEll) :
 					$('<div class="alert alert-info fade in span24 stp">').appendTo(newEll);
-				var newDiv2 = (i % 2 == 0) ?
+				var newDiv2 = (currentIter % 2 == 0) ?
 					$('<div class="alert alert-error fade in span24 stp">').appendTo(newEll) :
 					$('<div class="alert alert-info fade in span24 stp">').appendTo(newEll);
 				tCont = "";
 				tCont2 = "";
-				ticketsJson.ticket[i] = [];
+				ticketsJson.ticket[currentIter - 1] = [];
 				for (var j = 0; j < arr[i].length; j++) {
 					var dist = 0;
 					for (var ii = j + 1; ii < arr[i].length; ii++) {
@@ -1974,7 +1974,7 @@ $(function () {
 					obj['date'] = selectedTeamsJson.team[j].date;
 					obj['bet'] = arr[i][j];
 					obj['coeff'] = coeff;
-					ticketsJson.ticket[i][j] = obj;
+					ticketsJson.ticket[currentIter - 1][j] = obj;
 				}
 				tCont = `Билет №${parseInt(currentIter)} | ${inpObj.ratio}/${inpObj.events - inpObj.ratio} | x${coeff.toFixed(3)} </br> ${tCont}`;
 				tCont2 = `Билет №${parseInt(currentIter)} | ${inpObj.ratio}/${inpObj.events - inpObj.ratio} | x${coeff2.toFixed(3)} </br> ${tCont2}`;
