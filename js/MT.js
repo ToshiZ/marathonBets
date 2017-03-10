@@ -982,6 +982,7 @@ $(function () {
 		let allTicketsAmount = 0;
 		let allVars = 0;
 		let ticketsArr = [];
+		
 
 		//let n_filter_combs = getComposotions(n_ - k_);
 		//let k_filter_combs = k_ == n_ - k_ ? n_filter_combs.slice() : getComposotions(k_);
@@ -991,12 +992,24 @@ $(function () {
 			let k_filter_combs = plusRange == n_ - plusRange ? n_filter_combs.slice() : getComposotions(plusRange);
 			for (let combK of k_filter_combs) {
 				for (let combN of n_filter_combs) {
+					
 					let addons = cBlocksBin(n_, plusRange, combK, combN, true, true);
+					// let inverse = cBlocksBin(n_, plusRange, combN, combK, true, true);
+
 					addons['isEmptyKFilter'] = combK.length == 0 || sumOfMas(combK) == 0;
 					addons['isEmptyNFilter'] = combN.length == 0 || sumOfMas(combN) == 0;
 					addons['kFilter'] = combK;
 					addons['nFilter'] = combN;
+					addons['dynamic'] = false;
+
+					// inverse['isEmptyKFilter'] = combN.length == 0 || sumOfMas(combN) == 0;
+					// inverse['isEmptyNFilter'] = combK.length == 0 || sumOfMas(combK) == 0;
+					// inverse['kFilter'] = combN;
+					// inverse['nFilter'] = combK;
+					// inverse['inverse'] = true;
+
 					ticketsArr.push(addons);
+					// ticketsArr.push(inverse);
 				}
 			}
 		}
@@ -1007,6 +1020,7 @@ $(function () {
 			var n_check = false;
 			var k_anti_check = false;
 			var n_anti_check = false;
+			let dynamic = {'tf': [], 'ft': [], 'ff': []};
 			// if (n_filter_combs[j].length == 0 || sumOfMas(n_filter_combs[j]) == 0)
 			// 	fl_n = true;
 			// if (k_filter_combs[i].length == 0 || sumOfMas(k_filter_combs[i]) == 0)
@@ -1017,15 +1031,15 @@ $(function () {
 			//	res[3] = cBlocksBin(n_, plusRange, k_filter_combs[i], n_filter_combs[j], false, false);
 
 			var fl_ok = false;
-			var ticketsAmount;
+			//var ticketsAmount;
 
 			if ($('#k-check').prop("checked") && $('#n-k-check').prop("checked")) {
 				if ($('#anti-block-minus-check').prop("checked") && $('#anti-block-plus-check').prop("checked")) {
 					if (varAmount.indexOf(ticketsObj.tickets.length) != -1 && !ticketsObj.isEmptyKFilter && !ticketsObj.isEmptyNFilter) {
 						fl_ok = true;
 						//ticketsAmount = res[0].length;
-						k_anti_check = true;
-						n_anti_check = true;
+					//	k_anti_check = true;
+						//n_anti_check = true;
 						//continue;
 					}
 					// if (varAmount.indexOf(res[1].length) == -1 || varAmount.indexOf(res[2].length) == -1) {
@@ -1052,41 +1066,97 @@ $(function () {
 						// //for (var ii = 0; ii < res.length; ii++) {
 						// 	resTmp = res[0].slice();
 						// //}
-						if (ticketsObj.isEmptyNFilter && ticketsObj.isEmptyKFilter) {
-							//for (var ii = 0; ii < 4; ii++) {
-							let tt = popBloks(ticketsObj.tickets, 10);
-							if (varAmount.indexOf(tt.length) != -1) {
-								fl_ok = true;
-								k_check = true;
-								n_check = true;
-								//ticketsAmount = tt.length;
-								//break;
-							}
-							//if(fl_ok) continue;
-							//}
-						}
+						// if (ticketsObj.isEmptyNFilter && ticketsObj.isEmptyKFilter) {
+						// 	//for (var ii = 0; ii < 4; ii++) {
+						// 	let tt = popBloks(ticketsObj.tickets, 10);
+						// 	if (varAmount.indexOf(tt.length) != -1) {
+						// 		fl_ok = true;
+						// 		k_check = true;
+						// 		n_check = true;
+						// 		//ticketsAmount = tt.length;
+						// 		//break;
+						// 	}
+						// 	//if(fl_ok) continue;
+						// 	//}
+						// }
 						if (!ticketsObj.isEmptyNFilter && ticketsObj.isEmptyKFilter) {
 							//for (var ii = 0; ii < 4; ii++)
-							popBloks(ticketsObj.tickets, 1);
-							if (varAmount.indexOf(ticketsObj.tickets.length) != -1) {
+							//if (!ticketsObj.inverse) {
+								//let tmp = ticketsObj.tickets.slice();
+							dynamic.tf = cBlocksBin(ticketsObj.events, ticketsObj.ratio, ticketsObj.kFilter, ticketsObj.nFilter, true, false);
+							let tmp = dynamic.tf.tickets;
+							popBloks(tmp, 1);
+							if (varAmount.indexOf(tmp.length) != -1) {
 								fl_ok = true;
 								k_check = true;
-								n_anti_check = true;
+								ticketsObj.dynamic = 'tf';
+								//n_anti_check = true;
 								//ticketsAmount = res[2].length;
 								//continue;
 							}
+							// } else {
+							// 	//let tmp = ticketsObj.tickets.slice();
+							// 	popBloks(ticketsObj.tickets, 0);
+							// 	if (varAmount.indexOf(ticketsObj.tickets.length) != -1) {
+							// 		fl_ok = true;
+							// 		n_check = true;
+							// 		//n_anti_check = true;
+							// 		//ticketsAmount = res[2].length;
+							// 		//continue;
+							// 	}
+							// }
 						}
 						if (!ticketsObj.isEmptyKFilter && ticketsObj.isEmptyNFilter) {
 							//for (var ii = 0; ii < 4; ii++)
-							popBloks(ticketsObj.tickets, 0);
-							if (varAmount.indexOf(ticketsObj.tickets.length) != -1) {
-								fl_ok = true;
-								n_check = true;
-								k_anti_check = true;
-								//ticketsAmount = res[1].length;
-								//continue;
-							}
+							//if (!ticketsObj.inverse) {
+								//let tmp = ticketsObj.tickets.slice();
+							dynamic.ft = cBlocksBin(ticketsObj.events, ticketsObj.ratio, ticketsObj.kFilter, ticketsObj.nFilter, false, true);
+								let tmp = dynamic.ft.tickets;
+								popBloks(tmp, 0);
+								if (varAmount.indexOf(tmp.length) != -1) {
+									fl_ok = true;
+									n_check = true;
+									ticketsObj.dynamic = 'ft';
+									//n_anti_check = true;
+									//ticketsAmount = res[2].length;
+									//continue;
+								}
+
+
+								// popBloks(ticketsObj.tickets, 0);
+								// if (varAmount.indexOf(ticketsObj.tickets.length) != -1) {
+								// 	fl_ok = true;
+								// 	n_check = true;
+								// 	//k_anti_check = true;
+								// 	//ticketsAmount = res[1].length;
+								// 	//continue;
+								// }
+							// } else {
+							// 	//let tmp = ticketsObj.tickets.slice();
+							// 	popBloks(ticketsObj.tickets, 1);
+							// 	if (varAmount.indexOf(ticketsObj.tickets.length) != -1) {
+							// 		fl_ok = true;
+							// 		k_check = true;
+							// 		//n_anti_check = true;
+							// 		//ticketsAmount = res[1].length;
+							// 		//continue;
+							// 	}
+							// }
 						}
+							if (ticketsObj.isEmptyKFilter && ticketsObj.isEmptyNFilter) {
+								dynamic.ff = cBlocksBin(ticketsObj.events, ticketsObj.ratio, ticketsObj.kFilter, ticketsObj.nFilter, false, false);
+								let tmp = dynamic.ff.tickets;
+								popBloks(tmp, 10);
+								if (varAmount.indexOf(tmp.length) != -1) {
+									fl_ok = true;
+									k_check = true;
+									n_check = true;
+									ticketsObj.dynamic = 'ff';
+									//n_anti_check = true;
+									//ticketsAmount = res[2].length;
+									//continue;
+								}
+							}
 						// for (var ii = 0; ii < resTmp.length; ii++) {
 						// 	res[ii] = resTmp[ii].slice();
 						// }
@@ -1099,8 +1169,8 @@ $(function () {
 
 					if (varAmount.indexOf(ticketsObj.tickets.length) != -1) {
 						fl_ok = true;
-						k_anti_check = true;
-						n_anti_check = true;
+					//	k_anti_check = true;
+					//	n_anti_check = true;
 						//ticketsAmount = res[0].length;
 						//continue;
 					}
@@ -1126,13 +1196,23 @@ $(function () {
 			} else {
 				if ($('#k-check').prop("checked")) {
 					//for (var ii = 0; ii < 4; ii++)
-					popBloks(ticketsObj.tickets, 1);
-					k_check = true;
+					//if (!ticketsObj.inverse) {
+						popBloks(ticketsObj.tickets, 1);
+						k_check = true;
+					// } else {
+					// 	popBloks(ticketsObj.tickets, 0);
+					// 	n_check = true;
+					// }
 				}
 				if ($('#n-k-check').prop("checked")) {
 					//for (var ii = 0; ii < 4; ii++)
-					popBloks(ticketsObj.tickets, 0);
-					n_check = true;
+				//	if (!ticketsObj.inverse) {
+						popBloks(ticketsObj.tickets, 0);
+						n_check = true;
+					// } else {
+					// 	popBloks(ticketsObj.tickets, 1);
+					// 	k_check = true;
+					// }
 				}
 				// if (!$('#anti-block-minus-check').prop("checked") && !$('#anti-block-plus-check').prop("checked")) {
 				// 	if (varAmount.indexOf(res[3].length) != -1) {
@@ -1169,7 +1249,9 @@ $(function () {
 			}
 
 			if (fl_ok) {
-				var tCont = `#${parseInt(varNum + 1)} | ${ticketsObj.ratio}/${ticketsObj.events - ticketsObj.ratio} | (${ticketsObj.tickets.length}) </br>`;
+				let ticketsAmount = ticketsObj.tickets.length;
+				if (ticketsObj.dynamic) ticketsAmount = dynamic[ticketsObj.dynamic].tickets.length;
+				var tCont = `#${parseInt(varNum + 1)} | ${ticketsObj.ratio}/${ticketsObj.events - ticketsObj.ratio} | (${ticketsAmount}) </br>`;
 				var tCont2 = "";
 				var tCont3 = "";
 				// if (ticketsObj.ratio == 1) {
@@ -1196,7 +1278,7 @@ $(function () {
 						tCont3 += "ТМ: " + ticketsObj.nFilter;
 					//}
 				}
-				if (arrConts.indexOf(tCont2 + tCont3) == -1 && tCont2.length != 0 && tCont3.length != 0) {
+				if (arrConts.indexOf(tCont2 + tCont3 + ticketsObj.ratio) == -1 && tCont2.length != 0 && tCont3.length != 0) {
 					var newEl = $('<div class="row cont stp2">')
 						.appendTo('#accordionArea2 .accordion-inner')
 						.attr('data-var-num', varNum);
@@ -1205,10 +1287,10 @@ $(function () {
 						$('<div class="alert alert-info fade in span24 stp2 var-div">').appendTo(newEl);
 					newDiv.attr('tb', tCont2);
 					newDiv.attr('tm', tCont3);
-					arrConts.push(tCont2 + tCont3);
+					arrConts.push(tCont2 + tCont3 + ticketsObj.ratio);
 					newDiv.html(tCont + tCont2 + tCont3);
 					varNum++;
-					allTicketsAmount += ticketsObj.tickets.length;
+					allTicketsAmount += ticketsAmount;
 					varTicketsRes.push(ticketsObj);
 				}
 			}
