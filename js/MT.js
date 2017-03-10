@@ -554,8 +554,9 @@ $(function () {
 			fromPlus = parseInt($('#plus-slider-leftLabel').text());
 			toPlus = parseInt($('#plus-slider-rightLabel').text());
 		}
-
-		findVars(varAmount, fromPlus, toPlus);
+		if (fromPlus != undefined && toPlus != undefined) {
+			findVars(varAmount, fromPlus, toPlus);
+		}
 	});
 	$('#clean-k').on('click', function (e) {
 		inputsForBlocksK(k_);
@@ -1941,10 +1942,10 @@ $(function () {
 					coeff2 = 1;
 				var newEll = $('<div class="row cont stp">').appendTo('#steps-area .accordion-inner')
 					.attr('data-ticket-num', i);
-				var newDiv = (currentIter % 2 == 0) ?
+				var newDiv = ((currentIter - 1) % 2 == 0) ?
 					$('<div class="alert alert-error fade in span24 stp">').appendTo(newEll) :
 					$('<div class="alert alert-info fade in span24 stp">').appendTo(newEll);
-				var newDiv2 = (currentIter % 2 == 0) ?
+				var newDiv2 = ((currentIter - 1) % 2 == 0) ?
 					$('<div class="alert alert-error fade in span24 stp">').appendTo(newEll) :
 					$('<div class="alert alert-info fade in span24 stp">').appendTo(newEll);
 				tCont = "";
@@ -1981,7 +1982,7 @@ $(function () {
 				newDiv.html(tCont);
 				newDiv2.html(tCont2);
 				document.title = parseInt(currentIter) + " из " + totalTickets;
-				newEl.text(`Билеты (${currentIter}\\${totalTickets})`);
+				newEl.text(`Билеты (${currentIter}/${totalTickets})`);
 				currentIter++;
 			}
 		}
