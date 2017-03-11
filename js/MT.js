@@ -679,13 +679,14 @@ $(function () {
 		obj['date'] = $(this).parent().attr("data-date");
 		obj['country'] = $(this).parent().attr("data-country");
 		obj["TBFactor"] = $(this).parent().attr("data-tbfactor");
-		obj["totalValue"] = $(this).attr("data-totalValue");
+		obj["totalValue"] = $(this).parent().attr("data-totalValue");
 		obj["TMFactor"] = $(this).parent().attr("data-tmfactor");
 		obj["champ"] = $(this).parent().attr("data-champ");
 		var ind = -1;
 		var ind2 = -1;
 		for (var st = 0; st < selectedTeamsJson.team.length; st++) {
-			if (JSON.stringify(selectedTeamsJson.team[st]) == JSON.stringify(obj)) {
+			//if (JSON.stringify(selectedTeamsJson.team[st]) == JSON.stringify(obj)) {
+			if (selectedTeamsJson.team[st].date == obj.date && selectedTeamsJson.team[st].name == obj.name) {
 				ind = st;
 			}
 		}

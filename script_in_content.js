@@ -238,8 +238,8 @@ $(function () {
 			var obj = {};
 			obj['name'] = teamsNames;
 			obj['date'] = gameDate;
-			obj['TMFactor'] = TMFactor;
-			obj['TBFactor'] = TBFactor;
+			obj['TMFactor'] = parseFloat(TMFactor).toFixed(2);
+			obj['TBFactor'] = parseFloat(TBFactor).toFixed(2);
 			obj['totalValue'] = totalValue;
 			obj['champ'] = champ;
 			teamsJson.team[j] = obj;
