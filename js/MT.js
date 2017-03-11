@@ -232,7 +232,7 @@ $(function () {
 			return false;
 		}
 		if ($(".k-blocks").last().val() && sumOfMas(filter[0]) < k_) {
-			$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
+			let newInp = $('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
 				.attr('id', "k-block" + $(".k-blocks").length)
 				.css({
 					width: "50px",
@@ -241,6 +241,9 @@ $(function () {
 				})
 				.attr('placeholder', "Блок " + parseInt($(".k-blocks").length + 1))
 				.addClass("k-blocks dynamic dynamic-k");
+			let snippBtns =  $('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
+				.insertAfter(newInp);
+			refreshInputs(newInp);
 		} else {
 			$('.k-blocks').filter(function () { return !this.value; }).remove();
 		}
@@ -256,7 +259,7 @@ $(function () {
 			return false;
 		}
 		if ($(".n-k-blocks").last().val() && sumOfMas(filter[1]) < n_k_) {
-			$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
+			let newInp = $('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
 				.attr('id', "n-k-block" + $(".n-k-blocks").length)
 				.css({
 					width: "50px",
@@ -265,6 +268,10 @@ $(function () {
 				})
 				.attr('placeholder', "Блок " + parseInt($(".n-k-blocks").length + 1))
 				.addClass("n-k-blocks dynamic dynamic-n-k");
+			let snippBtns = $('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
+				.insertAfter(newInp);
+			
+			refreshInputs(newInp);
 		} else {
 			$('.n-k-blocks').filter(function () { return !this.value; }).remove();
 		}
@@ -558,10 +565,10 @@ $(function () {
 			findVars(varAmount, fromPlus, toPlus);
 		}
 	});
-	$('#clean-k').on('click', function (e) {
+	$(document).on('click', '#clean-k', function (e) {
 		inputsForBlocksK(k_);
 	});
-	$('#clean-n-k').on('click', function (e) {
+	$(document).on('click', '#clean-n-k', function (e) {
 		inputsForBlocksN(n_ - k_);
 	});
 	$('#var-tikets').on('click', function (e) {
@@ -595,7 +602,8 @@ $(function () {
 			$('.k-blocks').detach();
 			$('#k-check')[0].checked = true;
 			$('#anti-block-plus-check')[0].checked = false;
-			$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
+
+			let newInp = $('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
 				.attr('id', "k-block" + $(".k-blocks").length)
 				.css({
 					width: "50px",
@@ -604,6 +612,11 @@ $(function () {
 				})
 				.attr('placeholder', "Блок " + parseInt($(".k-blocks").length + 1))
 				.addClass("k-blocks dynamic dynamic-k");
+			$('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
+				.insertAfter(newInp);
+			$(`<a id="clean-k">X</a>`)
+				.appendTo('#k-blocks-div')
+				.addClass("dynamic-k dynamic button button-small");
 
 		} else {
 			$('.k-blocks').detach();
@@ -616,7 +629,7 @@ $(function () {
 				});
 
 			for (var i = 0; i < filter[0].length; i++) {
-				$('<input type="text"></input>').appendTo('#k-blocks-div')
+				let newInp = $('<input type="text"></input>').appendTo('#k-blocks-div')
 					.attr('id', "k-block" + $(".k-blocks").length)
 					.css({
 						width: "50px",
@@ -626,14 +639,21 @@ $(function () {
 					.attr('placeholder', "Блок " + parseInt($(".k-blocks").length + 1))
 					.addClass("k-blocks dynamic dynamic-k")
 					.val(filter[0][i]);
+				$('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
+				.insertAfter(newInp);
 			}
+			$(`<a id="clean-k">X</a>`)
+				.appendTo('#k-blocks-div')
+				.addClass("dynamic-k dynamic button button-small");
+
 		}
 		if (tm.indexOf('Без блоков') != -1) {
 			filter[1] = [];
 			$('.n-k-blocks').detach();
 			$('#n-k-check')[0].checked = true;
 			$('#anti-block-minus-check')[0].checked = false;
-			$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
+
+			let newInp = $('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
 				.attr('id', "n-k-blocks" + $(".n-k-blocks").length)
 				.css({
 					width: "50px",
@@ -642,6 +662,12 @@ $(function () {
 				})
 				.attr('placeholder', "Блок " + parseInt($(".n-k-blocks").length + 1))
 				.addClass("n-k-blocks dynamic dynamic-n-k");
+			$('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
+				.insertAfter(newInp);
+			$(`<a id="clean-n-k">X</a>`)
+				.appendTo('#n-k-blocks-div')
+				.addClass("dynamic-n-k dynamic button button-small");
+
 		} else {
 			$('.n-k-blocks').detach();
 			$('#n-k-check')[0].checked = false;
@@ -654,7 +680,7 @@ $(function () {
 				});
 
 			for (var i = 0; i < filter[1].length; i++) {
-				$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
+				let newInp = $('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
 					.attr('id', "n-k-blocks" + $(".n-k-blocks").length)
 					.css({
 						width: "50px",
@@ -664,7 +690,14 @@ $(function () {
 					.attr('placeholder', "Блок " + parseInt($(".n-k-blocks").length + 1))
 					.addClass("n-k-blocks dynamic dynamic-n-k")
 					.val(filter[1][i]);
+				let snippBtns = $('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
+				.insertAfter(newInp);
+				refreshInputs(newInp);
 			}
+			$(`<a id="clean-n-k">X</a>`)
+				.appendTo('#n-k-blocks-div')
+				.addClass("dynamic-n-k dynamic button button-small");
+
 		}
 	});
 
@@ -740,6 +773,38 @@ $(function () {
 				.appendTo('#buttons');
 		}
 	});
+	function refreshInputs(spinner) {
+		//$('.quantity input').each(function () {
+			spinner = $(spinner);
+				//input = spinner.find('input[type="number"]'),
+			let btnUp = spinner.siblings('.quantity-nav').find('.quantity-up'),
+				btnDown = spinner.siblings('.quantity-nav').find('.quantity-down'),
+				min = spinner.attr('min'),
+				max = spinner.attr('max') || 1000000;
+
+			btnUp.click(function () {
+				var oldValue = parseFloat(spinner.val()) || 0;
+				if (oldValue >= max) {
+					var newVal = oldValue;
+				} else {
+					var newVal = oldValue + 1;
+				}
+				spinner.val(newVal);
+				spinner.trigger("input");
+			});
+
+			btnDown.click(function () {
+				var oldValue = parseFloat(spinner.val());
+				if (oldValue <= min) {
+					var newVal = oldValue;
+				} else {
+					var newVal = oldValue - 1;
+				}
+				spinner.val(newVal);
+				spinner.trigger("input");
+			});
+	//	});
+	}
 	function chooseBlock(sefl, addedClass) {
 		var countryAttr = $(sefl).attr('country');
 		var blockAttr = $(sefl).attr('block');
@@ -1492,7 +1557,7 @@ $(function () {
 		$('.dynamic-k').detach();
 		filter[0] = [];
 		if (k > 1) {
-			$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
+			let newInp = $('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
 				.attr('id', "k-block" + $(".k-blocks").length)
 				.css({
 					width: "50px",
@@ -1501,13 +1566,22 @@ $(function () {
 				})
 				.attr('placeholder', "Блок " + parseInt($(".k-blocks").length + 1))
 				.addClass("k-blocks dynamic dynamic-k");
+			let snippBtns = $('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
+				.insertAfter(newInp);
+			refreshInputs(newInp);
+			$(`<a id="clean-k">X</a>`)
+				.appendTo('#k-blocks-div')
+				.addClass("dynamic-k dynamic button button-small");
+
 		}
 	}
 	function inputsForBlocksN(n_k) {
 		$('.dynamic-n-k').detach();
 		filter[1] = [];
 		if (n_k > 1) {
-			$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
+			
+
+			let newInp = $('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
 				.attr('id', "n-k-block" + $(".n-k-blocks").length)
 				.css({
 					width: "50px",
@@ -1516,13 +1590,20 @@ $(function () {
 				})
 				.attr('placeholder', "Блок " + parseInt($(".n-k-blocks").length + 1))
 				.addClass("n-k-blocks dynamic dynamic-n-k");
+			let snippBtns = $('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
+				.insertAfter(newInp);
+			refreshInputs(newInp);
+			$(`<a id="clean-n-k">X</a>`)
+				.appendTo('#n-k-blocks-div')
+				.addClass("dynamic-n-k dynamic button button-small");
 		}
 	}
 
 	function inputsForBlocks(n, k) {
 		$('.dynamic').detach();
 		if (k > 1) {
-			$('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
+
+			let newInp = $('<input type="number"  min="2"></input>').appendTo('#k-blocks-div')
 				.attr('id', "k-block" + $(".k-blocks").length)
 				.css({
 					width: "50px",
@@ -1531,9 +1612,16 @@ $(function () {
 				})
 				.attr('placeholder', "Блок " + parseInt($(".k-blocks").length + 1))
 				.addClass("k-blocks dynamic dynamic-k");
+			$('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
+				.insertAfter(newInp);
+			$(`<a id="clean-k">X</a>`)
+				.appendTo('#k-blocks-div')
+				.addClass("dynamic-k dynamic button button-small");
+
 		}
 		if (n - k > 1) {
-			$('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
+
+			let newInp = $('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
 				.attr('id', "n-k-block" + $(".n-k-blocks").length)
 				.css({
 					width: "50px",
@@ -1542,9 +1630,17 @@ $(function () {
 				})
 				.attr('placeholder', "Блок " + parseInt($(".n-k-blocks").length + 1))
 				.addClass("n-k-blocks dynamic dynamic-n-k");
+			let snippBtns = $('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
+				.insertAfter(newInp);
+			refreshInputs(newInp);
+			$(`<a id="clean-n-k">X</a>`)
+				.appendTo('#n-k-blocks-div')
+				.addClass("dynamic-n-k dynamic button button-small");
+
 		}
 		$('<a id="run" class="button button-large dynamic">Предпросмотр</a>')
 			.appendTo('#buttons');
+		
 	}
 
 	function fillTeamList(teamsJson) {

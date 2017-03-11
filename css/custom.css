@@ -1,0 +1,90 @@
+.quantity {
+  position: relative;
+  display: inline;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button
+{
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number]
+{
+  -moz-appearance: textfield;
+}
+
+.quantity-nav {
+    visibility: hidden;
+ }
+
+/*style="width:80px; background: #3C3F45; color: white"*/
+
+.quantity input {
+  width: 40px;
+  height: 40px;
+  background: #3C3F45;
+  color: white;
+  line-height: 1.65;
+  font-size: 15px;
+  float: left;
+  display: block;
+  padding: 0;
+  margin: 0;
+  padding-left: 10px;
+  padding-right: 7px;
+}
+
+
+#k-blocks-div, #n-k-blocks-div {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+#k-blocks-div input, #n-k-blocks-div input {
+     margin-left: 5px;
+}
+
+.quantity:hover  .quantity-nav {
+    visibility: visible;
+}
+
+.quantity input:focus {
+  outline: 0;
+}
+
+.quantity-nav {
+  float: left;
+  position: relative;
+  height: 45px;
+}
+
+.quantity-button {
+  position: relative;
+  cursor: pointer;
+  width: 25px;
+  text-align: center;
+  color: #7F8289;
+  font-size: 15px;
+  font-family: "Trebuchet MS", Helvetica, sans-serif !important;
+  -webkit-transform: translateX(-100%);
+  transform: translateX(-100%);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.quantity-button.quantity-up {
+  position: absolute;
+  height: 50%;
+  top: 0;
+}
+
+.quantity-button.quantity-down {
+  position: absolute;
+  bottom: -1px;
+  height: 50%;
+}
