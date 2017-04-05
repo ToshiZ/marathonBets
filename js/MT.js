@@ -241,7 +241,7 @@ $(function () {
 				})
 				.attr('placeholder', "Блок " + parseInt($(".k-blocks").length + 1))
 				.addClass("k-blocks dynamic dynamic-k");
-			let snippBtns =  $('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
+			let snippBtns = $('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
 				.insertAfter(newInp);
 			refreshInputs(newInp);
 		} else {
@@ -270,7 +270,7 @@ $(function () {
 				.addClass("n-k-blocks dynamic dynamic-n-k");
 			let snippBtns = $('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
 				.insertAfter(newInp);
-			
+
 			refreshInputs(newInp);
 		} else {
 			$('.n-k-blocks').filter(function () { return !this.value; }).remove();
@@ -640,7 +640,7 @@ $(function () {
 					.addClass("k-blocks dynamic dynamic-k")
 					.val(filter[0][i]);
 				$('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
-				.insertAfter(newInp);
+					.insertAfter(newInp);
 			}
 			$(`<a id="clean-k">X</a>`)
 				.appendTo('#k-blocks-div')
@@ -691,7 +691,7 @@ $(function () {
 					.addClass("n-k-blocks dynamic dynamic-n-k")
 					.val(filter[1][i]);
 				let snippBtns = $('<div class="quantity-nav"><div class="quantity-button quantity-up">&uarr;</div><div class="quantity-button quantity-down">&darr;</div></div>')
-				.insertAfter(newInp);
+					.insertAfter(newInp);
 				refreshInputs(newInp);
 			}
 			$(`<a id="clean-n-k">X</a>`)
@@ -754,7 +754,7 @@ $(function () {
 		chooseBlock(this, 'selected');
 	});
 	$(document).on('click', '.country-el', function (e) {
-		if (this != $('#inner-blocks-check')[0] && this.tagName != 'LABEL') {
+		if (e.target != $('#inner-blocks-check')[0] && this.tagName != 'LABEL') {
 			$('#inner-blocks-check')[0].checked = true;
 		}
 	});
@@ -775,35 +775,35 @@ $(function () {
 	});
 	function refreshInputs(spinner) {
 		//$('.quantity input').each(function () {
-			spinner = $(spinner);
-				//input = spinner.find('input[type="number"]'),
-			let btnUp = spinner.siblings('.quantity-nav').find('.quantity-up'),
-				btnDown = spinner.siblings('.quantity-nav').find('.quantity-down'),
-				min = spinner.attr('min'),
-				max = spinner.attr('max') || 1000000;
+		spinner = $(spinner);
+		//input = spinner.find('input[type="number"]'),
+		let btnUp = spinner.siblings('.quantity-nav').find('.quantity-up'),
+			btnDown = spinner.siblings('.quantity-nav').find('.quantity-down'),
+			min = spinner.attr('min'),
+			max = spinner.attr('max') || 1000000;
 
-			btnUp.click(function () {
-				var oldValue = parseFloat(spinner.val()) || 0;
-				if (oldValue >= max) {
-					var newVal = oldValue;
-				} else {
-					var newVal = oldValue + 1;
-				}
-				spinner.val(newVal);
-				spinner.trigger("input");
-			});
+		btnUp.click(function () {
+			var oldValue = parseFloat(spinner.val()) || 0;
+			if (oldValue >= max) {
+				var newVal = oldValue;
+			} else {
+				var newVal = oldValue + 1;
+			}
+			spinner.val(newVal);
+			spinner.trigger("input");
+		});
 
-			btnDown.click(function () {
-				var oldValue = parseFloat(spinner.val());
-				if (oldValue <= min) {
-					var newVal = oldValue;
-				} else {
-					var newVal = oldValue - 1;
-				}
-				spinner.val(newVal);
-				spinner.trigger("input");
-			});
-	//	});
+		btnDown.click(function () {
+			var oldValue = parseFloat(spinner.val());
+			if (oldValue <= min) {
+				var newVal = oldValue;
+			} else {
+				var newVal = oldValue - 1;
+			}
+			spinner.val(newVal);
+			spinner.trigger("input");
+		});
+		//	});
 	}
 	function chooseBlock(sefl, addedClass) {
 		var countryAttr = $(sefl).attr('country');
@@ -966,7 +966,7 @@ $(function () {
 		}
 		if (!$.isEmptyObject(_countries)) {
 			var eventsDiv = $('<div class="country-el" style="display: inline-block; margin-left: 30px; float: right;"></div>').appendTo($('#events-div'));
-			$('<label class="country-el">Внутренние блоки </span><input id="inner-blocks-check" class="country-el" type="checkBox"></br>')
+			$('<label class="country-el">Внутренние блоки </span><input id="inner-blocks-check" type="checkBox"></br>')
 				.appendTo(eventsDiv);
 			for (var i in _countries) {
 				if (_countries[i]['team'].length <= 1) continue;
@@ -1579,7 +1579,7 @@ $(function () {
 		$('.dynamic-n-k').detach();
 		filter[1] = [];
 		if (n_k > 1) {
-			
+
 
 			let newInp = $('<input type="number"  min="2"></input>').appendTo('#n-k-blocks-div')
 				.attr('id', "n-k-block" + $(".n-k-blocks").length)
@@ -1640,7 +1640,7 @@ $(function () {
 		}
 		$('<a id="run" class="button button-large dynamic">Предпросмотр</a>')
 			.appendTo('#buttons');
-		
+
 	}
 
 	function fillTeamList(teamsJson) {
@@ -1836,12 +1836,13 @@ $(function () {
 						if (fl || !onlySelectedBlocks) {
 							return true;
 						} else {
-							return false;
+							//return false;
 						}
 					}
 				}
 			}
 		}
+		return false;
 	}
 	function popInCountries(arr) {
 		for (var i = 0; i < arr.length; i++) top2: {
@@ -1849,7 +1850,7 @@ $(function () {
 			for (var countryName in _countries) {
 				var countryBlocks = [];
 				var step = 0;
-				var onlyCheck = $('#only' + countryName)[0].checked;
+				var onlyCheck = $('#only' + countryName).length? $('#only' + countryName)[0].checked: false;
 				for (var j = 0; j < arr[i].length - 1; j++) {
 					if (selectedTeamsJson.team[j].country == countryName && selectedTeamsJson.team[j + 1].country == countryName) {
 						if (arr[i][j] == arr[i][j + 1]) {
@@ -1861,7 +1862,7 @@ $(function () {
 						}
 					}
 				}
-				if ($('input#without' + countryName)[0].checked && countryBlocks.length != 0) {
+				if ($('input#without' + countryName).length && $('input#without' + countryName)[0].checked && countryBlocks.length != 0) {
 					arr.splice(i, 1);
 					i--;
 					break top2;

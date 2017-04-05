@@ -48,19 +48,19 @@ var enterCoast = function () {
 	}, 1000);
 }
 var setCoast = function (coast) {
-				setTimeout(function () {
+	setTimeout(function () {
 		//if(parseInt($('#betslip_button').text().split(" ")[1]) == ticketsJson.ticket[i].length)
 		if (parseInt($('.bet-slip-selection-count').text().split(" ")[1]) == ticketsJson.ticket[i].length)
 			enterCoast();
 		else
 			betTicket();
-				}, 1000);
+	}, 1000);
 }
 var betTicket = function () {
-				var forClick = [];
-				if ($('span.btn-remove').length != 0)
+	var forClick = [];
+	if ($('span.btn-remove').length != 0)
 		$('span.btn-remove')[0].click();
-				tbodyTeams.forEach(function (item, index) {
+	tbodyTeams.forEach(function (item, index) {
 		for (var j = 0; j < ticketsJson.ticket[i].length; j++) {
 			if (item.attr('data-event-name').indexOf(ticketsJson.ticket[i][j].name) != -1) {
 				var tdDate = item.find('td.date').html();
