@@ -57,9 +57,11 @@ $(function () {
 	rebuidSlider('blocks-slider', 'small', 'span', 0, 0, parseInt(selectedTeamsJson.team.length / 2), parseInt(selectedTeamsJson.team.length / 2));
 	if (n_) {
 		rebuidSlider('vars-slider', 'small', 'input', 1, 1, math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)), math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)));
+		rebuidSlider('incountry-slider', 'small', 'input', 1, 1, math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)), math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)));
 		rebuidSlider('plus-slider', 'xsmall', 'span', 0, 0, n_, n_);
 	} else {
 		rebuidSlider('vars-slider', 'small', 'input', 0, 0, 0, 0);
+		rebuidSlider('incountry-slider', 'small', 'input', 0, 0, 0, 0);
 		rebuidSlider('plus-slider', 'xsmall', 'span', 0, 0, 0, 0);
 	}
 
@@ -453,7 +455,7 @@ $(function () {
 		}
 		if (!$.isEmptyObject(_countries) && $('#inner-blocks-check')[0].checked) {
 			for (let i of res) {
-				popInCountries(i.tickets);
+				i.tickets = popInCountries(i.tickets);
 			}
 		}
 		if ($('#blocks-slider-check').prop('checked')) {
@@ -573,9 +575,15 @@ $(function () {
 	});
 	$('#var-tikets').on('click', function (e) {
 		if (varTicketsRes.length != 0) {
-			if (!$.isEmptyObject(_countries) && $('#inner-blocks-check')[0].checked) {
+			if (!$.isEmptyObject(_countries) && ($('#inner-blocks-check')[0].checked || $('#incountry-slider-check')[0].checked)) {
+				let leftInCoutry, rightInCountry;
+				let checkAllInCoutry = $('#incountry-slider-check')[0].checked;
+				if (checkAllInCoutry) {
+					leftInCoutry = parseInt($('#incountry-slider-leftLabel').val());
+					rightInCountry = parseInt($('#incountry-slider-rightLabel').val());
+				}
 				for (let ticketObj of varTicketsRes) {
-					popInCountries(ticketObj.tickets);
+					ticketObj.tickets = popInCountries(ticketObj.tickets, checkAllInCoutry, leftInCoutry, rightInCountry);
 				}
 			}
 			if ($('#blocks-slider-check').prop('checked')) {
@@ -596,7 +604,7 @@ $(function () {
 	$(document).on('click', ".var-div", function () {
 		var tb = this.getAttribute('tb');
 		var tm = this.getAttribute('tm');
-
+		$('.dynamic-k, .dynamic-n-k').detach();
 		if (tb.indexOf('Без блоков') != -1) {
 			filter[0] = [];
 			$('.k-blocks').detach();
@@ -755,8 +763,16 @@ $(function () {
 	});
 	$(document).on('click', '.country-el', function (e) {
 		if (e.target != $('#inner-blocks-check')[0] && this.tagName != 'LABEL') {
-			$('#inner-blocks-check')[0].checked = true;
+			var evt = document.createEvent("HTMLEvents");
+			evt.initEvent("change", false, true);
+			$('#inner-blocks-check')[0].dispatchEvent(evt);
 		}
+	});
+	$(document).on('change', '#inner-blocks-check', function (e) {
+		$('#incountry-slider-check')[0].checked = false;
+	});
+	$(document).on('change', '#incountry-slider-check', function (e) {
+		$('#inner-blocks-check')[0].checked = false;
 	});
 
 	$(document).on('contextmenu', '.country-blocks', function (e) {
@@ -958,9 +974,17 @@ $(function () {
 		for (var i = 0; i < selectedTeamsJson.team.length; i++) {
 			if (selectedTeamsJson.team[i].country != "") {
 				if (_countries.hasOwnProperty(selectedTeamsJson.team[i].country)) {
-					_countries[selectedTeamsJson.team[i].country]['team'].push(selectedTeamsJson.team[i]);
+					_countries[selectedTeamsJson.team[i].country]['team'].push({
+						'position': i,
+						'countryObj': selectedTeamsJson.team[i]
+					});
 				} else {
-					_countries[selectedTeamsJson.team[i].country] = { 'team': [selectedTeamsJson.team[i]] };
+					_countries[selectedTeamsJson.team[i].country] = {
+						'team': [{
+							'position': i,
+							'countryObj': selectedTeamsJson.team[i]
+						}]
+					};
 				}
 			}
 		}
@@ -1209,7 +1233,15 @@ $(function () {
 		}
 		return output;
 	}
-
+	function cartesianProductOf() {
+		return _.reduce(arguments, function (a, b) {
+			return _.flatten(_.map(a, function (x) {
+				return _.map(b, function (y) {
+					return x.concat([y]);
+				});
+			}), true);
+		}, [[]]);
+	};
 	function isArraysEqual(a, b) {
 		if (a === b) return true;
 		if (a == null || b == null) return false;
@@ -1429,6 +1461,19 @@ $(function () {
 					arr2.push(arr1[i].slice(0, j).concat(beg, arr1[i].slice(j)));
 			return arr2;
 		} else return [arr];
+	}
+	function isEqualArrays(a, b) {
+		if (a === b) return true;
+		if (a == null || b == null) return false;
+		if (a.length != b.length) return false;
+
+		// If you don't care about the order of the elements inside
+		// the array, you should sort both arrays here.
+
+		for (var i = 0; i < a.length; ++i) {
+			if (a[i] !== b[i]) return false;
+		}
+		return true;
 	}
 	function c_n_k(n, k) {
 		var total = 0,
@@ -1835,8 +1880,6 @@ $(function () {
 						}
 						if (fl || !onlySelectedBlocks) {
 							return true;
-						} else {
-							//return false;
 						}
 					}
 				}
@@ -1844,44 +1887,108 @@ $(function () {
 		}
 		return false;
 	}
-	function popInCountries(arr) {
-		for (var i = 0; i < arr.length; i++) top2: {
+	function popInCountries(arr, checkAllInCoutry, leftCount, rightCount) {
+		let countryComb = _countries;
+		let varsAmount = 0;
+
+		if (checkAllInCoutry) {
+			let convertedArr = [];
+			for (var i = 0; i < arr.length; i++) {
+				var flArrAll = [];
+				convertedArr[i] = [];
+				for (var countryName in countryComb) {
+					var countryBlocks = [];
+					convertedArr[i][parseInt(countryName)] = [];
+					var step = 0;
+					var onlyCheck = $('#only' + countryName).length ? $('#only' + countryName)[0].checked : false;
+					for (var j = 0; j < arr[i].length - 1; j++) {
+						if (selectedTeamsJson.team[j].country == countryName && selectedTeamsJson.team[j + 1].country == countryName) {
+							if (arr[i][j] == arr[i][j + 1]) {
+								countryBlocks.pushIfNotExist(j + step, e => (j + step) == e);
+								countryBlocks.pushIfNotExist(j + step + 1, e => (j + step + 1) == e);
+							}
+							if ((arr[i][j] == 0 && arr[i][j + 1] == 1) || (arr[i][j] == 1 && arr[i][j + 1] == 0)) {
+								step++;
+							}
+						}
+					}
+					convertedArr[i][parseInt(countryName)].push({
+						'name': countryName,
+						'blocks': countryBlocks.length == 0 ? false : countryBlocks.slice()
+					});
+				}
+			}
+			let filterCombs = [];
+			for (var countryName in countryComb) {
+				filterCombs.push(getComposotions(countryComb[countryName].team.length));
+			}
+			filterCombs = cartesianProductOf(...filterCombs);
+
+			let newArr = [];
+			for (let fComb of filterCombs) {
+				let counter = 0;
+				let flags = [];
+				for (let ticketObj of convertedArr) {
+					let flag = true;
+					for (let countryFilter = 0; countryFilter < fComb.length; countryFilter++) {
+						if (ticketObj[countryFilter + 1][0]['blocks'] == false && isEqualArrays(fComb[countryFilter], [0])) {
+							continue;
+						}
+						if (ticketObj[countryFilter + 1][0]['blocks'] != false && checkCountryBlock(ticketObj[countryFilter + 1][0]['blocks'], fComb[countryFilter], true)) {
+							continue;
+						}
+						flag = false;
+					}
+					flags.push(flag);
+					counter += flag;
+				}
+				if (counter >= leftCount && counter <= rightCount) {
+					for (let i = 0; i < flags.length; i++) {
+						if (flags[i]) newArr.pushIfNotExist(arr[i], (e) => isArraysEqual(e, arr[i]));
+					}
+				}
+			}
+			return newArr;
+		}
+		let tmpArr = arr.slice();
+		for (var i = 0; i < tmpArr.length; i++) top2: {
 			var flArrAll = [];
-			for (var countryName in _countries) {
+			for (var countryName in countryComb) {
 				var countryBlocks = [];
 				var step = 0;
-				var onlyCheck = $('#only' + countryName).length? $('#only' + countryName)[0].checked: false;
-				for (var j = 0; j < arr[i].length - 1; j++) {
+				var onlyCheck = $('#only' + countryName).length ? $('#only' + countryName)[0].checked : false;
+				for (var j = 0; j < tmpArr[i].length - 1; j++) {
 					if (selectedTeamsJson.team[j].country == countryName && selectedTeamsJson.team[j + 1].country == countryName) {
-						if (arr[i][j] == arr[i][j + 1]) {
+						if (tmpArr[i][j] == tmpArr[i][j + 1]) {
 							countryBlocks.pushIfNotExist(j + step, e => (j + step) == e);
 							countryBlocks.pushIfNotExist(j + step + 1, e => (j + step + 1) == e);
 						}
-						if ((arr[i][j] == 0 && arr[i][j + 1] == 1) || (arr[i][j] == 1 && arr[i][j + 1] == 0)) {
+						if ((tmpArr[i][j] == 0 && tmpArr[i][j + 1] == 1) || (tmpArr[i][j] == 1 && tmpArr[i][j + 1] == 0)) {
 							step++;
 						}
 					}
 				}
 				if ($('input#without' + countryName).length && $('input#without' + countryName)[0].checked && countryBlocks.length != 0) {
-					arr.splice(i, 1);
+					tmpArr.splice(i, 1);
 					i--;
 					break top2;
 				}
-				if (_countries[countryName].blocks && !$.isEmptyObject(_countries[countryName].blocks)) {
+				if (countryComb[countryName].blocks && !$.isEmptyObject(countryComb[countryName].blocks)) {
 					var filterBlocks = [];
-					for (var b = 0; b < _countries[countryName].blocksOrder.length; b++) {
-						for (var inB = 0; inB < _countries[countryName].blocks[_countries[countryName].blocksOrder[b]]; inB++) {
-							filterBlocks.push(parseInt(_countries[countryName].blocksOrder[b]) - 1);
+					for (var b = 0; b < countryComb[countryName].blocksOrder.length; b++) {
+						for (var inB = 0; inB < countryComb[countryName].blocks[countryComb[countryName].blocksOrder[b]]; inB++) {
+							filterBlocks.push(parseInt(countryComb[countryName].blocksOrder[b]) - 1);
 						}
 					}
+
 					var fl = checkCountryBlock(countryBlocks, filterBlocks, onlyCheck);
 					flArrAll.push(fl);
 				}
-				if (_countries[countryName].antiBlocks && !$.isEmptyObject(_countries[countryName].antiBlocks)) {
+				if (countryComb[countryName].antiBlocks && !$.isEmptyObject(countryComb[countryName].antiBlocks)) {
 					var filterBlocks = [];
-					for (var b = 0; b < _countries[countryName].antiBlocksOrder.length; b++) {
-						for (var inB = 0; inB < _countries[countryName].antiBlocks[_countries[countryName].antiBlocksOrder[b]]; inB++) {
-							filterBlocks.push(parseInt(_countries[countryName].antiBlocksOrder[b]) - 1);
+					for (var b = 0; b < countryComb[countryName].antiBlocksOrder.length; b++) {
+						for (var inB = 0; inB < countryComb[countryName].antiBlocks[countryComb[countryName].antiBlocksOrder[b]]; inB++) {
+							filterBlocks.push(parseInt(countryComb[countryName].antiBlocksOrder[b]) - 1);
 						}
 					}
 					var fl = !checkCountryBlock(countryBlocks, filterBlocks, onlyCheck);
@@ -1893,10 +2000,11 @@ $(function () {
 				fl *= flArrAll[f];
 			}
 			if (!fl) {
-				arr.splice(i, 1);
+				tmpArr.splice(i, 1);
 				i--;
 			}
 		}
+		return tmpArr;
 	}
 	function popByBloksAmount(teamsArray, fromBlock, toBlock) {
 		for (let i = 0; i < teamsArray.length; i++) {
