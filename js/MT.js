@@ -57,7 +57,7 @@ $(function () {
 	rebuidSlider('blocks-slider', 'small', 'span', 0, 0, parseInt(selectedTeamsJson.team.length / 2), parseInt(selectedTeamsJson.team.length / 2));
 	if (n_) {
 		rebuidSlider('vars-slider', 'small', 'input', 1, 1, math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)), math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)));
-		rebuidSlider('incountry-slider', 'small', 'input', 1, 1, math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)), math.combinations(n_, k_ ? k_ : parseInt(n_ / 2)));
+		rebuidSlider('incountry-slider', 'small', 'input', 1, 1, 10, 10);
 		rebuidSlider('plus-slider', 'xsmall', 'span', 0, 0, n_, n_);
 	} else {
 		rebuidSlider('vars-slider', 'small', 'input', 0, 0, 0, 0);
@@ -582,8 +582,23 @@ $(function () {
 					leftInCoutry = parseInt($('#incountry-slider-leftLabel').val());
 					rightInCountry = parseInt($('#incountry-slider-rightLabel').val());
 				}
+				let tmpRes = [];
 				for (let ticketObj of varTicketsRes) {
-					ticketObj.tickets = popInCountries(ticketObj.tickets, checkAllInCoutry, leftInCoutry, rightInCountry);
+					let tmpSize = tmpRes.length;
+					let tmpTicket = popInCountries(ticketObj.tickets, checkAllInCoutry, leftInCoutry, rightInCountry);
+					tmpRes.pushIfNotExist(tmpTicket, (e) => {
+						for (let arr of e) {
+							for (let tArr of tmpTicket) {
+								if (isEqualArrays(arr, tArr)) return true;
+							}
+						}
+					});
+					if (tmpRes.length == tmpSize) {
+						ticketObj.tickets = [];
+						continue;
+					} else {
+						ticketObj.tickets = tmpTicket;
+					}
 				}
 			}
 			if ($('#blocks-slider-check').prop('checked')) {
@@ -1242,17 +1257,17 @@ $(function () {
 			}), true);
 		}, [[]]);
 	};
-	function isArraysEqual(a, b) {
-		if (a === b) return true;
-		if (a == null || b == null) return false;
-		if (a.length != b.length) return false;
-		a.sort();
-		b.sort();
-		for (var i = 0; i < a.length; ++i) {
-			if (a[i] !== b[i]) return false;
-		}
-		return true;
-	}
+	// function isArraysEqual(a, b) {
+	// 	if (a === b) return true;
+	// 	if (a == null || b == null) return false;
+	// 	if (a.length != b.length) return false;
+	// 	a = a.slice().sort();
+	// 	b = b.slice().sort();
+	// 	for (var i = 0; i < a.length; ++i) {
+	// 		if (a[i] !== b[i]) return false;
+	// 	}
+	// 	return true;
+	// }
 	function findVarsLimit(k_filter_combs, n_filter_combs, upperLimit) {
 		var tCont = "";
 		var tCont2 = "";
@@ -1920,11 +1935,18 @@ $(function () {
 			}
 			let filterCombs = [];
 			for (var countryName in countryComb) {
-				filterCombs.push(getComposotions(countryComb[countryName].team.length));
+				let combs = getComposotions(countryComb[countryName].team.length);
+
+				for (let i = 0; i < combs.length; i++) {
+					for (let j = 0; j < combs[i].length; j++) {
+						if (combs[i][j] - 1 > 0) combs[i][j]--;
+					}
+				}
+				filterCombs.push(combs);
 			}
 			filterCombs = cartesianProductOf(...filterCombs);
 
-			let newArr = [];
+			var newArr = [];
 			for (let fComb of filterCombs) {
 				let counter = 0;
 				let flags = [];
@@ -1944,7 +1966,7 @@ $(function () {
 				}
 				if (counter >= leftCount && counter <= rightCount) {
 					for (let i = 0; i < flags.length; i++) {
-						if (flags[i]) newArr.pushIfNotExist(arr[i], (e) => isArraysEqual(e, arr[i]));
+						if (flags[i]) newArr.pushIfNotExist(arr[i], (e) => isEqualArrays(e, arr[i]));
 					}
 				}
 			}
