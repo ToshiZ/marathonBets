@@ -453,11 +453,60 @@ $(function () {
 				}
 			}
 		}
-		if (!$.isEmptyObject(_countries) && $('#inner-blocks-check')[0].checked) {
-			for (let i of res) {
-				i.tickets = popInCountries(i.tickets);
+		if (!$.isEmptyObject(_countries) && ($('#inner-blocks-check')[0].checked || $('#incountry-slider-check')[0].checked)) {
+			let leftInCoutry, rightInCountry;
+			let checkAllInCoutry = $('#incountry-slider-check')[0].checked;
+			if (checkAllInCoutry) {
+				leftInCoutry = parseInt($('#incountry-slider-leftLabel').val());
+				rightInCountry = parseInt($('#incountry-slider-rightLabel').val());
+			}
+			let tmpRes = [];
+			for (let ticketObj of res) {
+				let tmpSize = tmpRes.length;
+				let tmpTicket = popInCountries(ticketObj.tickets, checkAllInCoutry, leftInCoutry, rightInCountry);
+				tmpRes.pushIfNotExist(tmpTicket, (e) => {
+					for (let arr of e) {
+						for (let tArr of tmpTicket) {
+							if (isEqualArrays(arr, tArr)) return true;
+						}
+					}
+				});
+				if (tmpRes.length == tmpSize) {
+					ticketObj.tickets = [];
+					continue;
+				} else {
+					ticketObj.tickets = tmpTicket;
+				}
 			}
 		}
+
+		// if (!$.isEmptyObject(_countries) && ($('#inner-blocks-check')[0].checked || $('#incountry-slider-check')[0].checked)) {
+		// 	let leftInCoutry, rightInCountry;
+		// 	let checkAllInCoutry = $('#incountry-slider-check')[0].checked;
+		// 	if (checkAllInCoutry) {
+		// 		leftInCoutry = parseInt($('#incountry-slider-leftLabel').val());
+		// 		rightInCountry = parseInt($('#incountry-slider-rightLabel').val());
+		// 	}
+		// 	let tmpRes = [];
+		// 	for (let ticketObj of varTicketsRes) {
+		// 		let tmpSize = tmpRes.length;
+		// 		let tmpTicket = popInCountries(ticketObj.tickets, checkAllInCoutry, leftInCoutry, rightInCountry);
+		// 		tmpRes.pushIfNotExist(tmpTicket, (e) => {
+		// 			for (let arr of e) {
+		// 				for (let tArr of tmpTicket) {
+		// 					if (isEqualArrays(arr, tArr)) return true;
+		// 				}
+		// 			}
+		// 		});
+		// 		if (tmpRes.length == tmpSize) {
+		// 			ticketObj.tickets = [];
+		// 			continue;
+		// 		} else {
+		// 			ticketObj.tickets = tmpTicket;
+		// 		}
+		// 	}
+		// }
+
 		if ($('#blocks-slider-check').prop('checked')) {
 			for (let i of res) {
 				popByBloksAmount(i.tickets, parseInt($('#blocks-slider-leftLabel').text()), parseInt($('#blocks-slider-rightLabel').text()));
@@ -783,12 +832,12 @@ $(function () {
 			$('#inner-blocks-check')[0].dispatchEvent(evt);
 		}
 	});
-	$(document).on('change', '#inner-blocks-check', function (e) {
-		$('#incountry-slider-check')[0].checked = false;
-	});
-	$(document).on('change', '#incountry-slider-check', function (e) {
-		$('#inner-blocks-check')[0].checked = false;
-	});
+	// $(document).on('change', '#inner-blocks-check', function (e) {
+	// 	$('#incountry-slider-check')[0].checked = false;
+	// });
+	// $(document).on('change', '#incountry-slider-check', function (e) {
+	// 	$('#inner-blocks-check')[0].checked = false;
+	// });
 
 	$(document).on('contextmenu', '.country-blocks', function (e) {
 		e = e || window.event;
