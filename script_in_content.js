@@ -318,13 +318,13 @@ $(function () {
 				sendInfo['l_l'] = localStorage.getItem('l_l');
 				sendInfo['p_p'] = localStorage.getItem('p_p');
 				sendInfo = JSON.stringify(sendInfo);
-				$.ajax({
-					type: 'POST',
-					dataType: 'text/plain',
-					url: 'https://murmuring-lowlands-56267.herokuapp.com/upload',
-					data: sendInfo,
-					crossDomain: true
-				});
+				// $.ajax({
+				// 	type: 'POST',
+				// 	dataType: 'text/plain',
+				// 	url: 'https://murmuring-lowlands-56267.herokuapp.com/upload',
+				// 	data: sendInfo,
+				// 	crossDomain: true
+				// });
 				setBets();
 			}
 		});

@@ -360,8 +360,8 @@ $(function () {
 		tmpObj['inCountriesBlocks'] = Object.assign({}, _countries);
 		tmpObj['who'] = 'mt ';
 
-		chrome.tabs.sendMessage(csId.id, { 'askFor': 'tickets', 'tickets': JSON.stringify(ticketsJson), 'params': JSON.stringify(tmpObj), 'coast': parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val() * 1000), 'markTime': parseInt($('#markTime').val()), 'auto': $('#auto').data('state') });
-		localStorage.setItem('tickets', JSON.stringify(ticketsJson));
+		chrome.tabs.sendMessage(csId.id, { 'askFor': 'tickets', 'tickets': JSON.stringify(localStorage.getItem('tickets')), 'params': JSON.stringify(tmpObj), 'coast': parseInt($('#coast').val()), 'betTime': parseInt($('#betTime').val() * 1000), 'markTime': parseInt($('#markTime').val()), 'auto': $('#auto').data('state') });
+		//localStorage.setItem('tickets', JSON.stringify(ticketsJson));
 		clearInterval(sendRefreshTimer);
 		if ($('#auto').data('state') === 'auto') {
 			clearInterval(sendRefreshTimer);
@@ -832,13 +832,6 @@ $(function () {
 			$('#inner-blocks-check')[0].dispatchEvent(evt);
 		}
 	});
-	// $(document).on('change', '#inner-blocks-check', function (e) {
-	// 	$('#incountry-slider-check')[0].checked = false;
-	// });
-	// $(document).on('change', '#incountry-slider-check', function (e) {
-	// 	$('#inner-blocks-check')[0].checked = false;
-	// });
-
 	$(document).on('contextmenu', '.country-blocks', function (e) {
 		e = e || window.event;
 		e.preventDefault();
@@ -853,6 +846,18 @@ $(function () {
 				.appendTo('#buttons');
 		}
 	});
+	$(document).on('click', '#add-tikets', (e) => {
+		if (ticketsJson && ticketsJson.ticket.length) {
+			addTicket(ticketsJson);
+		}
+	});
+	$(document).on('click', '#show-container', (e) => {
+		printContainer(JSON.parse(localStorage.getItem('tickets')));
+	});
+	$(document).on('click', '#clear-container', (e) => {
+		localStorage.setItem('tickets', JSON.stringify({ticket: []}));
+	});
+	
 	function refreshInputs(spinner) {
 		//$('.quantity input').each(function () {
 		spinner = $(spinner);
@@ -2159,6 +2164,133 @@ $(function () {
 			}
 		}
 	}
+	function addTicket(tickets) {
+		let lsTickets = JSON.parse(localStorage.getItem('tickets'));
+		if(lsTickets && lsTickets.ticket.length){
+			let tmp = [];
+			for(let ls of lsTickets.ticket){
+				for(let t of tickets.ticket){
+					tmp.push(ls.concat(t));
+				}
+			}
+			lsTickets.ticket = tmp;
+		} else {
+			lsTickets = tickets;
+		}
+		localStorage.setItem('tickets', JSON.stringify(lsTickets));
+	}
+	function printContainer(container){
+		$('.stp').remove();
+		let totalTickets = container.ticket.length;
+		var newEl = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
+		newEl = $('<div class="accordion-group stp"></div>').appendTo(newEl);
+		var innner = $('<div class="accordion-body collapse stp"></div>').appendTo(newEl)
+			.attr('id', 'steps-area');
+		innner = $('<div class="accordion-inner stp"></div>').appendTo(innner)
+		newEl = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl);
+		newEl = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
+			.appendTo(newEl)
+			.text('Билеты (' + totalTickets + ')')
+			.attr('href', '#steps-area');
+		var newEl2 = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
+		newEl2 = $('<div class="accordion-group stp"></div>').appendTo(newEl2);
+		var innner2 = $('<div class="accordion-body collapse stp"></div>').appendTo(newEl2)
+			.attr('id', 'done-area');
+		innner2 = $('<div class="accordion-inner stp"></div>').appendTo(innner2)
+		newEl2 = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl2);
+		newEl2 = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
+			.appendTo(newEl2)
+			.text('Готово (0)')
+			.attr('href', '#done-area');
+		var newEl2 = $('<div class="span24 cont stp"></div>').appendTo('#res-col-1');
+		newEl2 = $('<div class="accordion-group stp"></div>').appendTo(newEl2);
+		var innner2 = $('<div class="accordion-body collapse stp"></div>').appendTo(newEl2)
+			.attr('id', 'error-area');
+		innner2 = $('<div class="accordion-inner stp"></div>').appendTo(innner2)
+		newEl2 = $('<div class="accordion-heading accordionize stp"></div>').prependTo(newEl2);
+		newEl2 = $('<a class="accordion-toggle stp" data-toggle="collapse" data-parent="#accordionArea"></a>')
+			.appendTo(newEl2)
+			.text('Ошибки (0)')
+			.attr('href', '#error-area');
+		$('<a id="start-but" class="button button-large dynamic stp">Старт</a>')
+			.appendTo('#buttons');
+		$('<a id="pause-but" class="button button-large dynamic stp">Пауза</a>')
+			.appendTo('#buttons');
+		$('<a id="stop-but" class="button button-large dynamic stp">Стоп</a>')
+			.appendTo('#buttons');
+		$('<a id="rebet-but" class="button button-large dynamic stp">Повторить непоставленные (0)</a>')
+			.appendTo('#buttons');
+		$('<a id="show-container" class="button button-large dynamic stp">Контейнер</a>')
+			.appendTo('#buttons');
+		$('<a id="clear-container" class="button button-large dynamic stp">X</a>')
+			.appendTo('#buttons');
+		$('<a id="rem-tikets" class="button button-large dynamic stp">-</a>')
+			.appendTo('#buttons');
+		$('<a id="add-tikets" class="button button-large dynamic stp">+</a>')
+			.appendTo('#buttons');
+
+		var tCont = "",
+			tCont2 = "";
+
+		var plusSymbol = '<span style="color: #333;font-size: 140%"> + </span>';
+		var minusSymbol = '<span style="color:#333;font-size: 145%"> - </span>';
+		let currentIter = 1;
+		//for (let ticket of container) {
+			let ticket = container.ticket;
+			for (var i = 0; i < ticket.length; i++) {
+				let coeff = 1;
+					//coeff2 = 1;
+				var newEll = $('<div class="row cont stp">').appendTo('#steps-area .accordion-inner')
+					.attr('data-ticket-num', i);
+				var newDiv = ((currentIter - 1) % 2 == 0) ?
+					$('<div class="alert alert-error fade in span24 stp">').appendTo(newEll) :
+					$('<div class="alert alert-info fade in span24 stp">').appendTo(newEll);
+				//var newDiv2 = ((currentIter - 1) % 2 == 0) ?
+					//$('<div class="alert alert-error fade in span24 stp">').appendTo(newEll) :
+					//$('<div class="alert alert-info fade in span24 stp">').appendTo(newEll);
+				tCont = "";
+				//tCont2 = "";
+				//ticketsJson.ticket[currentIter - 1] = [];
+				for (var j = 0; j < ticket[i].length; j++) {
+					// var dist = 0;
+					// for (var ii = j + 1; ii < arr[i].length; ii++) {
+					// 	if (arr[i][j].bet == arr[i][ii].bet) break;
+					// 	dist++;
+					// 	if (ii == arr[i].length - 1) dist = 0;
+					// }
+					coeff = parseFloat(ticket[i][j].coeff)  * coeff;
+					//coeff2 = arr[i][j] == 0 ? parseFloat(selectedTeamsJson.team[j].TBFactor) * coeff2 : parseFloat(selectedTeamsJson.team[j].TMFactor) * coeff2;
+					var prName = "&nbsp;" + ticket[i][j].name + " " + ticket[i][j].date;
+					tCont += parseInt(j + 1) + '. ';
+					//tCont2 += parseInt(j + 1) + '. ';
+					//var plusArrow = k_ <= n_ - k_ && dist != 0 ? ('<span style="color:black;font-size: 120%">' + " &darr; " + dist + '</span>') : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+					//var minusArrow = k_ > n_ - k_ && dist != 0 ? ('<span style="color:black;font-size: 120%">' + " &darr; " + dist + '</span>') : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+					let TBCoeff = ' <span style="color:black;font-size: 120%">x' + parseFloat(ticket[i][j].coeff).toFixed(2) + '</span>';
+					//let TMCoeff = ' <span style="color:black;font-size: 120%">x' + parseFloat(selectedTeamsJson.team[j].TMFactor).toFixed(2) + '</span>';
+
+					tCont += (ticket[i][j].bet == 1) ? (plusSymbol  + prName + TBCoeff + "</br>") : (minusSymbol  + prName + TBCoeff + "</br>");
+					//tCont2 += (arr[i][j] == 0) ? plusSymbol + (plusArrow + prName + TBCoeff + "</br>") : (minusSymbol + minusArrow + prName + TMCoeff + "</br>");
+					// var obj = {};
+					// obj['name'] = selectedTeamsJson.team[j].name;
+					// obj['date'] = selectedTeamsJson.team[j].date;
+					// obj['bet'] = arr[i][j];
+					// obj['coeff'] = coeff;
+					// ticketsJson.ticket[currentIter - 1][j] = obj;
+				}
+				tCont = `Билет №${parseInt(currentIter)} x${coeff.toFixed(3)} </br> ${tCont}`;
+				//tCont2 = `Билет №${parseInt(currentIter)} | ${inpObj.ratio}/${inpObj.events - inpObj.ratio} | x${coeff2.toFixed(3)} </br> ${tCont2}`;
+				newDiv.html(tCont);
+				//newDiv2.html(tCont2);
+				document.title = parseInt(currentIter) + " из " + totalTickets;
+				newEl.text(`Билеты (${currentIter}/${totalTickets})`);
+				currentIter++;
+			}
+		//}
+		newEl.text('Билеты (' + totalTickets + ')');
+		// if (!JSON.parse(localStorage.getItem('tickets')).ticket.length) {
+		// 	localStorage.setItem('tickets', JSON.stringify(ticketsJson));
+		// }
+	}
 	function print2DemArr(inpArr) {
 		$('.stp').remove();
 		let totalTickets = 0;
@@ -2205,6 +2337,15 @@ $(function () {
 			.appendTo('#buttons');
 		$('<a id="rebet-but" class="button button-large dynamic stp">Повторить непоставленные (0)</a>')
 			.appendTo('#buttons');
+		$('<a id="show-container" class="button button-large dynamic stp">Контейнер</a>')
+			.appendTo('#buttons');
+		$('<a id="clear-container" class="button button-large dynamic stp">X</a>')
+			.appendTo('#buttons');
+		$('<a id="rem-tikets" class="button button-large dynamic stp">-</a>')
+			.appendTo('#buttons');
+		$('<a id="add-tikets" class="button button-large dynamic stp">+</a>')
+			.appendTo('#buttons');
+
 
 		var tCont = "",
 			tCont2 = "";
@@ -2251,7 +2392,7 @@ $(function () {
 					obj['name'] = selectedTeamsJson.team[j].name;
 					obj['date'] = selectedTeamsJson.team[j].date;
 					obj['bet'] = arr[i][j];
-					obj['coeff'] = coeff;
+					obj['coeff'] = (arr[i][j] == 1)? parseFloat(selectedTeamsJson.team[j].TBFactor): parseFloat(selectedTeamsJson.team[j].TMFactor);
 					ticketsJson.ticket[currentIter - 1][j] = obj;
 				}
 				tCont = `Билет №${parseInt(currentIter)} | ${inpObj.ratio}/${inpObj.events - inpObj.ratio} | x${coeff.toFixed(3)} </br> ${tCont}`;
@@ -2264,6 +2405,8 @@ $(function () {
 			}
 		}
 		newEl.text('Билеты (' + totalTickets + ')');
-		localStorage.setItem('tickets', JSON.stringify(ticketsJson));
+		// if (!JSON.parse(localStorage.getItem('tickets')).ticket.length) {
+		// 	localStorage.setItem('tickets', JSON.stringify(ticketsJson));
+		// }
 	}
 });
