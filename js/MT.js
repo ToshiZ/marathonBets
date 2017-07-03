@@ -2167,13 +2167,8 @@ $(function () {
 	function addTicket(tickets) {
 		let lsTickets = JSON.parse(localStorage.getItem('tickets'));
 		if(lsTickets && lsTickets.ticket.length){
-			let tmp = [];
-			for(let ls of lsTickets.ticket){
-				for(let t of tickets.ticket){
-					tmp.push(ls.concat(t));
-				}
-			}
-			lsTickets.ticket = tmp;
+			lsTickets.ticket = cartesianProductOf(lsTickets.ticket, tickets.ticket)
+				.map(t => t.reduce((a,b) => a.concat(b)));
 		} else {
 			lsTickets = tickets;
 		}
