@@ -576,16 +576,7 @@ $(function () {
         }
 
     });
-    // $(document).keydown(function (e) {
-    // 	if (e.which == 37) {
-    // 		$('#total-coeff').nstSlider('set_position', parseInt(coeffLeft) - 1, coeffRight);
-    // 	}
-    // });
-    // $(document).keydown(function (e) {
-    // 	if (e.which == 39) {
-    // 		$('#total-coeff').nstSlider('set_position', parseInt(coeffLeft) + 1, coeffRight);
-    // 	}
-    // });
+   
     $(document).keypress(function (e) {
         if (e.which == 13) {
             $('#var-ok').click();

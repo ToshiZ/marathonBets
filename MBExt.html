@@ -2,218 +2,218 @@
 <html lang="ru">
 
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>MT</title>
-	<!-- Bootstrap -->
-	<link href="css/bootstrap.min.css" rel="stylesheet">
-	<!-- Shortcodes -->
-	<link href="css/shortcodes.css" rel="stylesheet">
-	<!-- Main Style -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>MT</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Shortcodes -->
+    <link href="css/shortcodes.css" rel="stylesheet">
+    <!-- Main Style -->
 
-	<link href="css/supersized.css" rel="stylesheet">
-	<link href="css/supersized.shutter.css" rel="stylesheet">
+    <link href="css/supersized.css" rel="stylesheet">
+    <link href="css/supersized.shutter.css" rel="stylesheet">
 
-	<link href="css/main.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
 
-	<link rel="shortcut icon" href="#">
-	<!-- Font Icons -->
-	<link href="css/fonts.css" rel="stylesheet">
-	<!-- Responsive -->
-	<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
-	<link href="css/responsive.css" rel="stylesheet">
-	<link href="js/jSlider/jquery.nstSlider.css" rel="stylesheet">
-	<link href="css/custom.css" rel="stylesheet">
+    <link rel="shortcut icon" href="#">
+    <!-- Font Icons -->
+    <link href="css/fonts.css" rel="stylesheet">
+    <!-- Responsive -->
+    <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="css/responsive.css" rel="stylesheet">
+    <link href="js/jSlider/jquery.nstSlider.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
 </head>
 
 <body>
-	<div id="top-div" class="span24">
-		<div class="span24">
-			<div id="n-k-params-div" class="span24">
-				<div class="quantity">
-					<input id="n" readonly type="number" min="1" name="n" class="n-k-params" placeholder="Всего"></input>
-				</div>
-				<div class="row"></div>
+    <div id="top-div" class="span24">
+        <div class="span24">
+            <div id="n-k-params-div" class="span24">
+                <div class="quantity">
+                    <input id="n" readonly type="number" min="1" name="n" class="n-k-params" placeholder="Всего"></input>
+                </div>
+                <div class="row"></div>
 
-				<div class="quantity">
-					<input id="k" type="number" min="0" name="k" class="n-k-params" placeholder="ТБ"></input>
-				</div>
-				<div id="k-blocks-div" class="quantity"></div>
-				<!--<a id="clean-k">очистить</a>-->
+                <div class="quantity">
+                    <input id="k" type="number" min="0" name="k" class="n-k-params" placeholder="ТБ"></input>
+                </div>
+                <div id="k-blocks-div" class="quantity"></div>
+                <!--<a id="clean-k">очистить</a>-->
 
-				<div class="row"></div>
-				<label> <input type="checkBox"  name="check" id="k-check"/> Плюсы без блоков </label>
-				<label> <input type="checkBox"  name="check" id="anti-block-plus-check"/> Только указанные</label>
+                <div class="row"></div>
+                <label> <input type="checkBox"  name="check" id="k-check"/> Плюсы без блоков </label>
+                <label> <input type="checkBox"  name="check" id="anti-block-plus-check"/> Только указанные</label>
 
 
-				<div class="quantity">
-					<input id="n-k" type="number" min="0" name="n-k" class="n-k-params" placeholder="ТМ"></input>
-				</div>
-				<div id="n-k-blocks-div" class="quantity"></div>
+                <div class="quantity">
+                    <input id="n-k" type="number" min="0" name="n-k" class="n-k-params" placeholder="ТМ"></input>
+                </div>
+                <div id="n-k-blocks-div" class="quantity"></div>
 
-				<!--<a id="clean-n-k">очистить</a>-->
+                <!--<a id="clean-n-k">очистить</a>-->
 
-				<div class="row"></div>
-				<label> <input type="checkBox"  name="check" id="n-k-check"/> Минусы без блоков </label>
-				<label> <input type="checkBox"  name="check" id="anti-block-minus-check"/> Только указанные</label>
+                <div class="row"></div>
+                <label> <input type="checkBox"  name="check" id="n-k-check"/> Минусы без блоков </label>
+                <label> <input type="checkBox"  name="check" id="anti-block-minus-check"/> Только указанные</label>
 
-				<div style="display: inline; margin: 10px;">
-					<label> <input type="checkBox" id="plus-slider-check"/>Интервал соотношения</label>
-					<div id="plus-slider-Container"></div>
-				</div>
+                <div style="display: inline; margin: 10px;">
+                    <label> <input type="checkBox" id="plus-slider-check"/>Интервал соотношения</label>
+                    <div id="plus-slider-Container"></div>
+                </div>
 
-				<input id="coast" type="text" name="coast" class="coast" placeholder="Сумма" style="width:80px; background: #3C3F45; color: white; margin-top:15px"></input>
-				<label>Выделение команд, мс</label>
-				<input id="markTime" type="text" name="refreshTime" class="coast" value="300" placeholder="минимум 300" style="width:100px; background: #3C3F45; color: white"></input>
-				<label>Задержка после ставки, сек</label>
-				<input id="betTime" type="text" name="betTime" class="coast" value="5" placeholder="минимум 5" style="width:100px; background: #3C3F45; color: white"></input>
-				<label>Обновлять через, сек</label>
-				<input id="refreshTime" type="text" value="60" name="refreshTime" readonly class="coast" placeholder="минимум 60" style="width:100px; background: #3C3F45; color: white"></input>
+                <input id="coast" type="text" name="coast" class="coast" placeholder="Сумма" style="width:80px; background: #3C3F45; color: white; margin-top:15px"></input>
+                <label>Выделение команд, мс</label>
+                <input id="markTime" type="text" name="refreshTime" class="coast" value="300" placeholder="минимум 300" style="width:100px; background: #3C3F45; color: white"></input>
+                <label>Задержка после ставки, сек</label>
+                <input id="betTime" type="text" name="betTime" class="coast" value="5" placeholder="минимум 5" style="width:100px; background: #3C3F45; color: white"></input>
+                <label>Обновлять через, сек</label>
+                <input id="refreshTime" type="text" value="60" name="refreshTime" readonly class="coast" placeholder="минимум 60" style="width:100px; background: #3C3F45; color: white"></input>
 
-			</div>
+            </div>
 
-			<!--<div class="span24" style="margin-top:41px">
+            <!--<div class="span24" style="margin-top:41px">
 				<div id="k-blocks-div"></div>
 				<div id="n-k-blocks-div"></div>
 			</div>-->
-			<div class="span24" id="events-div">
-				<div class="accordion" id="accordionArea">
+            <div class="span24" id="events-div">
+                <div class="accordion" id="accordionArea">
 
-					<div class="accordion-group">
-						<div class="accordion-heading accordionize">
-							<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionArea" href="#oneArea">
+                    <div class="accordion-group">
+                        <div class="accordion-heading accordionize">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionArea" href="#oneArea">
 						Команды
 						<span class="font-icon-arrow-simple-down"></span>
 					</a>
-						</div>
-						<a id="get-teams" class="button button-large">Обновить команды</a>
-						<a id="clear" class="button button-large">Очистить</a>
-						<a id="auto" class="button button-large" data-state='manual'>Авто</a>
-						<a id="marathon-vijet" class="button button-large" data-state='manual'>Виджет</a>
-						<div id="oneArea" class="accordion-body collapse">
-							<div id="team-list" class="accordion-inner">
-								<a id="clean-marked">снять выделение</a>
-							</div>
-						</div>
-					</div>
-				</div>
-				<hr>
-			</div>
-			<!--<div class="span24" id="slected-teams-list"></div>-->
-			<div class="span4 pull-right" style="margin-right:10px; margin-top: -10px">
-				</br>
-				</br>
-				</br>
-				</br>
-				</br>
-				</br>
-				</br>
-				</br>
-				<blockquote>
-					<div class="span12" style="display: inline-block;">
-						<input id="var-amount" type="number" min="1" class="" placeholder="Количество билетов" style="display: inline-block; width:160px; background: #3C3F45; color: white"></input>
-						<a id="clean-vars">очистить</a>
-						</br>
-						<div style="margin-top: 10px;">
-							<label> <input type="checkBox" id="vars-slider-check"/>Интервал количества билетов</label>
-							<div id="vars-slider-Container"></div>
-						</div>
-						<div style="margin-top: 10px;">
-							<label> <input type="checkBox" id="incountry-slider-check"/>Количество билетов варианта с учетом внутренних блоков</label>
-							<div id="incountry-slider-Container"></div>
-						</div>
-					</div>
-					</br>
-					</br>
-					<a id="var-ok" class="button button-large">Варианты</a>
-					<a id="var-tikets" class="button button-large">Билеты</a>
+                        </div>
+                        <a id="get-teams" class="button button-large">Обновить команды</a>
+                        <a id="clear" class="button button-large">Очистить</a>
+                        <a id="auto" class="button button-large" data-state='manual'>Авто</a>
+                        <a id="marathon-vijet" class="button button-large" data-state='manual'>Виджет</a>
+                        <div id="oneArea" class="accordion-body collapse">
+                            <div id="team-list" class="accordion-inner">
+                                <a id="clean-marked">снять выделение</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+            </div>
+            <!--<div class="span24" id="slected-teams-list"></div>-->
+            <div class="span4 pull-right" style="margin-right:10px; margin-top: -10px">
+                </br>
+                </br>
+                </br>
+                </br>
+                </br>
+                </br>
+                </br>
+                </br>
+                <blockquote>
+                    <div class="span12" style="display: inline-block;">
+                        <input id="var-amount" type="number" min="1" class="" placeholder="Количество билетов" style="display: inline-block; width:160px; background: #3C3F45; color: white"></input>
+                        <a id="clean-vars">очистить</a>
+                        </br>
+                        <div style="margin-top: 10px;">
+                            <label> <input type="checkBox" id="vars-slider-check"/>Интервал количества билетов</label>
+                            <div id="vars-slider-Container"></div>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <label> <input type="checkBox" id="incountry-slider-check"/>Количество билетов варианта с учетом внутренних блоков</label>
+                            <div id="incountry-slider-Container"></div>
+                        </div>
+                    </div>
+                    </br>
+                    </br>
+                    <a id="var-ok" class="button button-large">Варианты</a>
+                    <a id="var-tikets" class="button button-large">Билеты</a>
 
-					<div class="row"></div>
-					<hr>
-					<div class="accordion" id="accordionArea2">
-						<div class="accordion-group">
-							<div class="accordion-heading accordionize">
-								<a id="var-num" class="accordion-toggle" data-toggle="collapse" data-parent="#accordionArea2" href="#twoArea">Варианты
+                    <div class="row"></div>
+                    <hr>
+                    <div class="accordion" id="accordionArea2">
+                        <div class="accordion-group">
+                            <div class="accordion-heading accordionize">
+                                <a id="var-num" class="accordion-toggle" data-toggle="collapse" data-parent="#accordionArea2" href="#twoArea">Варианты
 								<span class="font-icon-arrow-simple-down"></span>
 							</a>
-							</div>
-							<div id="twoArea" class="accordion-body collapse">
-								<div id="team-list" class="accordion-inner"></div>
-							</div>
-						</div>
-					</div>
-				</blockquote>
-			</div>
-		</div>
-		<div class="row"></div>
-		<hr>
-		<blockquote>
-			<div class="span12" style="display: inline-block;">
-				<label> <input type="checkBox" id="blocks-slider-check"/>Количество блоков</label>
-				<div id="blocks-slider-Container" style="display: inline-block;"></div>
-				<label> <input type="checkBox" id="total-coeff-coeff-check"/> Коэффициент билета</label>
-				<div class="row"></div>
-				<input type="number" id="total-coeff-LeftInput" class="coeffInp" style="width:70px; background: #3C3F45; color: white" value="50"></input>
-				<div id="total-coeff-Container" style="display: inline-block;"></div>
-				<input type="number" id="total-coeff-RightInput" class="coeffInp" style="width:70px; background: #3C3F45; color: white" value="500"></input>
-			</div>
-			<div class="span12" style="display: inline-block;">
-				<label> <input type="checkBox" id="plus-coeff-slider-check"/> Коэффициенты ТБ</label>
-				<div class="row"></div>
-				<span id="plus-coeff-slider-leftLabel"></span>
-				<div id="plus-coeff-slider" class="nstSlider small" data-aria_enabled="true" data-range_min="0" data-range_max="25" data-cur_min="0"
-				 data-cur_max="20">
-					<div id="plus-coeff-bar" class="bar"></div>
-					<div id="plus-coeff-leftGrip" class="leftGrip"></div>
-					<div id="plus-coeff-rightGrip" class="rightGrip"></div>
-				</div>
-				<span id="plus-coeff-slider-rightLabel"></span>
+                            </div>
+                            <div id="twoArea" class="accordion-body collapse">
+                                <div id="team-list" class="accordion-inner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </blockquote>
+            </div>
+        </div>
+        <div class="row"></div>
+        <hr>
+        <blockquote>
+            <div class="span12" style="display: inline-block;">
+                <label> <input type="checkBox" id="blocks-slider-check"/>Количество блоков</label>
+                <div id="blocks-slider-Container" style="display: inline-block;"></div>
+                <label> <input type="checkBox" id="total-coeff-coeff-check"/> Коэффициент билета</label>
+                <div class="row"></div>
+                <input type="number" id="total-coeff-LeftInput" class="coeffInp" style="width:70px; background: #3C3F45; color: white" value="50"></input>
+                <div id="total-coeff-Container" style="display: inline-block;"></div>
+                <input type="number" id="total-coeff-RightInput" class="coeffInp" style="width:70px; background: #3C3F45; color: white" value="500"></input>
+            </div>
+            <div class="span12" style="display: inline-block;">
+                <label> <input type="checkBox" id="plus-coeff-slider-check"/> Коэффициенты ТБ</label>
+                <div class="row"></div>
+                <span id="plus-coeff-slider-leftLabel"></span>
+                <div id="plus-coeff-slider" class="nstSlider small" data-aria_enabled="true" data-range_min="0" data-range_max="25" data-cur_min="0"
+                    data-cur_max="20">
+                    <div id="plus-coeff-bar" class="bar"></div>
+                    <div id="plus-coeff-leftGrip" class="leftGrip"></div>
+                    <div id="plus-coeff-rightGrip" class="rightGrip"></div>
+                </div>
+                <span id="plus-coeff-slider-rightLabel"></span>
 
-				<div id="plus-coeff-value" class="nstSlider small" data-range_min="-5" data-range_max="5" data-cur_min="0">
-					<div id="plus-coeff-value-bar" class="bar"></div>
-					<div id="plus-coeff-value-leftGrip" class="leftGrip"></div>
-				</div>
-				<div id="plus-coeff-value-leftLabel" class="leftLabel" style="display: inline-block; margin-left: 10px;"></div>
-				<label style="display: inline-block; margin-left: 10px;"> <input type="checkBox" id="plus-strong-check" /> Строго</label>
-			</div>
+                <div id="plus-coeff-value" class="nstSlider small" data-range_min="-5" data-range_max="5" data-cur_min="0">
+                    <div id="plus-coeff-value-bar" class="bar"></div>
+                    <div id="plus-coeff-value-leftGrip" class="leftGrip"></div>
+                </div>
+                <div id="plus-coeff-value-leftLabel" class="leftLabel" style="display: inline-block; margin-left: 10px;"></div>
+                <label style="display: inline-block; margin-left: 10px;"> <input type="checkBox" id="plus-strong-check" /> Строго</label>
+            </div>
 
-			<div class="span12" style="display: inline-block;">
-				<label> <input type="checkBox" id="minus-coeff-slider-check"/> Коэффициенты ТМ</label>
-				<div class="row"></div>
-				<span id="minus-coeff-slider-leftLabel"></span>
-				<div id="minus-coeff-slider" class="nstSlider small" data-aria_enabled="true" data-range_min="0" data-range_max="25" data-cur_min="0"
-				 data-cur_max="20">
-					<div id="minus-coeff-bar" class="bar"></div>
-					<div id="minus-coeff-leftGrip" class="leftGrip"></div>
-					<div id="minus-coeff-rightGrip" class="rightGrip"></div>
-				</div>
-				<span id="minus-coeff-slider-rightLabel"></span>
+            <div class="span12" style="display: inline-block;">
+                <label> <input type="checkBox" id="minus-coeff-slider-check"/> Коэффициенты ТМ</label>
+                <div class="row"></div>
+                <span id="minus-coeff-slider-leftLabel"></span>
+                <div id="minus-coeff-slider" class="nstSlider small" data-aria_enabled="true" data-range_min="0" data-range_max="25" data-cur_min="0"
+                    data-cur_max="20">
+                    <div id="minus-coeff-bar" class="bar"></div>
+                    <div id="minus-coeff-leftGrip" class="leftGrip"></div>
+                    <div id="minus-coeff-rightGrip" class="rightGrip"></div>
+                </div>
+                <span id="minus-coeff-slider-rightLabel"></span>
 
-				<div id="minus-coeff-value" class="nstSlider small" data-range_min="-5" data-range_max="5" data-cur_min="0">
-					<div id="minus-coeff-value-bar" class="bar"></div>
-					<div id="minus-coeff-value-leftGrip" class="leftGrip"></div>
-				</div>
-				<div id="minus-coeff-value-leftLabel" class="leftLabel" style="display: inline-block; margin-left: 10px;"></div>
-				<label style="display: inline-block; margin-left: 10px;"> <input type="checkBox" id="minus-strong-check" /> Строго</label>
-			</div>
-			<div class="row"></div>
-		</blockquote>
-		<hr>
+                <div id="minus-coeff-value" class="nstSlider small" data-range_min="-5" data-range_max="5" data-cur_min="0">
+                    <div id="minus-coeff-value-bar" class="bar"></div>
+                    <div id="minus-coeff-value-leftGrip" class="leftGrip"></div>
+                </div>
+                <div id="minus-coeff-value-leftLabel" class="leftLabel" style="display: inline-block; margin-left: 10px;"></div>
+                <label style="display: inline-block; margin-left: 10px;"> <input type="checkBox" id="minus-strong-check" /> Строго</label>
+            </div>
+            <div class="row"></div>
+        </blockquote>
+        <hr>
 
-		<div id="buttons" class="span24"></div>
+        <div id="buttons" class="span24"></div>
 
-		<div class="row"></div>
+        <div class="row"></div>
 
-		<div id="res-col-1" class="span24"></div>
+        <div id="res-col-1" class="span24"></div>
 
-		<!--</div>-->
-		<script src="js/jquery.js"></script>
-		<!-- Bootstrap -->
-		<script src="js/bootstrap.min.js"></script>
-		<script src="js/jSlider/jquery.nstSlider.js"></script>
-		<script src="js/math.js"></script>
-		<script src="js/custom.css.js"></script>
-		<script src="js/underscore.js"></script>
-		<script src="js/MT.js"></script>
+        <!--</div>-->
+        <script src="js/jquery.js"></script>
+        <!-- Bootstrap -->
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/jSlider/jquery.nstSlider.js"></script>
+        <script src="js/math.js"></script>
+        <script src="js/custom.css.js"></script>
+        <script src="js/underscore.js"></script>
+        <script src="js/MT.js"></script>
 </body>
 
 </html>
